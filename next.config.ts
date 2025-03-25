@@ -1,7 +1,9 @@
+
 import type { NextConfig } from "next";
+import { env } from "process";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: [(env.REPLIT_DOMAINS || "").split(",")[0]],
 };
 
-export default nextConfig;
+module.exports = nextConfig;

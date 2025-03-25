@@ -1,0 +1,94 @@
+ ./app/news/[id]/page.tsx:208:1
+Ecmascript file had an error
+  206 | }
+  207 |
+> 208 | export default function NewsPage({ params }: NewsPageProps) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 209 |   if (!params.id) {
+      | ^^^^^^^^^^^^^^^^^^^
+> 210 |     notFound()
+      | ^^^^^^^^^^^^^^^^^^^
+> 211 |   }
+      | ^^^^^^^^^^^^^^^^^^^
+> 212 |
+      | ^^^^^^^^^^^^^^^^^^^
+> 213 |   return (
+      | ^^^^^^^^^^^^^^^^^^^
+> 214 |     <div className="container py-8">
+      | ^^^^^^^^^^^^^^^^^^^
+> 215 |       <h1 className="text-3xl font-bold mb-4">News Article {params.id}</h1>
+      | ^^^^^^^^^^^^^^^^^^^
+> 216 |       {/* Add your news article content here */}
+      | ^^^^^^^^^^^^^^^^^^^
+> 217 |     </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 218 |   )
+      | ^^^^^^^^^^^^^^^^^^^
+> 219 | }
+      | ^^
+
+the name `default` is exported multiple times
+
+
+
+./app/news/[id]/page.tsx:194:10
+Ecmascript file had an error
+  192 |
+  193 | import { Metadata } from 'next'
+> 194 | import { notFound } from 'next/navigation'
+      |          ^^^^^^^^
+  195 |
+  196 | interface NewsPageProps {
+  197 |   params: {
+
+the name `notFound` is defined multiple times
+
+
+ GET /news/1 500 in 3509ms
+ ⨯ ./app/news/[id]/page.tsx:208:1
+Ecmascript file had an error
+  206 | }
+  207 |
+> 208 | export default function NewsPage({ params }: NewsPageProps) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 209 |   if (!params.id) {
+      | ^^^^^^^^^^^^^^^^^^^
+> 210 |     notFound()
+      | ^^^^^^^^^^^^^^^^^^^
+> 211 |   }
+      | ^^^^^^^^^^^^^^^^^^^
+> 212 |
+      | ^^^^^^^^^^^^^^^^^^^
+> 213 |   return (
+      | ^^^^^^^^^^^^^^^^^^^
+> 214 |     <div className="container py-8">
+      | ^^^^^^^^^^^^^^^^^^^
+> 215 |       <h1 className="text-3xl font-bold mb-4">News Article {params.id}</h1>
+      | ^^^^^^^^^^^^^^^^^^^
+> 216 |       {/* Add your news article content here */}
+      | ^^^^^^^^^^^^^^^^^^^
+> 217 |     </div>
+      | ^^^^^^^^^^^^^^^^^^^
+> 218 |   )
+      | ^^^^^^^^^^^^^^^^^^^
+> 219 | }
+      | ^^
+
+the name `default` is exported multiple times
+
+
+
+./app/news/[id]/page.tsx:194:10
+Ecmascript file had an error
+  192 |
+  193 | import { Metadata } from 'next'
+> 194 | import { notFound } from 'next/navigation'
+      |          ^^^^^^^^
+  195 |
+  196 | interface NewsPageProps {
+  197 |   params: {
+
+the name `notFound` is defined multiple times
+
+
+ GET /news/1 500 in 117ms
