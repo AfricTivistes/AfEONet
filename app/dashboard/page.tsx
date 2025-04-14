@@ -6,9 +6,11 @@ import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { CountrySelector } from "@/components/country-selector"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, Download, Filter } from "lucide-react"
+import { AlertTriangle, Download, Filter, TrendingUp, TrendingDown, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 // Sample data for demonstration
 const dimensionsData = [
@@ -88,6 +90,34 @@ export default function DashboardPage() {
     setSelectedCountry(country)
   }
 
+  // Helper function to get trend icon
+  const getTrendIcon = (trend: string) => {
+    switch (trend) {
+      case "improving":
+        return <TrendingUp className="h-4 w-4 text-green-500" />
+      case "deteriorating":
+        return <TrendingDown className="h-4 w-4 text-red-500" />
+      case "stable":
+        return <Minus className="h-4 w-4 text-blue-500" />
+      default:
+        return null
+    }
+  }
+
+  // Helper function to get trend color class
+  const getTrendColorClass = (trend: string) => {
+    switch (trend) {
+      case "improving":
+        return "text-green-600 dark:text-green-400"
+      case "deteriorating":
+        return "text-red-600 dark:text-red-400"
+      case "stable":
+        return "text-blue-600 dark:text-blue-400"
+      default:
+        return "text-gray-600 dark:text-gray-400"
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       {/* Hero Section */}
@@ -108,7 +138,10 @@ export default function DashboardPage() {
       </section>
 
       <div className="container py-8">
-        <Alert variant="default" className="border-none bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 mb-8">
+        <Alert
+          variant="default"
+          className="border-none bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 mb-8"
+        >
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Attention</AlertTitle>
           <AlertDescription>
@@ -214,17 +247,6 @@ export default function DashboardPage() {
                       >
                         {dimension.status.charAt(0).toUpperCase() + dimension.status.slice(1)}
                       </span>
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          dimension.trend === "improving"
-                            ? "bg-green-100 text-green-800"
-                            : dimension.trend === "deteriorating"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-blue-100 text-blue-800"
-                        }`}
-                      >
-                        {dimension.trend.charAt(0).toUpperCase() + dimension.trend.slice(1)}
-                      </span>
                     </div>
                     <p className="text-sm text-muted-foreground">{dimension.details}</p>
                   </div>
@@ -234,11 +256,64 @@ export default function DashboardPage() {
           )}
 
           {activeTab === "trends" && (
-            <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-primary mb-4">Civic Space Trends</h2>
-              <p className="text-muted-foreground mb-6">Evolution of civic space dimensions over time</p>
-              <div className="h-[400px] flex items-center justify-center bg-secondary/10 rounded-lg p-4">
-                <p className="text-muted-foreground">Trend charts will be available in the final version.</p>
+            <div className="space-y-6">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm mb-6">
+                <h2 className="text-xl font-bold text-primary mb-4">Civic Space Trends</h2>
+                <p className="text-muted-foreground mb-6">Evolution of civic space dimensions over time</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {dimensionsData.map((dimension) => (
+                    <Card key={dimension.id} className="border-primary/10">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="text-md font-medium">{dimension.title}</h3>
+                          <Badge
+                            className={`${
+                              dimension.trend === "improving"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+                                : dimension.trend === "deteriorating"
+                                  ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300"
+                                  : "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
+                            }`}
+                          >
+                            <div className="flex items-center gap-1">
+                              {getTrendIcon(dimension.trend)}
+                              <span>{dimension.trend.charAt(0).toUpperCase() + dimension.trend.slice(1)}</span>
+                            </div>
+                          </Badge>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-4">
+                          <div className={`w-3 h-3 rounded-full status-${dimension.status}`}></div>
+                          <span className="text-sm text-muted-foreground">
+                            Current status: {dimension.status.charAt(0).toUpperCase() + dimension.status.slice(1)}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-primary/10">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">2021</span>
+                            <span className="text-xs text-muted-foreground">2022</span>
+                            <span className="text-xs font-medium">2023</span>
+                          </div>
+                          <div className="relative h-2 bg-gray-100 dark:bg-gray-700 rounded-full mt-2 overflow-hidden">
+                            <div
+                              className={`absolute left-0 top-0 h-full status-${dimension.status}`}
+                              style={{ width: "70%" }}
+                            ></div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
+                <h2 className="text-lg font-bold text-primary mb-4">Overall Trend Analysis</h2>
+                <div className="h-[300px] flex items-center justify-center bg-secondary/10 rounded-lg p-4">
+                  <p className="text-muted-foreground">Detailed trend charts will be available in the final version.</p>
+                </div>
               </div>
             </div>
           )}
@@ -247,4 +322,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-

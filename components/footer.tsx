@@ -23,7 +23,7 @@ export default function Footer() {
               <h3 className="text-xl font-semibold text-white">AfEONet</h3>
             </div>
             <p className="text-white/80">
-              African Election Observers Network - Monitoring civic space, strengthening democracy in Africa.
+              African Election Observers Network - Civic space for citizen election observers.
             </p>
             <div className="flex space-x-4">
               <Link href="#" className="text-white/70 hover:text-secondary transition-colors duration-200">

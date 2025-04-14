@@ -14,6 +14,26 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
+// Descriptions des dimensions pour aider les utilisateurs à comprendre chaque dimension
+const dimensionDescriptions = {
+  regulatoryFramework:
+    "The regulatory framework that protects citizen observers as human rights defenders, including laws and institutions governing civil society organizations' operations.",
+  administrativeConstraints:
+    "Accreditation procedures and other bureaucracies imposed on citizen observers, which were once relatively simple but have become more constraining.",
+  relationship:
+    "The quality and nature of the relationship between citizen observer organizations and the electoral management body.",
+  security:
+    "The use of legal and illegal mechanisms that threaten the work of citizen observer organizations, their leaders, staff, and volunteers.",
+  accessToData:
+    "The procedures in place to allow citizen observers to access information on electoral management and processes.",
+  accessToFunding:
+    "The freedom of citizen observers to mobilize funding for election observation, the types of funding sources available, and whether these sources are open or controlled.",
+  dialogue:
+    "The platforms available for citizen observers to engage in dialogue with relevant government institutions on observation recommendations and electoral reforms.",
+  perception:
+    "The perception of the ruling party/regime, opposition political parties, media, and the general public on the role of citizen observers in democracy and the credibility of elections.",
+}
+
 const formSchema = z.object({
   country: z.string().min(1, { message: "Please select a country" }),
   dataEntrant: z.string().min(1, { message: "Please enter your name" }),
@@ -172,6 +192,10 @@ export function DataSubmissionForm() {
                 </TooltipProvider>
               </div>
 
+              <div className="bg-secondary/10 p-4 rounded-md mb-6">
+                <p className="text-sm text-muted-foreground">{dimensionDescriptions.regulatoryFramework}</p>
+              </div>
+
               <FormField
                 control={form.control}
                 name="regulatoryFrameworkRating"
@@ -283,9 +307,276 @@ export function DataSubmissionForm() {
             </div>
           )}
 
-          {/* Other steps would follow the same pattern */}
+          {step === 3 && (
+            <div className="space-y-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <h3 className="text-lg font-medium text-primary">Administrative Constraints</h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs text-xs">
+                        Evaluate the administrative constraints imposed on citizen observers.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
 
-          {step === totalSteps && (
+              <div className="bg-secondary/10 p-4 rounded-md mb-6">
+                <p className="text-sm text-muted-foreground">{dimensionDescriptions.administrativeConstraints}</p>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="administrativeConstraintsRating"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Rating</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="open" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-open mr-2"></span>
+                            Open/free/secure
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="narrowed" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-narrowed mr-2"></span>
+                            Narrowed
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="obstructed" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-obstructed mr-2"></span>
+                            Obstructed
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="repressed" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-repressed mr-2"></span>
+                            Repressed/threatened
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="closed" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-closed mr-2"></span>
+                            Closed
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="administrativeConstraintsTrend"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Trend</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="border-primary/20">
+                          <SelectValue placeholder="Select a trend" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="improving">Improving</SelectItem>
+                        <SelectItem value="stable">Stable</SelectItem>
+                        <SelectItem value="deteriorating">Deteriorating</SelectItem>
+                        <SelectItem value="unknown">Unknown</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="administrativeConstraintsContext"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Context and reasons</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe the context and reasons for your assessment..."
+                        className="resize-none border-primary/20"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Provide details about administrative procedures, accreditation processes, or bureaucratic
+                      obstacles that justify your assessment.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="space-y-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <h3 className="text-lg font-medium text-primary">Relationship with Electoral Management Body</h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs text-xs">
+                        Evaluate the relationship between citizen observer organizations and the electoral management
+                        body.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+
+              <div className="bg-secondary/10 p-4 rounded-md mb-6">
+                <p className="text-sm text-muted-foreground">{dimensionDescriptions.relationship}</p>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="relationshipRating"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Rating</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="open" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-open mr-2"></span>
+                            Open/free/secure
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="narrowed" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-narrowed mr-2"></span>
+                            Narrowed
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="obstructed" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-obstructed mr-2"></span>
+                            Obstructed
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="repressed" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-repressed mr-2"></span>
+                            Repressed/threatened
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="closed" />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            <span className="inline-block w-3 h-3 rounded-full status-closed mr-2"></span>
+                            Closed
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="relationshipTrend"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Trend</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="border-primary/20">
+                          <SelectValue placeholder="Select a trend" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="improving">Improving</SelectItem>
+                        <SelectItem value="stable">Stable</SelectItem>
+                        <SelectItem value="deteriorating">Deteriorating</SelectItem>
+                        <SelectItem value="unknown">Unknown</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="relationshipContext"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Context and reasons</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe the context and reasons for your assessment..."
+                        className="resize-none border-primary/20"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Provide details about the nature of communication, cooperation, and interactions between observer
+                      organizations and the electoral management body.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
+          {step === 5 && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-primary mb-4">Summary and confirmation</h3>
               <p className="text-muted-foreground mb-6">
@@ -339,4 +630,3 @@ export function DataSubmissionForm() {
     </div>
   )
 }
-

@@ -66,7 +66,7 @@ export default function Home() {
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none text-white">
-                  Monitor civic space, strengthen democracy
+                  Monitoring Civic Space for Citizen Election Observers
                 </h1>
                 <p className="max-w-[600px] text-primary-foreground/80 md:text-xl">
                   AfEONet monitors and documents civic space for citizen election observers in Africa.
@@ -112,6 +112,50 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Our Mission Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="container px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold mb-6 text-primary relative inline-block">
+                Our Mission
+                <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
+              </h2>
+              <p className="mb-4 text-muted-foreground">
+                AfEONet's mission is to monitor and document the state of civic space for citizen election observers in
+                Africa. Our ultimate goal is to establish a robust monitoring framework that highlights and reports
+                whenever the work of citizen observers is threatened.
+              </p>
+              <p className="text-muted-foreground">
+                Citizen election observers are now recognized as human rights defenders, playing an indispensable role
+                in upholding civil and political rights, as well as strengthening democratic values and principles.
+              </p>
+              <div className="mt-8">
+                <Button asChild className="bg-primary text-white hover:bg-primary/90">
+                  <Link href="/about">
+                    Learn more about our mission <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
+                <Image
+                  src="/placeholder.svg?height=300&width=500"
+                  alt="Election observers at work"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="text-white text-lg font-medium">Citizen observers monitoring elections in Africa</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
       {/* Mini Dashboard Preview */}
       <section className="py-16 md:py-24 bg-white">
         <div className="container px-4 md:px-6">
