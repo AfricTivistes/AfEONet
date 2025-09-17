@@ -6,46 +6,10 @@ import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { ArrowRight, BarChart2, FileText, Send, Users, Calendar, Globe, Shield, Award } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-
-// Données d'exemple pour les actualités récentes
-const recentNews = [
-  {
-    id: 1,
-    title: "AfEONet Launches New Civic Space Monitoring Platform",
-    excerpt:
-      "The African Election Observers Network has launched a new platform to monitor and document the state of civic space for election observers across the continent.",
-    date: "May 15, 2023",
-    category: "Announcements",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-  {
-    id: 2,
-    title: "Report: Civic Space Deteriorating in Several African Countries",
-    excerpt:
-      "A new report by AfEONet highlights concerning trends in civic space restrictions for election observers in multiple African countries over the past year.",
-    date: "April 22, 2023",
-    category: "Reports",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-  {
-    id: 3,
-    title: "Training Workshop for Election Observers Held in Nairobi",
-    excerpt:
-      "AfEONet conducted a successful training workshop for election observers from East African countries, focusing on new methodologies and digital tools.",
-    date: "March 10, 2023",
-    category: "Events",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-  {
-    id: 4,
-    title: "Interview: The Challenges of Election Observation in Conflict Zones",
-    excerpt:
-      "In an exclusive interview, experienced observers discuss the unique challenges and risks of monitoring elections in conflict-affected regions of Africa.",
-    date: "February 28, 2023",
-    category: "Interviews",
-    image: "/placeholder.svg?height=400&width=600",
-  },
-]
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { getPage } from "@/lib/pages"
+import { getAllNewsArticles } from "@/lib/news"
 
 // Données pour les statistiques
 const stats = [
@@ -55,42 +19,57 @@ const stats = [
   { value: "35+", label: "Partner Organizations", icon: Shield, color: "bg-accent-purple" },
 ]
 
-export default function Home() {
+export default async function Home() {
+  const pageData = await getPage('homepage')
+  const content = pageData?.content || ''
+  const newsArticles = getAllNewsArticles().slice(0, 4) // Top 4 recent articles
+  
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       {/* Hero Section */}
       <div className="bg-secondary">
-      <section className="relative py-20 md:py-32 overflow-hidden bg-primary diagonal-clip">
-        <div className="container px-4 md:px-6">
-          <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
-            <div className="flex flex-col justify-center space-y-4">
-              <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none text-white">
-                  Monitoring Civic Space for Citizen Election Observers
-                </h1>
-                <p className="max-w-[600px] text-primary-foreground/80 md:text-xl">
-                  AfEONet monitors and documents civic space for citizen election observers in Africa.
-                </p>
+        <section className="relative py-20 md:py-32 overflow-hidden bg-primary diagonal-clip">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+              <div className="flex flex-col justify-center space-y-4">
+                {pageData?.hero ? (
+                  <div className="space-y-2">
+                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none text-white mb-4">
+                      {pageData.hero.title}
+                    </h1>
+                    <p className="max-w-[600px] text-primary-foreground/80 md:text-xl">
+                      {pageData.hero.subtitle}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none text-white">
+                      Monitoring Civic Space for Citizen Election Observers
+                    </h1>
+                    <p className="max-w-[600px] text-primary-foreground/80 md:text-xl">
+                      AfEONet monitors and documents civic space for citizen election observers in Africa.
+                    </p>
+                  </div>
+                )}
+                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                  <Button asChild size="lg" className="gap-1 bg-secondary text-primary hover:bg-secondary/90">
+                    <Link href="/dashboard">
+                      View data <ArrowRight className="h-4 w-4 ml-2" />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" className="bg-white/20 text-white border border-white/40 hover:bg-white/30">
+                    <Link href="/about">About AfEONet</Link>
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Button asChild size="lg" className="gap-1 bg-secondary text-primary hover:bg-secondary/90">
-                  <Link href="/dashboard">
-                    View data <ArrowRight className="h-4 w-4 ml-2" />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" className="bg-white/20 text-white border border-white/40 hover:bg-white/30">
-                  <Link href="/about">About AfEONet</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="mx-auto lg:mr-0 flex items-center justify-center">
-              <div className="relative w-[300px] h-[300px] rounded-full overflow-hidden">
-                <Image src="/AfEONet-Logo-Green.jpeg" alt="AfEONet Logo" fill className="object-contain" />
+              <div className="mx-auto lg:mr-0 flex items-center justify-center">
+                <div className="relative w-[300px] h-[300px] rounded-full overflow-hidden">
+                  <Image src="/AfEONet-Logo-Green.jpeg" alt="AfEONet Logo" fill className="object-contain" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
       </div>
 
       {/* Stats Section */}
@@ -116,28 +95,49 @@ export default function Home() {
       <section className="py-16 md:py-24 bg-white">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6 text-primary relative inline-block">
-                Our Mission
-                <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
-              </h2>
-              <p className="mb-4 text-muted-foreground">
-                AfEONet's mission is to monitor and document the state of civic space for citizen election observers in
-                Africa. Our ultimate goal is to establish a robust monitoring framework that highlights and reports
-                whenever the work of citizen observers is threatened.
-              </p>
-              <p className="text-muted-foreground">
-                Citizen election observers are now recognized as human rights defenders, playing an indispensable role
-                in upholding civil and political rights, as well as strengthening democratic values and principles.
-              </p>
-              <div className="mt-8">
-                <Button asChild className="bg-primary text-white hover:bg-primary/90">
-                  <Link href="/about">
-                    Learn more about our mission <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+            {pageData?.mission ? (
+              <div className="prose prose-slate dark:prose-invert max-w-none">
+                <h2 className="text-3xl font-bold mb-6 text-primary relative inline-block">
+                  {pageData.mission.title}
+                  <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
+                </h2>
+                <div className="space-y-4">
+                  {pageData.mission.content?.split('\n\n').map((paragraph, index) => (
+                    <p key={index} className="mb-4 text-muted-foreground">{paragraph}</p>
+                  ))}
+                </div>
+                <div className="mt-8">
+                  <Button asChild className="bg-primary text-white hover:bg-primary/90">
+                    <Link href="/about">
+                      Learn more about our mission <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div>
+                <h2 className="text-3xl font-bold mb-6 text-primary relative inline-block">
+                  Our Mission
+                  <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
+                </h2>
+                <p className="mb-4 text-muted-foreground">
+                  AfEONet's mission is to monitor and document the state of civic space for citizen election observers in
+                  Africa. Our ultimate goal is to establish a robust monitoring framework that highlights and reports
+                  whenever the work of citizen observers is threatened.
+                </p>
+                <p className="text-muted-foreground">
+                  Citizen election observers are now recognized as human rights defenders, playing an indispensable role
+                  in upholding civil and political rights, as well as strengthening democratic values and principles.
+                </p>
+                <div className="mt-8">
+                  <Button asChild className="bg-primary text-white hover:bg-primary/90">
+                    <Link href="/about">
+                      Learn more about our mission <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            )}
             <div className="flex justify-center">
               <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
                 <Image
@@ -184,12 +184,21 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-16 md:py-24 bg-primary text-white">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-6">Key Features</h2>
-            <p className="max-w-[700px] text-primary-foreground/80 md:text-lg">
-              Discover how AfEONet helps you understand and improve civic space.
-            </p>
-          </div>
+          {pageData?.features ? (
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-3xl font-bold text-white mb-6">{pageData.features.title}</h2>
+              <p className="max-w-[700px] text-primary-foreground/80 md:text-lg">
+                {pageData.features.subtitle}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-3xl font-bold text-white mb-6">Key Features</h2>
+              <p className="max-w-[700px] text-primary-foreground/80 md:text-lg">
+                Discover how AfEONet helps you understand and improve civic space.
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
             <Card className="bg-white/10 border-none">
               <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
@@ -245,49 +254,60 @@ export default function Home() {
       {/* Latest News Section - Simplified */}
       <section className="py-16 md:py-24 bg-white">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <h2 className="text-3xl font-bold text-primary mb-6">Latest News</h2>
-            <p className="max-w-[700px] text-muted-foreground md:text-lg">
-              Stay updated with the latest developments, reports, and activities from AfEONet
-            </p>
-          </div>
+          {pageData?.news ? (
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-3xl font-bold text-primary mb-6">{pageData.news.title}</h2>
+              <p className="max-w-[700px] text-muted-foreground md:text-lg">
+                {pageData.news.subtitle}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-3xl font-bold text-primary mb-6">Latest News</h2>
+              <p className="max-w-[700px] text-muted-foreground md:text-lg">
+                Stay updated with the latest developments, reports, and activities from AfEONet
+              </p>
+            </div>
+          )}
 
-          {/* Featured Article - Simplified */}
-          <div className="bg-secondary/10 p-8 rounded-lg mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="relative h-64 md:h-auto rounded-lg overflow-hidden">
-                <Image
-                  src={recentNews[0].image || "/placeholder.svg"}
-                  alt={recentNews[0].title}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute top-4 left-4">
-                  <Badge className="bg-secondary text-primary">{recentNews[0].category}</Badge>
-                </div>
-              </div>
-              <div className="flex flex-col justify-center space-y-4">
-                <h3 className="text-2xl md:text-3xl font-bold text-primary">{recentNews[0].title}</h3>
-                <p className="text-muted-foreground">{recentNews[0].excerpt}</p>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{recentNews[0].date}</span>
+          {/* Featured Article - Using real news data */}
+          {newsArticles.length > 0 && (
+            <div className="bg-secondary/10 p-8 rounded-lg mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="relative h-64 md:h-auto rounded-lg overflow-hidden">
+                  <Image
+                    src={newsArticles[0].image || "/placeholder.svg"}
+                    alt={newsArticles[0].title}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <Badge className="bg-secondary text-primary">{newsArticles[0].category}</Badge>
                   </div>
                 </div>
-                <Button asChild className="w-fit bg-primary text-white hover:bg-primary/90">
-                  <Link href={`/news/${recentNews[0].id}`}>
-                    Read full article <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+                <div className="flex flex-col justify-center space-y-4">
+                  <h3 className="text-2xl md:text-3xl font-bold text-primary">{newsArticles[0].title}</h3>
+                  <p className="text-muted-foreground">{newsArticles[0].description}</p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{new Date(newsArticles[0].date).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <Button asChild className="w-fit bg-primary text-white hover:bg-primary/90">
+                    <Link href={`/news/${newsArticles[0].slug}`}>
+                      Read full article <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Other Recent Articles - Simplified Grid */}
+          {/* Other Recent Articles - Using real news data */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {recentNews.slice(1, 4).map((article) => (
-              <div key={article.id}>
+            {newsArticles.slice(1, 4).map((article) => (
+              <div key={article.slug}>
                 <div className="relative h-48 rounded-lg overflow-hidden mb-4">
                   <Image src={article.image || "/placeholder.svg"} alt={article.title} fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -302,10 +322,10 @@ export default function Home() {
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      <span>{article.date}</span>
+                      <span>{new Date(article.date).toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <Link href={`/news/${article.id}`} className="text-primary text-sm font-medium">
+                  <Link href={`/news/${article.slug}`} className="text-primary text-sm font-medium">
                     Read more
                   </Link>
                 </div>
@@ -326,35 +346,46 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-16 md:py-24 bg-secondary wave-clip">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-6 text-center">
-            <div className="space-y-4 max-w-3xl">
-              <h2 className="text-3xl font-bold md:text-4xl text-primary">Join us in this mission</h2>
-              <p className="text-primary/80 md:text-lg">
-                Contribute to monitoring civic space and help strengthen democracy in Africa. Together, we can make a
-                difference in promoting transparent and fair elections across the continent.
-              </p>
+          {pageData?.cta ? (
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4 max-w-3xl">
+                <h2 className="text-3xl font-bold md:text-4xl text-primary">{pageData.cta.title}</h2>
+                <p className="text-primary/80 md:text-lg">
+                  {pageData.cta.content}
+                </p>
+              </div>
             </div>
-            <div className="flex flex-col gap-3 min-[400px]:flex-row mt-4">
-              <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
-                <Link href="/contact">Contact Us</Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="bg-transparent text-primary border-primary hover:bg-primary/10"
-              >
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="bg-transparent text-primary border-primary hover:bg-primary/10"
-              >
-                <Link href="/submit">Submit Data</Link>
-              </Button>
+          ) : (
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-4 max-w-3xl">
+                <h2 className="text-3xl font-bold md:text-4xl text-primary">Join us in this mission</h2>
+                <p className="text-primary/80 md:text-lg">
+                  Contribute to monitoring civic space and help strengthen democracy in Africa. Together, we can make a
+                  difference in promoting transparent and fair elections across the continent.
+                </p>
+              </div>
             </div>
+          )}
+          <div className="flex flex-col gap-3 min-[400px]:flex-row mt-4">
+            <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
+              <Link href="/contact">Contact Us</Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="bg-transparent text-primary border-primary hover:bg-primary/10"
+            >
+              <Link href="/login">Login</Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="bg-transparent text-primary border-primary hover:bg-primary/10"
+            >
+              <Link href="/submit">Submit Data</Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -364,12 +395,23 @@ export default function Home() {
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1">
-              <h2 className="text-3xl font-bold text-primary mb-6">Our Impact Across Africa</h2>
-              <p className="text-muted-foreground mb-6">
-                AfEONet has been working tirelessly to monitor and improve civic space for election observers across
-                Africa. Our network spans the continent, providing crucial data and insights that help strengthen
-                democratic processes.
-              </p>
+              {pageData?.impact ? (
+                <>
+                  <h2 className="text-3xl font-bold text-primary mb-6">{pageData.impact.title}</h2>
+                  <p className="text-muted-foreground mb-6">
+                    {pageData.impact.content}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-3xl font-bold text-primary mb-6">Our Impact Across Africa</h2>
+                  <p className="text-muted-foreground mb-6">
+                    AfEONet has been working tirelessly to monitor and improve civic space for election observers across
+                    Africa. Our network spans the continent, providing crucial data and insights that help strengthen
+                    democratic processes.
+                  </p>
+                </>
+              )}
               <ul className="space-y-4">
                 <li className="flex items-start">
                   <div className="bg-accent-pink w-6 h-6 rounded-full flex items-center justify-center mt-1 mr-3">
@@ -424,4 +466,3 @@ export default function Home() {
     </div>
   )
 }
-

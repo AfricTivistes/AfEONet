@@ -5,90 +5,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, Download, FileText, Search, ArrowRight } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { getPage } from "@/lib/pages"
+import { getReports, getAlerts } from "@/lib/reports"
 
-// Sample data for demonstration
-const reports = [
-  {
-    id: 1,
-    title: "State of Civic Space in Senegal - 2023",
-    date: "December 15, 2023",
-    country: "Senegal",
-    status: "open",
-    summary:
-      "This report presents a detailed analysis of civic space in Senegal in 2023, highlighting progress made and persistent challenges.",
-  },
-  {
-    id: 2,
-    title: "Administrative Constraints for Observers in Nigeria",
-    date: "November 10, 2023",
-    country: "Nigeria",
-    status: "obstructed",
-    summary: "An in-depth analysis of administrative constraints faced by election observers in Nigeria.",
-  },
-  {
-    id: 3,
-    title: "Report on Observer Security in Kenya",
-    date: "October 5, 2023",
-    country: "Kenya",
-    status: "repressed",
-    summary: "This report documents threats and security incidents affecting election observers in Kenya.",
-  },
-  {
-    id: 4,
-    title: "Access to Funding for Observers in West Africa",
-    date: "September 20, 2023",
-    country: "Regional",
-    status: "narrowed",
-    summary:
-      "A comparative analysis of access to funding for election observer organizations in West African countries.",
-  },
-  {
-    id: 5,
-    title: "Relationships between Observers and Electoral Management Bodies in Southern Africa",
-    date: "August 15, 2023",
-    country: "Regional",
-    status: "narrowed",
-    summary:
-      "This report examines relationships between citizen observers and electoral management bodies in Southern African countries.",
-  },
-  {
-    id: 6,
-    title: "Perception of Election Observers in Ghana",
-    date: "July 1, 2023",
-    country: "Ghana",
-    status: "open",
-    summary: "An analysis of the perception of election observers by various stakeholders in Ghana.",
-  },
-]
-
-const alerts = [
-  {
-    id: 1,
-    title: "Closure of Civic Space in Mali",
-    date: "March 10, 2023",
-    country: "Mali",
-    status: "closed",
-    description: "Malian authorities have imposed severe new restrictions on the activities of election observers.",
-  },
-  {
-    id: 2,
-    title: "Threats Against Observers in Burkina Faso",
-    date: "February 5, 2023",
-    country: "Burkina Faso",
-    status: "repressed",
-    description: "Threats have been reported against several election observers in Burkina Faso.",
-  },
-  {
-    id: 3,
-    title: "New Accreditation Procedures in Tanzania",
-    date: "January 20, 2023",
-    country: "Tanzania",
-    status: "obstructed",
-    description: "Tanzanian authorities have introduced complex new accreditation procedures for election observers.",
-  },
-]
-
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const pageData = await getPage('reports')
+  const staticContent = pageData?.content || ''
+  const reports = await getReports()
+  const alerts = await getAlerts()
+  
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       {/* Hero Section */}
@@ -104,6 +31,34 @@ export default function ReportsPage() {
       </section>
 
       <div className="container py-12">
+        {staticContent && (
+          <div className="prose prose-slate dark:prose-invert max-w-none mb-12">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h2: ({ children }) => (
+                  <h2 className="text-2xl font-bold mb-6 text-primary relative inline-block">
+                    {children}
+                    <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-xl font-semibold mb-4 text-primary">{children}</h3>
+                ),
+                p: ({ children }) => (
+                  <p className="mb-4 text-muted-foreground leading-relaxed">{children}</p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="mb-4 space-y-2 text-muted-foreground list-disc list-inside">{children}</ul>
+                ),
+                li: ({ children }) => <li className="mb-1">{children}</li>,
+              }}
+            >
+              {staticContent}
+            </ReactMarkdown>
+          </div>
+        )}
+        
         <Alert variant="default" className="border-none bg-yellow-100 dark:bg-yellow-900/20 mb-8 border-yellow-500/50">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Attention</AlertTitle>
@@ -194,4 +149,3 @@ export default function ReportsPage() {
     </div>
   )
 }
-

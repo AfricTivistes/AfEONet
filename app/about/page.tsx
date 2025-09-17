@@ -3,13 +3,23 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowRight, Award, Globe, Users } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { getPage } from "@/lib/pages"
+import { notFound } from "next/navigation"
 
 export const metadata = {
   title: "About AfEONet - African Election Observers Network",
   description: "Discover our mission, history, and impact on election observation in Africa. Learn about our 8-dimension monitoring framework for civic space.",
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const pageData = await getPage('about')
+  
+  if (!pageData) {
+    notFound()
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       {/* Hero Section */}
@@ -25,25 +35,43 @@ export default function AboutPage() {
       </section>
 
       <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
-          <div>
-            <h2 className="text-2xl font-bold mb-6 text-primary relative inline-block">
-              Our Mission
-              <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
-            </h2>
-            <p className="mb-4 text-muted-foreground">
-              AfEONet's mission is to monitor and document the state of civic space for citizen election observers in
-              Africa. Our ultimate goal is to establish a robust monitoring framework that highlights and reports
-              whenever the work of citizen observers is threatened.
-            </p>
-            <p className="text-muted-foreground">
-              Citizen election observers are now recognized as human rights defenders, playing an indispensable role in
-              upholding civil and political rights, as well as strengthening democratic values and principles.
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start mb-16">
+          <div className="prose prose-slate dark:prose-invert max-w-none">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => (
+                  <h1 className="text-3xl font-bold tracking-tight text-primary mb-6">{children}</h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-2xl font-bold mb-6 text-primary relative inline-block">
+                    {children}
+                    <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-xl font-semibold mb-4 text-primary">{children}</h3>
+                ),
+                p: ({ children }) => (
+                  <p className="mb-4 text-muted-foreground leading-relaxed">{children}</p>
+                ),
+                a: ({ children, href }) => (
+                  <Link href={href || '#'} className="text-primary hover:text-primary/80 underline">
+                    {children}
+                  </Link>
+                ),
+                ul: ({ children }) => (
+                  <ul className="mb-4 space-y-2 text-muted-foreground list-disc list-inside">{children}</ul>
+                ),
+                li: ({ children }) => <li className="mb-1">{children}</li>,
+              }}
+            >
+              {pageData.content}
+            </ReactMarkdown>
           </div>
           <div className="flex justify-center">
             <div className="relative w-[300px] h-[300px] rounded-full overflow-hidden shadow-lg">
-              <Image src="/AfEONet-Logo-Green.jpeg" alt="AfEONet Logo" fill className="object-contain" />
+              <Image src="/AfEONet-Logo-Green.jpeg" alt="AfEONet Logo" fill className="object-contain" sizes="300px" />
             </div>
           </div>
         </div>
