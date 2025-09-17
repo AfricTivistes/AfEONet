@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowRight, Award, Globe, Users } from "lucide-react"
 
+export const metadata = {
+  title: "About AfEONet - African Election Observers Network",
+  description: "Discover our mission, history, and impact on election observation in Africa. Learn about our 8-dimension monitoring framework for civic space.",
+}
+
 export default function AboutPage() {
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
@@ -248,4 +253,3 @@ export default function AboutPage() {
     </div>
   )
 }
-
