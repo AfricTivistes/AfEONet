@@ -3,20 +3,20 @@ backend:
   name: git-gateway
   branch: main
 
-# Production mode (for local development, change to: local_backend: true)
-local_backend: false
+# Development mode - set to false for production
+local_backend: true
 
 # Media settings
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-# Site configuration - REPLACE WITH YOUR ACTUAL NETLIFY DOMAIN
-site_url: "https://afeonet.netlify.app"
-display_url: "https://afeonet.netlify.app"
+# Local development configuration
+site_url: "http://localhost:5000"
+display_url: "http://localhost:5000"
 logo_url: "/AfEONet-Logo-Green.jpeg"
 
-# Editorial workflow for content approval
-publish_mode: editorial_workflow
+# No editorial workflow for easier development
+# publish_mode: editorial_workflow
 
 # Collections configuration
 collections:

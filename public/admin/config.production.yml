@@ -14,8 +14,8 @@ media_folder: "public/uploads"
 public_folder: "/uploads"
 
 # Production site configuration
-site_url: "https://your-actual-site.netlify.app"
-display_url: "https://your-actual-site.netlify.app"
+site_url: "https://afeonet.africtivistes.com"
+display_url: "https://afeonet.africtivistes.com"
 logo_url: "/AfEONet-Logo-Green.jpeg"
 
 # Editorial workflow for content approval
