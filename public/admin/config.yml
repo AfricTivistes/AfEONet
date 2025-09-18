@@ -3,20 +3,17 @@ backend:
   name: git-gateway
   branch: main
 
-# Development mode - set to false for production
+# Development mode
 local_backend: true
 
 # Media settings
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-# Local development configuration
-site_url: "http://localhost:5000"
-display_url: "http://localhost:5000"
+# Production site configuration
+site_url: "https://afeonet.africtivistes.com"
+display_url: "https://afeonet.africtivistes.com"
 logo_url: "/AfEONet-Logo-Green.jpeg"
-
-# No editorial workflow for easier development
-# publish_mode: editorial_workflow
 
 # Collections configuration
 collections:
@@ -29,15 +26,15 @@ collections:
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-      - { name: "date", label: "Date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: true }
-      - { name: "category", label: "Category", widget: "select", options: ["News", "Annual Reports", "Research", "Analysis", "Updates"], required: true }
-      - { name: "author", label: "Author", widget: "string", required: true }
-      - { name: "featured", label: "Featured Article", widget: "boolean", default: false }
-      - { name: "image", label: "Featured Image", widget: "image", required: false }
+      - { name: "title", label: "Title", widget: "string" }
+      - { name: "description", label: "Description", widget: "text" }
+      - { name: "date", label: "Date", widget: "string" }
+      - { name: "category", label: "Category", widget: "string" }
+      - { name: "author", label: "Author", widget: "string" }
+      - { name: "featured", label: "Featured", widget: "boolean", default: false }
+      - { name: "image", label: "Image", widget: "string", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content (MDX)", widget: "code", default_language: "mdx", allow_language_selection: false, required: true, hint: "Use MDX syntax with React components" }
+      - { name: "body", label: "Content", widget: "markdown" }
 
   # Reports Collection
   - name: "reports"
@@ -48,16 +45,16 @@ collections:
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "id", label: "Report ID", widget: "number", required: true }
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "date", label: "Date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: true }
-      - { name: "country", label: "Country", widget: "select", options: ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Democratic Republic of Congo", "Republic of Congo", "Côte d'Ivoire", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "São Tomé and Príncipe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"], required: true }
-      - { name: "status", label: "Civic Space Status", widget: "select", options: ["open", "narrowed", "obstructed", "repressed", "closed"], required: true }
-      - { name: "summary", label: "Summary", widget: "text", required: true }
+      - { name: "id", label: "Report ID", widget: "string" }
+      - { name: "title", label: "Title", widget: "string" }
+      - { name: "date", label: "Date", widget: "string" }
+      - { name: "country", label: "Country", widget: "string" }
+      - { name: "status", label: "Status", widget: "string" }
+      - { name: "summary", label: "Summary", widget: "text" }
       - { name: "downloadUrl", label: "Download URL", widget: "string", required: false }
-      - { name: "authors", label: "Authors", widget: "list", required: true }
+      - { name: "authors", label: "Authors", widget: "list", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content (MDX)", widget: "code", default_language: "mdx", allow_language_selection: false, required: true, hint: "Use MDX syntax with React components" }
+      - { name: "body", label: "Content", widget: "markdown" }
 
   # Alerts Collection
   - name: "alerts"
@@ -68,18 +65,18 @@ collections:
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "id", label: "Alert ID", widget: "number", required: true }
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "date", label: "Date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: true }
-      - { name: "country", label: "Country", widget: "select", options: ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Democratic Republic of Congo", "Republic of Congo", "Côte d'Ivoire", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "São Tomé and Príncipe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"], required: true }
-      - { name: "status", label: "Civic Space Status", widget: "select", options: ["open", "narrowed", "obstructed", "repressed", "closed"], required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-      - { name: "severity", label: "Severity Level", widget: "select", options: ["low", "moderate", "high", "critical"], required: true }
-      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "Central Africa", "Southern Africa", "North Africa"], required: true }
+      - { name: "id", label: "Alert ID", widget: "string" }
+      - { name: "title", label: "Title", widget: "string" }
+      - { name: "date", label: "Date", widget: "string" }
+      - { name: "country", label: "Country", widget: "string" }
+      - { name: "status", label: "Status", widget: "string" }
+      - { name: "description", label: "Description", widget: "text" }
+      - { name: "severity", label: "Severity", widget: "string" }
+      - { name: "region", label: "Region", widget: "string" }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content (MDX)", widget: "code", default_language: "mdx", allow_language_selection: false, required: true, hint: "Use MDX syntax with React components" }
+      - { name: "body", label: "Content", widget: "markdown" }
 
-  # About Sections Collection (using code widget for MDX safety)
+  # About Sections Collection
   - name: "about"
     label: "About Sections"
     folder: "content/about"
@@ -88,87 +85,7 @@ collections:
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-      - { name: "section", label: "Section Type", widget: "select", options: ["dimensions", "methodology", "mission", "partners"], required: true }
-      - { name: "body", label: "Content (MDX)", widget: "code", default_language: "mdx", allow_language_selection: false, required: true, hint: "Use MDX syntax with React components like <DimensionGrid> and <DimensionCard>" }
-
-  # Pages Collection (Static Pages)
-  - name: "pages"
-    label: "Static Pages"
-    folder: "content/pages"
-    create: true
-    slug: "{{slug}}"
-    extension: "md"
-    format: "frontmatter"
-    fields:
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-      
-      # Hero Section
-      - label: "Hero Section"
-        name: "hero"
-        widget: "object"
-        required: false
-        fields:
-          - { name: "title", label: "Hero Title", widget: "string" }
-          - { name: "subtitle", label: "Hero Subtitle", widget: "text" }
-      
-      # Mission Section
-      - label: "Mission Section"
-        name: "mission"
-        widget: "object"
-        required: false
-        fields:
-          - { name: "title", label: "Mission Title", widget: "string" }
-          - { name: "content", label: "Mission Content", widget: "markdown" }
-      
-      # Features Section
-      - label: "Features Section"
-        name: "features"
-        widget: "object"
-        required: false
-        fields:
-          - { name: "title", label: "Features Title", widget: "string" }
-          - { name: "subtitle", label: "Features Subtitle", widget: "text" }
-      
-      # News Section
-      - label: "News Section"
-        name: "news"
-        widget: "object"
-        required: false
-        fields:
-          - { name: "title", label: "News Title", widget: "string" }
-          - { name: "subtitle", label: "News Subtitle", widget: "text" }
-      
-      # Call to Action Section
-      - label: "Call to Action"
-        name: "cta"
-        widget: "object"
-        required: false
-        fields:
-          - { name: "title", label: "CTA Title", widget: "string" }
-          - { name: "content", label: "CTA Content", widget: "text" }
-      
-      # Impact Section
-      - label: "Impact Section"
-        name: "impact"
-        widget: "object"
-        required: false
-        fields:
-          - { name: "title", label: "Impact Title", widget: "string" }
-          - { name: "content", label: "Impact Content", widget: "text" }
-      
-      - { name: "body", label: "Additional Content", widget: "markdown", required: false }
-
-# Editor settings
-editor:
-  preview: true
-
-# Slug configuration
-slug:
-  encoding: "ascii"
-  clean_accents: true
-
-# Search configuration
-search: true
+      - { name: "title", label: "Title", widget: "string" }
+      - { name: "description", label: "Description", widget: "text" }
+      - { name: "section", label: "Section", widget: "string" }
+      - { name: "body", label: "Content", widget: "markdown" }
