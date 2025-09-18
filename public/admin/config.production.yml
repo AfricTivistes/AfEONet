@@ -4,6 +4,7 @@
 backend:
   name: git-gateway
   branch: main
+  repo: AfricTivistes/AfEONet
 
 # Disable local development mode for production
 local_backend: false
