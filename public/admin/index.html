@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AfEONet - Content Manager</title>
+  <meta name="description" content="Content management interface for AfEONet" />
+  <!-- Netlify Identity Widget for authentication -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Decap CMS styles -->
+  <style>
+    /* Custom styles for AfEONet branding */
+    :root {
+      --color-primary: #0f7b7c;
+      --color-secondary: #f59e0b;
+    }
+    
+    /* Override CMS colors to match AfEONet theme */
+    .nc-controlPane-control {
+      --color-button: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Include the script that builds the page and powers Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  
+  <!-- Netlify Identity initialization -->
+  <script>
+    // Netlify Identity initialization
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
+    
+    // Custom preview styles for better content preview
+    CMS.registerPreviewStyle('/admin/preview.css');
+  </script>
+</body>
+</html>
