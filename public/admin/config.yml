@@ -28,11 +28,11 @@ collections:
     fields:
       - { name: "title", label: "Title", widget: "string" }
       - { name: "description", label: "Description", widget: "text" }
-      - { name: "date", label: "Date", widget: "string" }
+      - { name: "date", label: "Date", widget: "datetime" }
       - { name: "category", label: "Category", widget: "string" }
       - { name: "author", label: "Author", widget: "string" }
       - { name: "featured", label: "Featured", widget: "boolean", default: false }
-      - { name: "image", label: "Image", widget: "string", required: false }
+      - { name: "image", label: "Image", widget: "image", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
       - { name: "body", label: "Content", widget: "markdown" }
 
@@ -47,11 +47,11 @@ collections:
     fields:
       - { name: "id", label: "Report ID", widget: "string" }
       - { name: "title", label: "Title", widget: "string" }
-      - { name: "date", label: "Date", widget: "string" }
+      - { name: "date", label: "Date", widget: "datetime" }
       - { name: "country", label: "Country", widget: "string" }
       - { name: "status", label: "Status", widget: "string" }
       - { name: "summary", label: "Summary", widget: "text" }
-      - { name: "downloadUrl", label: "Download URL", widget: "string", required: false }
+      - { name: "downloadUrl", label: "Download URL", widget: "file", required: false }
       - { name: "authors", label: "Authors", widget: "list", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
       - { name: "body", label: "Content", widget: "markdown" }
@@ -67,7 +67,7 @@ collections:
     fields:
       - { name: "id", label: "Alert ID", widget: "string" }
       - { name: "title", label: "Title", widget: "string" }
-      - { name: "date", label: "Date", widget: "string" }
+      - { name: "date", label: "Date", widget: "datetime" }
       - { name: "country", label: "Country", widget: "string" }
       - { name: "status", label: "Status", widget: "string" }
       - { name: "description", label: "Description", widget: "text" }
@@ -89,3 +89,71 @@ collections:
       - { name: "description", label: "Description", widget: "text" }
       - { name: "section", label: "Section", widget: "string" }
       - { name: "body", label: "Content", widget: "markdown" }
+
+  # Pages Collection (Static Pages)
+  - name: "pages"
+  label: "Static Pages"
+  folder: "content/pages"
+  create: true
+  slug: "{{slug}}"
+  extension: "md"
+  format: "frontmatter"
+  fields:
+    - { name: "title", label: "Title", widget: "string", required: true }
+    - { name: "description", label: "Description", widget: "text", required: true }
+
+    # Hero Section
+    - label: "Hero Section"
+      name: "hero"
+      widget: "object"
+      required: false
+      fields:
+        - { name: "title", label: "Hero Title", widget: "string" }
+        - { name: "subtitle", label: "Hero Subtitle", widget: "text" }
+
+    # Mission Section
+    - label: "Mission Section"
+      name: "mission"
+      widget: "object"
+      required: false
+      fields:
+        - { name: "title", label: "Mission Title", widget: "string" }
+        - { name: "content", label: "Mission Content", widget: "markdown" }
+
+    # Features Section
+    - label: "Features Section"
+      name: "features"
+      widget: "object"
+      required: false
+      fields:
+        - { name: "title", label: "Features Title", widget: "string" }
+        - { name: "subtitle", label: "Features Subtitle", widget: "text" }
+
+    # News Section
+    - label: "News Section"
+      name: "news"
+      widget: "object"
+      required: false
+      fields:
+        - { name: "title", label: "News Title", widget: "string" }
+        - { name: "subtitle", label: "News Subtitle", widget: "text" }
+
+    # Call to Action Section
+    - label: "Call to Action"
+      name: "cta"
+      widget: "object"
+      required: false
+      fields:
+        - { name: "title", label: "CTA Title", widget: "string" }
+        - { name: "content", label: "CTA Content", widget: "text" }
+
+    # Impact Section
+    - label: "Impact Section"
+      name: "impact"
+      widget: "object"
+      required: false
+      fields:
+        - { name: "title", label: "Impact Title", widget: "string" }
+        - { name: "content", label: "Impact Content", widget: "text" }
+
+    - { name: "body", label: "Additional Content", widget: "markdown", required: false }
