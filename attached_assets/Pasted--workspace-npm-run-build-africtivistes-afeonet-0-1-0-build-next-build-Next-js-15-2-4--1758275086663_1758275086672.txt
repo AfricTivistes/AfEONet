@@ -1,0 +1,29 @@
+~/workspace$ npm run build
+
+> africtivistes@afeonet@0.1.0 build
+> next build
+
+   ▲ Next.js 15.2.4
+
+   Creating an optimized production build ...
+Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully
+   Linting and checking validity of types  ... ⨯ ESLint: Failed to load config "next/core-web-vitals" to extend from. Referenced from: 
+ ✓ Linting and checking validity of types    
+ ✓ Collecting page data    
+Error occurred prerendering page "/news". Read more: https://nextjs.org/docs/messages/prerender-error
+Error: Objects are not valid as a React child (found: [object Date]). If you meant to render a collection of children, use an array instead.
+    at nq (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:68052)
+    at nH (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:65009)
+    at nV (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:70865)
+    at nF (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:60898)
+    at nq (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:67434)
+    at nH (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:65009)
+    at nV (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:70865)
+    at nz (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:69548)
+    at nq (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:67701)
+    at nH (/home/runner/workspace/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:76:65009)
+Export encountered an error on /news/page: /news, exiting the build.
+ ⨯ Next.js build worker exited with code: 1 and signal: null
