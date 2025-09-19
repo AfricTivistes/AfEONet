@@ -101,7 +101,7 @@ collections:
   fields:
     - { name: "title", label: "Title", widget: "string", required: true }
     - { name: "description", label: "Description", widget: "text", required: true }
-
+  
     # Hero Section
     - label: "Hero Section"
       name: "hero"
@@ -110,7 +110,7 @@ collections:
       fields:
         - { name: "title", label: "Hero Title", widget: "string" }
         - { name: "subtitle", label: "Hero Subtitle", widget: "text" }
-
+  
     # Mission Section
     - label: "Mission Section"
       name: "mission"
@@ -119,7 +119,7 @@ collections:
       fields:
         - { name: "title", label: "Mission Title", widget: "string" }
         - { name: "content", label: "Mission Content", widget: "markdown" }
-
+  
     # Features Section
     - label: "Features Section"
       name: "features"
@@ -128,7 +128,7 @@ collections:
       fields:
         - { name: "title", label: "Features Title", widget: "string" }
         - { name: "subtitle", label: "Features Subtitle", widget: "text" }
-
+  
     # News Section
     - label: "News Section"
       name: "news"
@@ -137,7 +137,7 @@ collections:
       fields:
         - { name: "title", label: "News Title", widget: "string" }
         - { name: "subtitle", label: "News Subtitle", widget: "text" }
-
+  
     # Call to Action Section
     - label: "Call to Action"
       name: "cta"
@@ -146,7 +146,7 @@ collections:
       fields:
         - { name: "title", label: "CTA Title", widget: "string" }
         - { name: "content", label: "CTA Content", widget: "text" }
-
+  
     # Impact Section
     - label: "Impact Section"
       name: "impact"
@@ -155,5 +155,5 @@ collections:
       fields:
         - { name: "title", label: "Impact Title", widget: "string" }
         - { name: "content", label: "Impact Content", widget: "text" }
-
+  
     - { name: "body", label: "Additional Content", widget: "markdown", required: false }
