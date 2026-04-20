@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft, Calendar, User, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -106,9 +107,11 @@ const getCachedMDXContent = async (slug: string, content: string) => {
         em: ({ children }) => <em className="text-muted-foreground">{children}</em>,
         hr: () => <hr className="border-border my-8" />,
         img: ({ src, alt }) => (
-          <img
-            src={src}
+          <Image
+            src={typeof src === 'string' ? src : '/placeholder.svg'}
             alt={alt || ''}
+            width={800}
+            height={450}
             className="rounded-lg shadow-sm my-4 max-w-full h-auto"
           />
         ),
