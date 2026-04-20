@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-// import { cache } from 'react' // Temporairement désactivé en développement
+import { cache } from 'react'
 
 const newsDirectory = path.join(process.cwd(), 'content/news')
 
@@ -19,8 +19,7 @@ export interface NewsArticle {
   content: string
 }
 
-// Version mise en cache pour améliorer les performances (désactivée temporairement en dev)
-export const getAllNewsArticles = ((): NewsArticle[] => {
+export const getAllNewsArticles = cache((): NewsArticle[] => {
   try {
     // Créer le répertoire s'il n'existe pas
     if (!fs.existsSync(newsDirectory)) {
@@ -61,8 +60,7 @@ export const getAllNewsArticles = ((): NewsArticle[] => {
   }
 })
 
-// Version mise en cache pour les articles individuels (désactivée temporairement en dev)
-export const getNewsArticle = ((slug: string): NewsArticle | null => {
+export const getNewsArticle = cache((slug: string): NewsArticle | null => {
   try {
     const fullPath = path.join(newsDirectory, `${slug}.mdx`)
     
