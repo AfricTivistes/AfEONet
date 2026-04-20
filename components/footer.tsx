@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Facebook, Twitter, Instagram, Linkedin, Github } from "lucide-react"
+import { Share2, X, Camera, Users, Code2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function Footer() {
@@ -27,23 +27,23 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               <Link href="#" className="text-white/70 hover:text-secondary transition-colors duration-200">
-                <Facebook className="h-5 w-5" />
+                <Share2 className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
               <Link href="#" className="text-white/70 hover:text-secondary transition-colors duration-200">
-                <Twitter className="h-5 w-5" />
+                <X className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
               </Link>
               <Link href="#" className="text-white/70 hover:text-secondary transition-colors duration-200">
-                <Instagram className="h-5 w-5" />
+                <Camera className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </Link>
               <Link href="#" className="text-white/70 hover:text-secondary transition-colors duration-200">
-                <Linkedin className="h-5 w-5" />
+                <Users className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
               </Link>
               <Link href="#" className="text-white/70 hover:text-secondary transition-colors duration-200">
-                <Github className="h-5 w-5" />
+                <Code2 className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </Link>
             </div>
