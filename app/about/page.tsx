@@ -116,7 +116,7 @@ export default async function AboutPage() {
                 <h3 className="text-lg font-semibold mb-2 text-primary">1. Regulatory Framework</h3>
                 <p className="text-muted-foreground">
                   The regulatory framework that protects citizen observers as human rights defenders, including laws and
-                  institutions governing civil society organizations' operations.
+                  institutions governing civil society organizations&apos; operations.
                 </p>
               </div>
               <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm">

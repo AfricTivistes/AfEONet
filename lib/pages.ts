@@ -15,7 +15,7 @@ export interface PageData {
   title: string
   description: string
   content: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   hero?: HomepageSection
   mission?: HomepageSection
   features?: HomepageSection

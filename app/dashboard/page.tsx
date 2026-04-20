@@ -82,13 +82,8 @@ const dimensionsData = [
 ]
 
 export default function DashboardPage() {
-  const [selectedCountry, setSelectedCountry] = useState<string>("")
   const [selectedYear, setSelectedYear] = useState<string>("2023")
   const [activeTab, setActiveTab] = useState("dimensions")
-
-  const handleCountrySelect = (country: string) => {
-    setSelectedCountry(country)
-  }
 
   // Helper function to get trend icon
   const getTrendIcon = (trend: string) => {
@@ -101,20 +96,6 @@ export default function DashboardPage() {
         return <Minus className="h-4 w-4 text-blue-500" />
       default:
         return null
-    }
-  }
-
-  // Helper function to get trend color class
-  const getTrendColorClass = (trend: string) => {
-    switch (trend) {
-      case "improving":
-        return "text-green-600 dark:text-green-400"
-      case "deteriorating":
-        return "text-red-600 dark:text-red-400"
-      case "stable":
-        return "text-blue-600 dark:text-blue-400"
-      default:
-        return "text-gray-600 dark:text-gray-400"
     }
   }
 
@@ -167,7 +148,7 @@ export default function DashboardPage() {
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-1 block">Country</label>
-                <CountrySelector onSelect={handleCountrySelect} />
+                <CountrySelector onSelect={() => {}} />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Year</label>

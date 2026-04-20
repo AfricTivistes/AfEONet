@@ -15,6 +15,7 @@ export async function getMDXContent(filePath: string) {
     section: string
   }>({
     source,
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     components: useMDXComponents(),
     options: {
       parseFrontmatter: true,

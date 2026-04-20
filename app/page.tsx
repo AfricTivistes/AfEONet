@@ -6,8 +6,6 @@ import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { ArrowRight, BarChart2, FileText, Send, Users, Calendar, Globe, Shield, Award } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
 import { getPage } from "@/lib/pages"
 import { getAllNewsArticles } from "@/lib/news"
 
@@ -21,7 +19,6 @@ const stats = [
 
 export default async function Home() {
   const pageData = await getPage('homepage')
-  const content = pageData?.content || ''
   const newsArticles = getAllNewsArticles().slice(0, 4) // Top 4 recent articles
   
   return (
@@ -121,7 +118,7 @@ export default async function Home() {
                   <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
                 </h2>
                 <p className="mb-4 text-muted-foreground">
-                  AfEONet's mission is to monitor and document the state of civic space for citizen election observers in
+                  AfEONet&apos;s mission is to monitor and document the state of civic space for citizen election observers in
                   Africa. Our ultimate goal is to establish a robust monitoring framework that highlights and reports
                   whenever the work of citizen observers is threatened.
                 </p>
