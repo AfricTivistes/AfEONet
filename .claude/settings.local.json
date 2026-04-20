@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('next:', d['dependencies']['next']\\); print\\('eslint-config-next:', d.get\\('devDependencies',{}\\).get\\('eslint-config-next', 'MISSING'\\)\\)\")",
+      "Bash(node *)",
+      "Bash(npm outdated *)",
+      "Bash(npm show *)",
+      "Bash(npm install *)",
+      "Bash(npm audit *)",
+      "Bash(npm run *)",
+      "Bash(grep -v \"^$\")",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  }
+}
