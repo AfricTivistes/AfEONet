@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Calendar, Search, Clock, User, ArrowRight } from "lucide-react"
-import { getAllNewsArticles, getFeaturedArticles, type NewsArticle } from "@/lib/news"
+import { getAllNewsArticles, type NewsArticle } from "@/lib/news"
 
 // Fonction utilitaire pour calculer le temps de lecture
 function calculateReadTime(content: string): string {

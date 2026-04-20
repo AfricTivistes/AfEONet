@@ -78,11 +78,11 @@ export default function ForgotPasswordPage() {
                   <CheckCircle className="h-16 w-16 text-green-500" />
                 </div>
                 <p className="mb-4">
-                  We've sent a password reset link to your email address. Please check your inbox and follow the
+                  We&apos;ve sent a password reset link to your email address. Please check your inbox and follow the
                   instructions to reset your password.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  If you don't receive an email within a few minutes, check your spam folder or try again.
+                  If you don&apos;t receive an email within a few minutes, check your spam folder or try again.
                 </p>
               </div>
             )}

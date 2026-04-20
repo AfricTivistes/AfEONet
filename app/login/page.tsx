@@ -347,7 +347,7 @@ export default function LoginPage() {
           </CardContent>
           <CardFooter className="flex flex-col">
             <p className="text-xs text-center text-muted-foreground mt-4">
-              By continuing, you agree to AfEONet's{" "}
+              By continuing, you agree to AfEONet&apos;s{" "}
               <Link href="/terms" className="underline underline-offset-2 hover:text-primary">
                 Terms of Service
               </Link>{" "}

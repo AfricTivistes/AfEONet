@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation"
-import { Suspense } from "react"
 import Link from "next/link"
 import { ArrowLeft, Calendar, User, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -8,8 +7,6 @@ import { MdxLayout } from "@/components/mdx-layout"
 import { getNewsArticle, getAllNewsArticles } from "@/lib/news"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { useMDXComponents } from "@/mdx-components"
-// import { cache } from "react" // Désactivé temporairement en dev
 
 interface NewsArticlePageProps {
   params: Promise<{
@@ -221,7 +218,7 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
             <h3 className="text-2xl font-bold text-primary mb-6">Related Articles</h3>
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">
-                Discover more insights from AfEONet's research and monitoring work.
+                Discover more insights from AfEONet&apos;s research and monitoring work.
               </p>
               <Button asChild>
                 <Link href="/news">View All News</Link>

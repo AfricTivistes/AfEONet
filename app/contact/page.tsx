@@ -22,7 +22,7 @@ export default async function ContactPage() {
           <div className="flex flex-col space-y-4">
             <h1 className="text-3xl font-bold tracking-tight">Contact Us</h1>
             <p className="text-primary-foreground/80 max-w-2xl">
-              We're here to answer your questions and receive your feedback.
+              We&apos;re here to answer your questions and receive your feedback.
             </p>
           </div>
         </div>

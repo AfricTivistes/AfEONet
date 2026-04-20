@@ -49,7 +49,7 @@ export function ContactForm() {
     <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-8">
       <h2 className="text-2xl font-bold text-primary mb-2">Contact Form</h2>
       <p className="text-muted-foreground mb-6">
-        Fill out this form to send us a message. We'll respond as soon as possible.
+        Fill out this form to send us a message. We&apos;ll respond as soon as possible.
       </p>
 
       {isSuccess ? (
@@ -58,7 +58,7 @@ export function ContactForm() {
             Message sent successfully!
           </h3>
           <p className="text-green-700 dark:text-green-400 mb-6">
-            Thank you for contacting us. We'll respond as soon as possible.
+            Thank you for contacting us. We&apos;ll respond as soon as possible.
           </p>
           <Button onClick={() => setIsSuccess(false)} className="bg-primary text-white hover:bg-primary/90">
             Send another message
