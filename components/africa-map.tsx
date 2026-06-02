@@ -1,176 +1,199 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
+import { ComposableMap, Geographies, Geography } from "react-simple-maps"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  countries,
+  byIsoNum,
+  byRegion,
+  statusClass,
+  statusLabel,
+  statusDescription,
+  REGIONS,
+  type CivicStatus,
+} from "@/lib/countries"
 
-// Sample data for demonstration
-const countryData: Record<string, { status: string; name: string }> = {
-  dz: { status: "narrowed", name: "Algeria" },
-  eg: { status: "closed", name: "Egypt" },
-  ng: { status: "obstructed", name: "Nigeria" },
-  za: { status: "narrowed", name: "South Africa" },
-  ke: { status: "repressed", name: "Kenya" },
-  gh: { status: "open", name: "Ghana" },
-  ci: { status: "repressed", name: "Ivory Coast" },
-  cm: { status: "repressed", name: "Cameroon" },
-  ml: { status: "closed", name: "Mali" },
-  bf: { status: "closed", name: "Burkina Faso" },
-  tz: { status: "obstructed", name: "Tanzania" },
-  et: { status: "repressed", name: "Ethiopia" },
-  cd: { status: "closed", name: "DR Congo" },
-  ma: { status: "repressed", name: "Morocco" },
-  tn: { status: "narrowed", name: "Tunisia" },
-  ug: { status: "repressed", name: "Uganda" },
-  rw: { status: "repressed", name: "Rwanda" },
-  zw: { status: "repressed", name: "Zimbabwe" },
-  mz: { status: "obstructed", name: "Mozambique" },
-  sn: { status: "open", name: "Senegal" },
+// Status fill colors (HSL values matching globals.css)
+const STATUS_FILL: Record<CivicStatus | "unknown", string> = {
+  open:        "hsl(120 100% 35%)",
+  narrowed:    "hsl(45 100% 50%)",
+  obstructed:  "hsl(30 100% 50%)",
+  repressed:   "hsl(30 100% 30%)",
+  closed:      "hsl(0 100% 50%)",
+  unknown:     "hsl(220 9% 75%)",
 }
 
-// Grouping countries by region for better visual organization
-const regions = [
-  {
-    name: "West Africa",
-    countries: ["sn", "gh", "ng", "ci", "ml", "bf"],
-  },
-  {
-    name: "East Africa",
-    countries: ["ke", "tz", "et", "ug", "rw"],
-  },
-  {
-    name: "North Africa",
-    countries: ["eg", "dz", "ma", "tn"],
-  },
-  {
-    name: "Central Africa",
-    countries: ["cm", "cd"],
-  },
-  {
-    name: "Southern Africa",
-    countries: ["za", "zw", "mz"],
-  },
-]
+const HOVER_FILL: Record<CivicStatus | "unknown", string> = {
+  open:        "hsl(120 100% 28%)",
+  narrowed:    "hsl(45 100% 40%)",
+  obstructed:  "hsl(30 100% 40%)",
+  repressed:   "hsl(30 100% 22%)",
+  closed:      "hsl(0 100% 40%)",
+  unknown:     "hsl(220 9% 60%)",
+}
 
-export function AfricaMap() {
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
+// Numeric ISO IDs that belong to Africa (our 44 mappable countries + others in topo)
+const AFRICA_ISO_NUMS = new Set(countries.map((c) => c.isoNum))
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "open":
-        return "Open/free/secure"
-      case "narrowed":
-        return "Narrowed"
-      case "obstructed":
-        return "Obstructed"
-      case "repressed":
-        return "Repressed/threatened"
-      case "closed":
-        return "Closed"
-      default:
-        return status
-    }
-  }
+function statusKey(status: CivicStatus | null): CivicStatus | "unknown" {
+  return status ?? "unknown"
+}
 
-  const getStatusDescription = (status: string) => {
-    switch (status) {
-      case "open":
-        return "Civic space is fully respected and protected"
-      case "narrowed":
-        return "Civic space is experiencing some restrictions"
-      case "obstructed":
-        return "Civic space faces significant obstacles"
-      case "repressed":
-        return "Civic space is severely limited with active threats"
-      case "closed":
-        return "Civic space is completely closed or non-existent"
-      default:
-        return ""
-    }
-  }
+interface AfricaMapProps {
+  selectedIso2?: string | null
+  onSelectCountry?: (iso2: string | null) => void
+}
 
-  const handleCountryClick = (code: string) => {
-    if (code === selectedCountry) {
-      setSelectedCountry(null)
-    } else {
-      setSelectedCountry(code)
-    }
-  }
+export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: AfricaMapProps) {
+  const [internalSelected, setInternalSelected] = useState<string | null>(null)
+  const [tooltip, setTooltip] = useState<{ name: string; status: CivicStatus | null } | null>(null)
+
+  const isControlled = controlledIso2 !== undefined
+  const selectedIso2 = isControlled ? controlledIso2 : internalSelected
+
+  const handleClick = useCallback(
+    (iso2: string | null) => {
+      if (isControlled) {
+        onSelectCountry?.(iso2 === selectedIso2 ? null : iso2)
+      } else {
+        setInternalSelected((prev) => (prev === iso2 ? null : iso2))
+      }
+    },
+    [isControlled, onSelectCountry, selectedIso2],
+  )
+
+  const selectedCountry = selectedIso2 ? countries.find((c) => c.iso2 === selectedIso2) : null
 
   return (
     <Card className="w-full border-primary/20">
       <CardContent className="p-4">
         <h3 className="text-lg font-medium mb-4 text-primary">Civic Space Status in Africa</h3>
 
-        <div className="mb-6">
-          <div className="relative w-full h-[400px] bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <p className="text-lg font-medium text-primary">Interactive Map Visualization</p>
-                <p className="text-sm text-muted-foreground">Region-based visualization available below</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Interactive choropleth map */}
+        <div className="w-full rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900">
+          <ComposableMap
+            projection="geoMercator"
+            projectionConfig={{ scale: 380, center: [22, 2] }}
+            viewBox="0 0 800 620"
+            style={{ width: "100%", height: "auto" }}
+          >
+            <Geographies geography="/data/world-110m.json">
+              {({ geographies }) =>
+                geographies.map((geo) => {
+                  const isoNum = String(geo.id)
 
-        <div className="space-y-8">
-          {regions.map((region) => (
-            <div key={region.name}>
-              <h4 className="font-medium text-primary mb-3 flex items-center">
-                <span className="inline-block w-2 h-2 rounded-full bg-primary mr-2"></span>
-                {region.name}
-              </h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                {region.countries.map((code) => {
-                  const country = countryData[code]
-                  if (!country) return null
+                  // Hide non-African countries (render as very light background)
+                  if (!AFRICA_ISO_NUMS.has(isoNum)) {
+                    return (
+                      <Geography
+                        key={geo.rsmKey}
+                        geography={geo}
+                        fill="hsl(220 20% 92%)"
+                        stroke="hsl(220 20% 85%)"
+                        strokeWidth={0.5}
+                        style={{ default: { outline: "none" }, hover: { outline: "none" }, pressed: { outline: "none" } }}
+                      />
+                    )
+                  }
+
+                  const country = byIsoNum(isoNum)
+                  const key = statusKey(country?.status ?? null)
+                  const isSelected = country?.iso2 === selectedIso2
 
                   return (
-                    <div
-                      key={code}
-                      className={`status-${country.status} p-3 rounded-md cursor-pointer text-center ${
-                        country.status === "narrowed" ? "text-black" : "text-white"
-                      } text-sm font-medium ${selectedCountry === code ? "ring-2 ring-primary" : ""}`}
-                      onClick={() => handleCountryClick(code)}
-                    >
-                      {country.name}
-                    </div>
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill={isSelected ? HOVER_FILL[key] : STATUS_FILL[key]}
+                      stroke="white"
+                      strokeWidth={0.8}
+                      style={{
+                        default: { outline: "none" },
+                        hover: { fill: HOVER_FILL[key], outline: "none", cursor: "pointer" },
+                        pressed: { outline: "none" },
+                      }}
+                      onMouseEnter={() => country && setTooltip({ name: country.name, status: country.status })}
+                      onMouseLeave={() => setTooltip(null)}
+                      onClick={() => country && handleClick(country.iso2)}
+                    />
                   )
-                })}
-              </div>
-            </div>
-          ))}
+                })
+              }
+            </Geographies>
+          </ComposableMap>
         </div>
 
-        {selectedCountry && countryData[selectedCountry] && (
-          <div className="mt-8 p-4 border rounded-lg bg-background/80">
+        {/* Hover tooltip (simple) */}
+        {tooltip && (
+          <div className="mt-2 text-sm text-center text-muted-foreground">
+            <span className="font-medium text-foreground">{tooltip.name}</span>
+            {" — "}
+            <span>{statusLabel(tooltip.status)}</span>
+          </div>
+        )}
+
+        {/* Selected country detail panel */}
+        {selectedCountry && (
+          <div className="mt-4 p-4 border rounded-lg bg-background/80">
             <div className="flex items-start gap-3">
               <div
-                className={`w-10 h-10 rounded-md flex-shrink-0 status-${countryData[selectedCountry].status} flex items-center justify-center text-white font-bold text-lg`}
+                className={`w-10 h-10 rounded-md flex-shrink-0 ${statusClass(selectedCountry.status)} flex items-center justify-center font-bold text-lg ${
+                  selectedCountry.status === "narrowed" ? "text-black" : "text-white"
+                }`}
               >
-                {countryData[selectedCountry].name.charAt(0)}
+                {selectedCountry.name.charAt(0)}
               </div>
               <div className="flex-1">
-                <h4 className="font-medium text-lg text-primary">{countryData[selectedCountry].name}</h4>
+                <h4 className="font-medium text-lg text-primary">{selectedCountry.name}</h4>
+                <p className="text-xs text-muted-foreground">{selectedCountry.region}</p>
                 <div className="flex items-center mt-1">
-                  <div className={`w-3 h-3 rounded-full status-${countryData[selectedCountry].status} mr-2`}></div>
-                  <span className="font-medium">{getStatusLabel(countryData[selectedCountry].status)}</span>
+                  <div className={`w-3 h-3 rounded-full ${statusClass(selectedCountry.status)} mr-2`} />
+                  <span className="font-medium text-sm">{statusLabel(selectedCountry.status)}</span>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {getStatusDescription(countryData[selectedCountry].status)}
+                  {statusDescription(selectedCountry.status)}
                 </p>
-                <p className="mt-4 text-xs text-muted-foreground">
-                  Click on another country to see its details or click on this country again to close this panel.
-                </p>
+                <button
+                  className="mt-3 text-xs text-muted-foreground underline hover:text-foreground"
+                  onClick={() => handleClick(selectedCountry.iso2)}
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
         )}
 
-        <p className="text-xs text-muted-foreground mt-6 text-center">
-          Note: A detailed interactive SVG map of Africa will be implemented in the final version.
+        {/* Region grid fallback (accessible + mobile) */}
+        <div className="mt-6 space-y-6">
+          {REGIONS.map((region) => (
+            <div key={region}>
+              <h4 className="font-medium text-primary mb-3 flex items-center text-sm">
+                <span className="inline-block w-2 h-2 rounded-full bg-primary mr-2" />
+                {region}
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                {byRegion(region).map((country) => (
+                  <div
+                    key={country.iso2}
+                    className={`${statusClass(country.status)} p-2 rounded-md cursor-pointer text-center text-xs font-medium transition-opacity hover:opacity-80 ${
+                      country.status === "narrowed" ? "text-black" : "text-white"
+                    } ${selectedIso2 === country.iso2 ? "ring-2 ring-primary ring-offset-1" : ""}`}
+                    onClick={() => handleClick(country.iso2)}
+                  >
+                    {country.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-muted-foreground mt-4 text-center">
+          Comoros, Mauritius and Seychelles are shown in the region grid above (too small for map resolution).
         </p>
       </CardContent>
     </Card>
   )
 }
-
