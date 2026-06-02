@@ -5,8 +5,10 @@ import createMDX from '@next/mdx'
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: [(env.REPLIT_DOMAINS || "").split(",")[0]],
-  // Configure `pageExtensions` to include markdown and MDX files
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  images: {
+    unoptimized: true,
+  },
 };
 
 const withMDX = createMDX({
