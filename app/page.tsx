@@ -8,6 +8,7 @@ import { ArrowRight, BarChart2, FileText, Send, Users, Calendar, Globe, Shield, 
 import { Badge } from "@/components/ui/badge"
 import { getPage } from "@/lib/pages"
 import { getAllNewsArticles } from "@/lib/news"
+import { statusCounts, statusLabel, countries } from "@/lib/countries"
 
 // Données pour les statistiques
 const stats = [
@@ -16,6 +17,32 @@ const stats = [
   { value: "250+", label: "Reports Published", icon: FileText, color: "bg-accent-green" },
   { value: "35+", label: "Partner Organizations", icon: Shield, color: "bg-accent-purple" },
 ]
+
+const STATUS_ORDER = ["open", "narrowed", "obstructed", "repressed", "closed", "unknown"] as const
+
+function CivicSpaceStats() {
+  const counts = statusCounts()
+  return (
+    <div className="flex flex-wrap justify-center gap-3 mb-6">
+      {STATUS_ORDER.map((key) => {
+        const count = counts[key]
+        if (count === 0) return null
+        const label = key === "unknown" ? "Not assessed" : statusLabel(key)
+        return (
+          <div
+            key={key}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium status-${key} ${
+              key === "narrowed" ? "text-black" : "text-white"
+            }`}
+          >
+            <span className="text-lg font-bold">{count}</span>
+            <span className="opacity-90">{label}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export default async function Home() {
   const pageData = await getPage('homepage')
@@ -153,27 +180,46 @@ export default async function Home() {
         </div>
       </section>
       
-      {/* Mini Dashboard Preview */}
-      <section className="py-16 md:py-24 bg-white">
+      {/* Overview of Civic Space */}
+      <section className="py-16 md:py-24 bg-white dark:bg-background">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <h2 className="text-3xl font-bold text-primary mb-6">Overview of Civic Space in Africa</h2>
+          <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8">
+            <h2 className="text-3xl font-bold text-primary">Overview of Civic Space in Africa</h2>
             <p className="max-w-[700px] text-muted-foreground md:text-lg">
               Explore the current state of civic space for election observers across the continent.
             </p>
           </div>
-          <div className="mt-8">
-            <AfricaMap />
-          </div>
-          <div className="mt-4">
-            <StatusLegend />
-          </div>
-          <div className="mt-8 text-center">
-            <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">
-              <Link href="/dashboard">
-                View full dashboard <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+
+          {/* Live status stats */}
+          <CivicSpaceStats />
+
+          <div className="mt-8 lg:grid lg:grid-cols-3 lg:gap-8">
+            <div className="lg:col-span-2">
+              <AfricaMap />
+            </div>
+            <div className="mt-6 lg:mt-0 flex flex-col gap-4">
+              <StatusLegend />
+              <Card className="border-primary/20 flex-1">
+                <CardContent className="p-4">
+                  <h4 className="text-sm font-medium text-primary mb-3">Coverage</h4>
+                  <p className="text-2xl font-bold text-primary">
+                    {countries.filter((c) => c.status !== null).length}
+                    <span className="text-sm font-normal text-muted-foreground"> / {countries.length} countries assessed</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {countries.length - countries.filter((c) => c.status !== null).length} countries pending assessment.
+                    Click any country on the map or grid for details.
+                  </p>
+                </CardContent>
+              </Card>
+              <div className="mt-auto text-center lg:text-left">
+                <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">
+                  <Link href="/dashboard">
+                    View full dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
