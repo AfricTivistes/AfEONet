@@ -79,7 +79,7 @@ export default function LoginPage() {
         <Card className="border-primary/20 shadow-lg">
           <CardHeader className="space-y-1 text-center">
             <div className="flex justify-center mb-2">
-              <Image src="/logo-yellow-on-teal.jpeg" alt="AfEONet Logo" width={60} height={60} className="rounded-md" />
+              <Image src="/logo.png" alt="AfEONet Logo" width={60} height={60} className="rounded-md" />
             </div>
             <CardTitle className="text-2xl font-bold text-primary">Welcome to AfEONet</CardTitle>
             <CardDescription>

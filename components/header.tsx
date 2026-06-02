@@ -113,7 +113,7 @@ export default function Header() {
             <Link href="/" className="flex items-center space-x-2" onClick={() => setMobileMenuOpen(false)}>
               <div className="relative w-10 h-10">
                 <Image
-                  src="/AfEONet-Logo__1_-removebg-preview.png"
+                  src="/logo.png"
                   alt="AfEONet Logo"
                   fill
                   className="object-contain"
