@@ -9,12 +9,29 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { getPage } from "@/lib/pages"
 import { getReports, getAlerts } from "@/lib/reports"
+import { Pagination } from "@/components/pagination"
 
-export default async function ReportsPage() {
+const PER_PAGE = 6
+
+export default async function ReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ rpage?: string; apage?: string }>
+}) {
+  const params = await searchParams
+  const reportsPage = Math.max(1, Number(params?.rpage) || 1)
+  const alertsPage = Math.max(1, Number(params?.apage) || 1)
+
   const pageData = await getPage('reports')
   const staticContent = pageData?.content || ''
-  const reports = await getReports()
-  const alerts = await getAlerts()
+  const allReports = await getReports()
+  const allAlerts = await getAlerts()
+
+  const totalReportsPages = Math.ceil(allReports.length / PER_PAGE)
+  const totalAlertsPages = Math.ceil(allAlerts.length / PER_PAGE)
+
+  const reports = allReports.slice((reportsPage - 1) * PER_PAGE, reportsPage * PER_PAGE)
+  const alerts = allAlerts.slice((alertsPage - 1) * PER_PAGE, alertsPage * PER_PAGE)
   
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
@@ -119,6 +136,7 @@ export default async function ReportsPage() {
                 </div>
               ))}
             </div>
+            <Pagination currentPage={reportsPage} totalPages={totalReportsPages} />
           </TabsContent>
 
           <TabsContent value="alerts" className="space-y-4">
@@ -143,6 +161,7 @@ export default async function ReportsPage() {
                 </div>
               ))}
             </div>
+            <Pagination currentPage={alertsPage} totalPages={totalAlertsPages} />
           </TabsContent>
         </Tabs>
       </div>

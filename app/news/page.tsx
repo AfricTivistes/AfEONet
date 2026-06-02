@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Calendar, Search, Clock, User, ArrowRight } from "lucide-react"
 import { getAllNewsArticles, type NewsArticle } from "@/lib/news"
+import { Pagination } from "@/components/pagination"
 
-// Fonction utilitaire pour calculer le temps de lecture
+const PER_PAGE = 12
+
 function calculateReadTime(content: string): string {
   const wordsPerMinute = 200
   const words = content.trim().split(/\s+/).length
@@ -14,7 +16,6 @@ function calculateReadTime(content: string): string {
   return `${readTime} min read`
 }
 
-// Fonction pour adapter les articles MDX au format attendu
 function adaptArticleData(article: NewsArticle) {
   return {
     ...article,
@@ -25,37 +26,36 @@ function adaptArticleData(article: NewsArticle) {
   }
 }
 
-// Fonction pour obtenir les catégories dynamiquement
 function getCategories(articles: NewsArticle[]): string[] {
   const categories = new Set(["All"])
   articles.forEach(article => {
-    if (article.category) {
-      categories.add(article.category)
-    }
+    if (article.category) categories.add(article.category)
   })
   return Array.from(categories)
 }
 
-export default function NewsPage() {
+export default async function NewsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const params = await searchParams
+  const currentPage = Math.max(1, Number(params?.page) || 1)
+
   const allArticles = getAllNewsArticles()
   const featuredArticles = allArticles.filter(article => article.featured)
   const categories = getCategories(allArticles)
-  
-  // Obtenir l'article vedette (le premier featured ou le plus récent)
-  const featuredArticle = featuredArticles.length > 0 
-    ? adaptArticleData(featuredArticles[0]) 
-    : allArticles.length > 0 
-    ? adaptArticleData(allArticles[0]) 
+
+  const featuredArticle = featuredArticles.length > 0
+    ? adaptArticleData(featuredArticles[0])
+    : allArticles.length > 0
+    ? adaptArticleData(allArticles[0])
     : null
-  
-  // Articles populaires (featured ou les plus récents)
-  const popularArticles = (featuredArticles.length > 1 
-    ? featuredArticles.slice(1, 4) 
-    : allArticles.slice(0, 3)
-  ).map(adaptArticleData)
-  
-  // Articles récents (les 4 plus récents)
-  const recentArticles = allArticles.slice(0, 4).map(adaptArticleData)
+
+  const totalPages = Math.ceil(allArticles.length / PER_PAGE)
+  const start = (currentPage - 1) * PER_PAGE
+  const paginatedArticles = allArticles.slice(start, start + PER_PAGE).map(adaptArticleData)
+
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       {/* Hero Section */}
@@ -81,8 +81,8 @@ export default function NewsPage() {
 
       <div className="container py-12">
         <div className="flex flex-col space-y-16">
-          {/* Featured Article */}
-          {featuredArticle && (
+          {/* Featured Article — visible only on page 1 */}
+          {featuredArticle && currentPage === 1 && (
             <section className="bg-secondary/10 p-8 rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="relative h-64 md:h-auto rounded-lg overflow-hidden">
@@ -123,12 +123,19 @@ export default function NewsPage() {
             </section>
           )}
 
-          {/* Popular Articles */}
-          {popularArticles.length > 0 && (
+          {/* All Articles — paginated */}
+          {paginatedArticles.length > 0 && (
             <section>
-              <h2 className="text-2xl font-bold text-primary mb-8">Popular Articles</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {popularArticles.map((article) => (
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-primary">
+                  {currentPage === 1 ? "All Articles" : `All Articles — Page ${currentPage}`}
+                </h2>
+                <span className="text-sm text-muted-foreground">
+                  {allArticles.length} articles
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {paginatedArticles.map((article) => (
                   <div key={article.slug} className="group">
                     <div className="relative h-48 rounded-lg overflow-hidden mb-4">
                       <Image
@@ -137,7 +144,7 @@ export default function NewsPage() {
                         fill
                         className="object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute top-3 right-3">
                         <Badge className="bg-secondary text-primary">{article.category}</Badge>
                       </div>
@@ -168,53 +175,12 @@ export default function NewsPage() {
                   </div>
                 ))}
               </div>
+              <Pagination currentPage={currentPage} totalPages={totalPages} />
             </section>
           )}
 
-          {/* Recent Articles */}
-          {recentArticles.length > 0 && (
-            <section className="bg-primary/5 py-12 -mx-4 px-4">
-              <div className="container">
-                <h2 className="text-2xl font-bold text-primary mb-8">Recent Articles</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {recentArticles.map((article) => (
-                    <Link key={article.slug} href={`/news/${article.slug}`} className="group">
-                      <div className="relative h-40 rounded-lg overflow-hidden mb-3">
-                        <Image
-                          src={article.image || "/placeholder.svg"}
-                          alt={article.title}
-                          fill
-                          className="object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                        <div className="absolute top-2 right-2">
-                          <Badge className="bg-secondary/80 text-primary text-xs">{article.category}</Badge>
-                        </div>
-                        <div className="absolute bottom-2 left-2 right-2">
-                          <h3 className="text-base font-medium text-white line-clamp-2 group-hover:text-secondary transition-colors">
-                            {article.title}
-                          </h3>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>{article.date}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{article.readTime}</span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* Categories */}
-          {categories.length > 1 && (
+          {/* Browse by Category */}
+          {categories.length > 1 && currentPage === 1 && (
             <section>
               <h2 className="text-2xl font-bold text-primary mb-6">Browse by Category</h2>
               <div className="flex flex-wrap gap-3">
@@ -236,17 +202,13 @@ export default function NewsPage() {
           )}
         </div>
       </div>
-      
-      {/* Message si aucun article */}
+
       {allArticles.length === 0 && (
         <div className="container py-16 text-center">
           <h2 className="text-2xl font-bold text-primary mb-4">No articles available</h2>
-          <p className="text-muted-foreground">
-            Articles will appear here once they are published.
-          </p>
+          <p className="text-muted-foreground">Articles will appear here once they are published.</p>
         </div>
       )}
     </div>
   )
 }
-
