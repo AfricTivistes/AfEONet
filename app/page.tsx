@@ -192,32 +192,19 @@ export default async function Home() {
           {/* Live status stats */}
           <CivicSpaceStats />
 
-          <div className="mt-8 lg:grid lg:grid-cols-3 lg:gap-8">
-            <div className="lg:col-span-2">
-              <AfricaMap />
-            </div>
-            <div className="mt-6 lg:mt-0 flex flex-col gap-4">
-              <Card className="border-primary/20 flex-1">
-                <CardContent className="p-4">
-                  <h4 className="text-sm font-medium text-primary mb-3">Coverage</h4>
-                  <p className="text-2xl font-bold text-primary">
-                    {countries.filter((c) => c.status !== null).length}
-                    <span className="text-sm font-normal text-muted-foreground"> / {countries.length} countries assessed</span>
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {countries.length - countries.filter((c) => c.status !== null).length} countries pending assessment.
-                    Click any country on the map or grid for details.
-                  </p>
-                </CardContent>
-              </Card>
-              <div className="mt-auto text-center lg:text-left">
-                <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">
-                  <Link href="/dashboard">
-                    View full dashboard <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
+          <p className="text-center text-sm text-muted-foreground mb-8">
+            <span className="font-medium text-primary">{countries.filter((c) => c.status !== null).length}</span>
+            {" / "}{countries.length} countries assessed — {countries.length - countries.filter((c) => c.status !== null).length} pending
+          </p>
+
+          <AfricaMap />
+
+          <div className="mt-8 text-center">
+            <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">
+              <Link href="/dashboard">
+                View full dashboard <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
