@@ -2,7 +2,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { ArrowRight, BarChart2, FileText, Send, Users, Calendar, Globe, Shield, Award } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -198,7 +197,6 @@ export default async function Home() {
               <AfricaMap />
             </div>
             <div className="mt-6 lg:mt-0 flex flex-col gap-4">
-              <StatusLegend />
               <Card className="border-primary/20 flex-1">
                 <CardContent className="p-4">
                   <h4 className="text-sm font-medium text-primary mb-3">Coverage</h4>
