@@ -1,19 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { CountrySelector } from "@/components/country-selector"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, Download, Filter, TrendingUp, TrendingDown, Minus } from "lucide-react"
+import { AlertTriangle, Filter, TrendingUp, TrendingDown, Minus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { byIso2 } from "@/lib/countries"
 
-// Sample data for demonstration
-const dimensionsData = [
+const ALL_DIMENSIONS = [
   {
     id: 1,
     title: "Regulatory Framework",
@@ -83,25 +83,36 @@ const dimensionsData = [
 
 export default function DashboardPage() {
   const [selectedYear, setSelectedYear] = useState<string>("2023")
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
+  const [selectedDimension, setSelectedDimension] = useState<string>("all")
   const [activeTab, setActiveTab] = useState("dimensions")
 
-  // Helper function to get trend icon
+  const selectedCountryData = selectedCountry ? byIso2(selectedCountry) : null
+
+  const filteredDimensions = useMemo(() => {
+    if (selectedDimension === "all") return ALL_DIMENSIONS
+    return ALL_DIMENSIONS.filter((d) => String(d.id) === selectedDimension)
+  }, [selectedDimension])
+
+  const handleClearFilters = () => {
+    setSelectedCountry(null)
+    setSelectedDimension("all")
+    setSelectedYear("2023")
+  }
+
+  const hasActiveFilters = selectedCountry || selectedDimension !== "all" || selectedYear !== "2023"
+
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case "improving":
-        return <TrendingUp className="h-4 w-4 text-green-500" />
-      case "deteriorating":
-        return <TrendingDown className="h-4 w-4 text-red-500" />
-      case "stable":
-        return <Minus className="h-4 w-4 text-blue-500" />
-      default:
-        return null
+      case "improving":    return <TrendingUp className="h-4 w-4 text-green-500" />
+      case "deteriorating":return <TrendingDown className="h-4 w-4 text-red-500" />
+      default:             return <Minus className="h-4 w-4 text-blue-500" />
     }
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="bg-primary py-12 text-white">
         <div className="container">
           <div className="flex flex-col space-y-4">
@@ -131,28 +142,52 @@ export default function DashboardPage() {
         </Alert>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Map */}
           <div className="md:col-span-2 bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-primary mb-4">Civic Space Map</h2>
-            <p className="text-muted-foreground mb-6">Overview of the state of civic space in Africa</p>
-            <div className="w-full mb-4">
-              <AfricaMap />
-            </div>
+            <h2 className="text-xl font-bold text-primary mb-1">Civic Space Map</h2>
+            {selectedCountryData && (
+              <p className="text-sm text-muted-foreground mb-4">
+                Selected: <span className="font-medium text-foreground">{selectedCountryData.name}</span>
+                {" "}({selectedCountryData.region})
+              </p>
+            )}
+            {!selectedCountryData && (
+              <p className="text-muted-foreground mb-4 text-sm">Click a country to see details</p>
+            )}
+            <AfricaMap
+              selectedIso2={selectedCountry}
+              onSelectCountry={setSelectedCountry}
+            />
             <div className="mt-6 bg-secondary/10 p-4 rounded-lg">
               <StatusLegend />
             </div>
           </div>
 
+          {/* Filters */}
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-primary mb-4">Filters</h2>
-            <p className="text-muted-foreground mb-6">Refine the displayed data</p>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-primary">Filters</h2>
+              {hasActiveFilters && (
+                <button
+                  onClick={handleClearFilters}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3 w-3" /> Clear
+                </button>
+              )}
+            </div>
+            <p className="text-muted-foreground mb-6 text-sm">Refine the displayed data</p>
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-1 block">Country</label>
-                <CountrySelector onSelect={() => {}} />
+                <CountrySelector
+                  value={selectedCountry ?? undefined}
+                  onSelect={(v) => setSelectedCountry(v === selectedCountry ? null : v)}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Year</label>
-                <Select defaultValue={selectedYear} onValueChange={setSelectedYear}>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
                   <SelectTrigger className="border-primary/20">
                     <SelectValue placeholder="Select a year" />
                   </SelectTrigger>
@@ -165,33 +200,43 @@ export default function DashboardPage() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Dimension</label>
-                <Select>
+                <Select value={selectedDimension} onValueChange={setSelectedDimension}>
                   <SelectTrigger className="border-primary/20">
                     <SelectValue placeholder="All dimensions" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All dimensions</SelectItem>
-                    <SelectItem value="1">Regulatory Framework</SelectItem>
-                    <SelectItem value="2">Administrative Constraints</SelectItem>
-                    <SelectItem value="3">Relationship with Electoral Management Body</SelectItem>
-                    <SelectItem value="4">Security and Well-being</SelectItem>
-                    <SelectItem value="5">Access to Electoral Data</SelectItem>
-                    <SelectItem value="6">Access to Funding</SelectItem>
-                    <SelectItem value="7">Dialogue and Consultation</SelectItem>
-                    <SelectItem value="8">Perception of Observers</SelectItem>
+                    {ALL_DIMENSIONS.map((d) => (
+                      <SelectItem key={d.id} value={String(d.id)}>{d.title}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full bg-secondary text-primary hover:bg-secondary/90 mt-2">
-                <Filter className="mr-2 h-4 w-4" /> Apply filters
-              </Button>
-              <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/10">
-                <Download className="mr-2 h-4 w-4" /> Export data
+              {hasActiveFilters && (
+                <div className="rounded-md bg-primary/5 p-3 text-xs text-muted-foreground space-y-1">
+                  <p className="font-medium text-foreground">Active filters:</p>
+                  {selectedCountryData && <p>Country: {selectedCountryData.name}</p>}
+                  {selectedDimension !== "all" && (
+                    <p>Dimension: {ALL_DIMENSIONS.find((d) => String(d.id) === selectedDimension)?.title}</p>
+                  )}
+                  {selectedYear !== "2023" && <p>Year: {selectedYear}</p>}
+                  <p className="mt-1">
+                    Showing {filteredDimensions.length} of {ALL_DIMENSIONS.length} dimensions
+                  </p>
+                </div>
+              )}
+              <Button
+                variant="outline"
+                className="w-full border-primary/20 text-primary hover:bg-primary/10"
+                onClick={handleClearFilters}
+              >
+                <Filter className="mr-2 h-4 w-4" /> Reset filters
               </Button>
             </div>
           </div>
         </div>
 
+        {/* Dimensions / Trends tabs */}
         <div className="mt-12">
           <div className="flex rounded-lg overflow-hidden mb-8">
             <button
@@ -201,6 +246,9 @@ export default function DashboardPage() {
               onClick={() => setActiveTab("dimensions")}
             >
               Dimensions
+              {filteredDimensions.length < ALL_DIMENSIONS.length && (
+                <span className="ml-2 text-xs opacity-80">({filteredDimensions.length}/{ALL_DIMENSIONS.length})</span>
+              )}
             </button>
             <button
               className={`py-3 px-6 text-center flex-1 transition-colors ${
@@ -214,12 +262,12 @@ export default function DashboardPage() {
 
           {activeTab === "dimensions" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {dimensionsData.map((dimension) => (
+              {filteredDimensions.map((dimension) => (
                 <div
                   key={dimension.id}
-                  className={`bg-white dark:bg-slate-800 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden`}
+                  className="bg-white dark:bg-slate-800 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden"
                 >
-                  <div className={`absolute top-0 left-0 w-1 h-full status-${dimension.status}`}></div>
+                  <div className={`absolute top-0 left-0 w-1 h-full status-${dimension.status}`} />
                   <div className="pl-3">
                     <h3 className="text-lg font-semibold text-primary mb-1">{dimension.title}</h3>
                     <div className="flex flex-wrap gap-2 mb-3">
@@ -240,10 +288,10 @@ export default function DashboardPage() {
             <div className="space-y-6">
               <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm mb-6">
                 <h2 className="text-xl font-bold text-primary mb-4">Civic Space Trends</h2>
-                <p className="text-muted-foreground mb-6">Evolution of civic space dimensions over time</p>
+                <p className="text-muted-foreground mb-6 text-sm">Evolution of civic space dimensions over time</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {dimensionsData.map((dimension) => (
+                  {filteredDimensions.map((dimension) => (
                     <Card key={dimension.id} className="border-primary/10">
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
@@ -265,7 +313,7 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="flex items-center gap-2 mt-4">
-                          <div className={`w-3 h-3 rounded-full status-${dimension.status}`}></div>
+                          <div className={`w-3 h-3 rounded-full status-${dimension.status}`} />
                           <span className="text-sm text-muted-foreground">
                             Current status: {dimension.status.charAt(0).toUpperCase() + dimension.status.slice(1)}
                           </span>
@@ -281,7 +329,7 @@ export default function DashboardPage() {
                             <div
                               className={`absolute left-0 top-0 h-full status-${dimension.status}`}
                               style={{ width: "70%" }}
-                            ></div>
+                            />
                           </div>
                         </div>
                       </CardContent>
@@ -293,7 +341,9 @@ export default function DashboardPage() {
               <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
                 <h2 className="text-lg font-bold text-primary mb-4">Overall Trend Analysis</h2>
                 <div className="h-[300px] flex items-center justify-center bg-secondary/10 rounded-lg p-4">
-                  <p className="text-muted-foreground">Detailed trend charts will be available in the final version.</p>
+                  <p className="text-muted-foreground text-sm">
+                    Detailed trend charts will be available in the final version.
+                  </p>
                 </div>
               </div>
             </div>

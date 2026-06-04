@@ -42,6 +42,7 @@
     --status-obstructed: 30 100% 50%;
     --status-repressed: 30 100% 30%;
     --status-closed: 0 100% 50%;
+    --status-unknown: 220 9% 75%;
 
     /* Accent colors inspired by the image */
     --accent-pink: 330 100% 50%;
@@ -110,6 +111,10 @@
 
 .status-closed {
   @apply bg-[hsl(var(--status-closed))];
+}
+
+.status-unknown {
+  @apply bg-[hsl(var(--status-unknown))];
 }
 
 /* Nouvelles classes inspirées par l'image */
