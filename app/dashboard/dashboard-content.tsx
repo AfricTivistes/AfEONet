@@ -70,7 +70,6 @@ function ScoreBar({ score, max = 10 }: { score: number; max?: number }) {
 function CountryDimensionPanel({ country }: { country: Country }) {
   if (!country.dimensions) return null
   const data = toDimArray(country.dimensions, country.name, true)
-  const globalData = data.map((d) => ({ dim: d.dim, score: GLOBAL_AVERAGES[DIM_KEYS[data.indexOf(d)]] }))
 
   return (
     <div className="space-y-6">
