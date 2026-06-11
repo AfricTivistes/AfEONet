@@ -1,0 +1,419 @@
+{
+  "metadata": {
+    "source": "AfEONet Report 2025 - Eyes on the Ballot Watchers",
+    "author": "Abel Eseru",
+    "year": 2025,
+    "note": "Scores are estimations based on the report. Update with exact values from AfEONet team.",
+    "totalCountries": 21,
+    "totalDimensions": 8,
+    "scale": "0-10"
+  },
+  "dimensions": {
+    "1": "Regulatory Framework",
+    "2": "Administrative Constraints",
+    "3": "EMB Relationship",
+    "4": "Security and Well-being",
+    "5": "Access to Electoral Data",
+    "6": "Access to Funding",
+    "7": "Dialogue and Consultation",
+    "8": "Perception of Observers"
+  },
+  "categories": {
+    "0-2": "Closed",
+    "3-4": "Repressed",
+    "5-6": "Obstructed",
+    "7-8": "Restricted",
+    "9-10": "Open"
+  },
+  "countries": [
+    {
+      "iso2": "gh",
+      "name": "Ghana",
+      "region": "West Africa",
+      "composite": 6.5,
+      "category": "narrowed",
+      "dimensions": {
+        "1": 8,
+        "2": 7,
+        "3": 9,
+        "4": 6,
+        "5": 7,
+        "6": 5,
+        "7": 8,
+        "8": 8
+      },
+      "notes": "Strong EMB-CSO collaboration but heavy reliance on external funding"
+    },
+    {
+      "iso2": "ng",
+      "name": "Nigeria",
+      "region": "West Africa",
+      "composite": 5.5,
+      "category": "obstructed",
+      "dimensions": {
+        "1": 6,
+        "2": 5,
+        "3": 6,
+        "4": 5,
+        "5": 7,
+        "6": 4,
+        "7": 6,
+        "8": 5
+      },
+      "notes": "IReV present but limited funding and digital transparency"
+    },
+    {
+      "iso2": "ke",
+      "name": "Kenya",
+      "region": "East Africa",
+      "composite": 7.5,
+      "category": "restricted",
+      "dimensions": {
+        "1": 8,
+        "2": 7,
+        "3": 8,
+        "4": 6,
+        "5": 8,
+        "6": 6,
+        "7": 7,
+        "8": 7
+      },
+      "notes": "Technology innovation expanding civic space amid political contestation"
+    },
+    {
+      "iso2": "bw",
+      "name": "Botswana",
+      "region": "Southern Africa",
+      "composite": 9.0,
+      "category": "open",
+      "dimensions": {
+        "1": 9,
+        "2": 9,
+        "3": 9,
+        "4": 9,
+        "5": 9,
+        "6": 8,
+        "7": 9,
+        "8": 9
+      },
+      "notes": "Open/Free environment, transparent processes"
+    },
+    {
+      "iso2": "sz",
+      "name": "Eswatini",
+      "region": "Southern Africa",
+      "composite": 4.5,
+      "category": "repressed",
+      "dimensions": {
+        "1": 4,
+        "2": 4,
+        "3": 5,
+        "4": 4,
+        "5": 5,
+        "6": 4,
+        "7": 5,
+        "8": 5
+      },
+      "notes": "Public legitimacy amid constrained civic space"
+    },
+    {
+      "iso2": "so",
+      "name": "Somalia",
+      "region": "East Africa",
+      "composite": 4.0,
+      "category": "repressed",
+      "dimensions": {
+        "1": 4,
+        "2": 4,
+        "3": 5,
+        "4": 3,
+        "5": 4,
+        "6": 3,
+        "7": 4,
+        "8": 5
+      },
+      "notes": "Fragility and external dependence"
+    },
+    {
+      "iso2": "cm",
+      "name": "Cameroon",
+      "region": "Central Africa",
+      "composite": 5.0,
+      "category": "obstructed",
+      "dimensions": {
+        "1": 5,
+        "2": 4,
+        "3": 5,
+        "4": 4,
+        "5": 5,
+        "6": 5,
+        "7": 5,
+        "8": 5
+      },
+      "notes": "Political filtering of civic space, selective openness"
+    },
+    {
+      "iso2": "lr",
+      "name": "Liberia",
+      "region": "West Africa",
+      "composite": 7.0,
+      "category": "restricted",
+      "dimensions": {
+        "1": 7,
+        "2": 7,
+        "3": 7,
+        "4": 6,
+        "5": 7,
+        "6": 6,
+        "7": 7,
+        "8": 7
+      },
+      "notes": "Post-conflict constraints shaping civic space"
+    },
+    {
+      "iso2": "ss",
+      "name": "South Sudan",
+      "region": "East Africa",
+      "composite": 3.5,
+      "category": "repressed",
+      "dimensions": {
+        "1": 3,
+        "2": 3,
+        "3": 4,
+        "4": 3,
+        "5": 4,
+        "6": 3,
+        "7": 4,
+        "8": 3
+      },
+      "notes": "Fragility, hostile environment"
+    },
+    {
+      "iso2": "sl",
+      "name": "Somaliland",
+      "region": "East Africa",
+      "composite": 8.0,
+      "category": "restricted",
+      "dimensions": {
+        "1": 8,
+        "2": 8,
+        "3": 8,
+        "4": 7,
+        "5": 8,
+        "6": 7,
+        "7": 8,
+        "8": 8
+      },
+      "notes": "Non-recognized but functional, progressive"
+    },
+    {
+      "iso2": "za",
+      "name": "South Africa",
+      "region": "Southern Africa",
+      "composite": 8.0,
+      "category": "restricted",
+      "dimensions": {
+        "1": 8,
+        "2": 8,
+        "3": 8,
+        "4": 8,
+        "5": 8,
+        "6": 7,
+        "7": 8,
+        "8": 8
+      },
+      "notes": "Robust civic space confronting sustainability pressures"
+    },
+    {
+      "iso2": "tz",
+      "name": "Tanzania",
+      "region": "East Africa",
+      "composite": 4.5,
+      "category": "repressed",
+      "dimensions": {
+        "1": 4,
+        "2": 4,
+        "3": 5,
+        "4": 4,
+        "5": 5,
+        "6": 4,
+        "7": 5,
+        "8": 5
+      },
+      "notes": "Restrictive accreditation procedures"
+    },
+    {
+      "iso2": "ug",
+      "name": "Uganda",
+      "region": "East Africa",
+      "composite": 3.0,
+      "category": "repressed",
+      "dimensions": {
+        "1": 3,
+        "2": 3,
+        "3": 4,
+        "4": 2,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 3
+      },
+      "notes": "Hostile environment, mass arrests of observers"
+    },
+    {
+      "iso2": "zm",
+      "name": "Zambia",
+      "region": "Southern Africa",
+      "composite": 6.0,
+      "category": "obstructed",
+      "dimensions": {
+        "1": 6,
+        "2": 6,
+        "3": 6,
+        "4": 5,
+        "5": 6,
+        "6": 5,
+        "7": 6,
+        "8": 6
+      },
+      "notes": "Progressive decline, funding challenges"
+    },
+    {
+      "iso2": "mg",
+      "name": "Madagascar",
+      "region": "Southern Africa",
+      "composite": 5.0,
+      "category": "obstructed",
+      "dimensions": {
+        "1": 5,
+        "2": 5,
+        "3": 5,
+        "4": 4,
+        "5": 5,
+        "6": 4,
+        "7": 5,
+        "8": 5
+      },
+      "notes": "Political instability, fragile environment"
+    },
+    {
+      "iso2": "tn",
+      "name": "Tunisia",
+      "region": "North Africa",
+      "composite": 6.5,
+      "category": "narrowed",
+      "dimensions": {
+        "1": 7,
+        "2": 6,
+        "3": 7,
+        "4": 6,
+        "5": 7,
+        "6": 5,
+        "7": 7,
+        "8": 6
+      },
+      "notes": "Post-revolution transition, dialogue remains open"
+    },
+    {
+      "iso2": "ci",
+      "name": "Côte d'Ivoire",
+      "region": "West Africa",
+      "composite": 5.5,
+      "category": "obstructed",
+      "dimensions": {
+        "1": 6,
+        "2": 5,
+        "3": 6,
+        "4": 5,
+        "5": 5,
+        "6": 4,
+        "7": 6,
+        "8": 5
+      },
+      "notes": "Post-conflict, selective openness"
+    },
+    {
+      "iso2": "td",
+      "name": "Chad",
+      "region": "Central Africa",
+      "composite": 3.0,
+      "category": "repressed",
+      "dimensions": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 3,
+        "6": 2,
+        "7": 3,
+        "8": 3
+      },
+      "notes": "Military transition, hostile environment"
+    },
+    {
+      "iso2": "cg",
+      "name": "Congo Brazzaville",
+      "region": "Central Africa",
+      "composite": 2.0,
+      "category": "closed",
+      "dimensions": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 2,
+        "6": 1,
+        "7": 2,
+        "8": 2
+      },
+      "notes": "Closed environment, virtually nonexistent"
+    },
+    {
+      "iso2": "et",
+      "name": "Ethiopia",
+      "region": "East Africa",
+      "composite": 4.5,
+      "category": "repressed",
+      "dimensions": {
+        "1": 5,
+        "2": 4,
+        "3": 5,
+        "4": 4,
+        "5": 5,
+        "6": 4,
+        "7": 5,
+        "8": 4
+      },
+      "notes": "Reforming but constraints persist"
+    },
+    {
+      "iso2": "zw",
+      "name": "Zimbabwe",
+      "region": "Southern Africa",
+      "composite": 3.0,
+      "category": "repressed",
+      "dimensions": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 3
+      },
+      "notes": "Repression, police raids on observer offices"
+    }
+  ],
+  "global": {
+    "regulatory": 5.4,
+    "administrative": 5.1,
+    "embRelationship": 5.6,
+    "security": 4.5,
+    "dataAccess": 5.5,
+    "funding": 4.4,
+    "dialogue": 5.5,
+    "perception": 5.6,
+    "composite": 5.2
+  }
+}
