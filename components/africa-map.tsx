@@ -17,6 +17,7 @@ import {
 // Status fill colors (HSL values matching globals.css)
 const STATUS_FILL: Record<CivicStatus | "unknown", string> = {
   open:        "hsl(120 100% 35%)",
+  restricted:  "hsl(80 80% 40%)",
   narrowed:    "hsl(45 100% 50%)",
   obstructed:  "hsl(30 100% 50%)",
   repressed:   "hsl(30 100% 30%)",
@@ -26,6 +27,7 @@ const STATUS_FILL: Record<CivicStatus | "unknown", string> = {
 
 const HOVER_FILL: Record<CivicStatus | "unknown", string> = {
   open:        "hsl(120 100% 28%)",
+  restricted:  "hsl(80 80% 32%)",
   narrowed:    "hsl(45 100% 40%)",
   obstructed:  "hsl(30 100% 40%)",
   repressed:   "hsl(30 100% 22%)",
