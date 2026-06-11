@@ -101,3 +101,11 @@ export function getArticlesByCategory(category: string): NewsArticle[] {
 export function getArticlesByTag(tag: string): NewsArticle[] {
   return getAllNewsArticles().filter(article => article.tags.includes(tag))
 }
+
+export function getNewsByCountry(country: string): NewsArticle[] {
+  const key = country.toLowerCase().replace(/[^a-z]/g, "")
+  return getAllNewsArticles().filter((a) => {
+    if (a.country) return a.country.toLowerCase().replace(/[^a-z]/g, "") === key
+    return a.tags.some((t) => t.toLowerCase().replace(/[^a-z]/g, "") === key)
+  })
+}
