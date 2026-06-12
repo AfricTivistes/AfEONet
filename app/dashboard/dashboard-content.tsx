@@ -11,7 +11,7 @@ import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { CountrySelector } from "@/components/country-selector"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, Globe, Map, GitCompare, X } from "lucide-react"
+import { AlertTriangle, Globe, GitCompare, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -123,7 +123,7 @@ function CountryDimensionPanel({ country }: { country: Country }) {
   )
 }
 
-function GlobalView() {
+function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
   const assessed = useMemo(() => assessedCountries().sort((a, b) => (b.composite ?? 0) - (a.composite ?? 0)), [])
 
   const globalChartData = DIM_KEYS.map((k) => ({
@@ -171,7 +171,11 @@ function GlobalView() {
             </thead>
             <tbody>
               {assessed.map((c, i) => (
-                <tr key={c.iso2} className="border-b border-primary/5 hover:bg-primary/5">
+                <tr
+                  key={c.iso2}
+                  className="border-b border-primary/5 hover:bg-primary/5 cursor-pointer"
+                  onClick={() => onSelect(c.iso2)}
+                >
                   <td className="py-2 pr-4 text-muted-foreground">{i + 1}</td>
                   <td className="py-2 pr-4 font-medium">{c.name}</td>
                   <td className="py-2 pr-4 text-muted-foreground">{c.region}</td>
@@ -306,9 +310,8 @@ export default function DashboardContent() {
   const selectedCountryData = selectedCountry ? byIso2(selectedCountry) : null
 
   const TABS = [
-    { id: "global",     label: "Global View",    icon: Globe },
-    { id: "country",    label: "Country View",   icon: Map },
-    { id: "comparison", label: "Comparison",     icon: GitCompare },
+    { id: "global",     label: "Global View", icon: Globe },
+    { id: "comparison", label: "Comparison",  icon: GitCompare },
   ]
 
   return (
@@ -340,19 +343,19 @@ export default function DashboardContent() {
                 ? <>Selected: <span className="font-medium text-foreground">{selectedCountryData.name}</span> ({selectedCountryData.region})</>
                 : "Click a country to see details"}
             </p>
-            <AfricaMap selectedIso2={selectedCountry} onSelectCountry={(v) => { setCountry(v); if (v) setTab("country") }} />
+            <AfricaMap selectedIso2={selectedCountry} onSelectCountry={setCountry} />
             <div className="mt-6 bg-secondary/10 p-4 rounded-lg">
               <StatusLegend />
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-            {activeTab === "country" && selectedCountryData?.dimensions ? (
+            {selectedCountryData?.dimensions ? (
               <CountryDimensionPanel country={selectedCountryData} />
             ) : (
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-primary">Select Country</h2>
-                <CountrySelector value={selectedCountry ?? undefined} onSelect={(v) => { setCountry(v === selectedCountry ? null : v); if (v) setTab("country") }} />
+                <CountrySelector value={selectedCountry ?? undefined} onSelect={(v) => setCountry(v === selectedCountry ? null : v)} />
                 {selectedCountry && (
                   <button
                     onClick={() => setCountry(null)}
@@ -387,21 +390,7 @@ export default function DashboardContent() {
           ))}
         </div>
 
-        {activeTab === "global" && <GlobalView />}
-
-        {activeTab === "country" && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-            {selectedCountryData?.dimensions ? (
-              <CountryDimensionPanel country={selectedCountryData} />
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <Map className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                <p>Click a country on the map or use the selector above.</p>
-                <p className="text-xs mt-1">Only assessed countries (21) have dimension scores.</p>
-              </div>
-            )}
-          </div>
-        )}
+        {activeTab === "global" && <GlobalView onSelect={setCountry} />}
 
         {activeTab === "comparison" && (
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">

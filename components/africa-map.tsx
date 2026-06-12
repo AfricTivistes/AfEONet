@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { ComposableMap, Geographies, Geography } from "react-simple-maps"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -45,24 +46,32 @@ function statusKey(status: CivicStatus | null): CivicStatus | "unknown" {
 interface AfricaMapProps {
   selectedIso2?: string | null
   onSelectCountry?: (iso2: string | null) => void
+  navigateOnClick?: boolean
 }
 
-export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: AfricaMapProps) {
+export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navigateOnClick }: AfricaMapProps) {
+  const router = useRouter()
+  const mapRef = useRef<HTMLDivElement>(null)
   const [internalSelected, setInternalSelected] = useState<string | null>(null)
-  const [tooltip, setTooltip] = useState<{ name: string; status: CivicStatus | null } | null>(null)
+  const [tooltip, setTooltip] = useState<{ name: string; status: CivicStatus | null; composite?: number | null } | null>(null)
+  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null)
 
   const isControlled = controlledIso2 !== undefined
   const selectedIso2 = isControlled ? controlledIso2 : internalSelected
 
   const handleClick = useCallback(
     (iso2: string | null) => {
+      if (navigateOnClick && iso2) {
+        router.push(`/dashboard?view=country&country=${iso2}`)
+        return
+      }
       if (isControlled) {
         onSelectCountry?.(iso2 === selectedIso2 ? null : iso2)
       } else {
         setInternalSelected((prev) => (prev === iso2 ? null : iso2))
       }
     },
-    [isControlled, onSelectCountry, selectedIso2],
+    [navigateOnClick, router, isControlled, onSelectCountry, selectedIso2],
   )
 
   const selectedCountry = selectedIso2 ? countries.find((c) => c.iso2 === selectedIso2) : null
@@ -73,7 +82,17 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: Afr
         <h3 className="text-lg font-medium mb-4 text-primary">Civic Space Status in Africa</h3>
 
         {/* Interactive choropleth map */}
-        <div className="w-full rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900">
+        <div
+          ref={mapRef}
+          className="relative w-full rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900"
+          onMouseMove={(e) => {
+            if (mapRef.current) {
+              const rect = mapRef.current.getBoundingClientRect()
+              setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+            }
+          }}
+          onMouseLeave={() => { setTooltip(null); setMousePos(null) }}
+        >
           <ComposableMap
             projection="geoMercator"
             projectionConfig={{ scale: 380, center: [22, 2] }}
@@ -115,7 +134,7 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: Afr
                         hover: { fill: HOVER_FILL[key], outline: "none", cursor: "pointer" },
                         pressed: { outline: "none" },
                       }}
-                      onMouseEnter={() => country && setTooltip({ name: country.name, status: country.status })}
+                      onMouseEnter={() => country && setTooltip({ name: country.name, status: country.status, composite: country.composite })}
                       onMouseLeave={() => setTooltip(null)}
                       onClick={() => country && handleClick(country.iso2)}
                     />
@@ -124,16 +143,24 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: Afr
               }
             </Geographies>
           </ComposableMap>
-        </div>
 
-        {/* Hover tooltip (simple) */}
-        {tooltip && (
-          <div className="mt-2 text-sm text-center text-muted-foreground">
-            <span className="font-medium text-foreground">{tooltip.name}</span>
-            {" — "}
-            <span>{statusLabel(tooltip.status)}</span>
-          </div>
-        )}
+          {tooltip && mousePos && (
+            <div
+              className="absolute z-50 pointer-events-none bg-popover border border-border rounded-md px-2 py-1.5 text-sm shadow-md"
+              style={{
+                left: mousePos.x + 14,
+                top: mousePos.y - 10,
+                transform: mousePos.x > (mapRef.current?.clientWidth ?? 600) - 160 ? "translateX(-110%)" : "none",
+              }}
+            >
+              <div className="font-medium text-foreground">{tooltip.name}</div>
+              <div className="text-xs text-muted-foreground">
+                {statusLabel(tooltip.status)}
+                {tooltip.composite != null && <span className="ml-2 font-mono">{tooltip.composite}/10</span>}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Selected country detail panel */}
         {selectedCountry && (

@@ -197,7 +197,7 @@ export default async function Home() {
             {" / "}{countries.length} countries assessed — {countries.length - countries.filter((c) => c.status !== null).length} pending
           </p>
 
-          <AfricaMap />
+          <AfricaMap navigateOnClick />
 
           <div className="mt-8 text-center">
             <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">
