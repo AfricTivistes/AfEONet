@@ -29,8 +29,10 @@ collections:
       - { name: "title", label: "Title", widget: "string" }
       - { name: "description", label: "Description", widget: "text" }
       - { name: "date", label: "Date", widget: "datetime" }
-      - { name: "category", label: "Category", widget: "string" }
+      - { name: "category", label: "Category", widget: "select", options: ["civic-space", "election-observation", "alerts", "reports", "capacity-building", "general"] }
       - { name: "author", label: "Author", widget: "string" }
+      - { name: "country", label: "Country (ISO2 or name)", widget: "string", required: false, hint: "Link news to a country for filtering (e.g. 'Ghana' or 'gh')" }
+      - { name: "dimensionTags", label: "Dimension Tags", widget: "select", multiple: true, required: false, options: ["Regulatory Framework", "Administrative Constraints", "EMB Relationship", "Security and Well-being", "Access to Electoral Data", "Access to Funding", "Dialogue and Consultation", "Perception of Observers"] }
       - { name: "featured", label: "Featured", widget: "boolean", default: false }
       - { name: "image", label: "Image", widget: "image", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
@@ -38,19 +40,45 @@ collections:
 
   # Reports Collection
   - name: "reports"
-    label: "Reports"
+    label: "Country Reports"
     folder: "content/reports"
     create: true
     slug: "{{slug}}"
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "id", label: "Report ID", widget: "string" }
+      - { name: "id", label: "Report ID", widget: "number" }
       - { name: "title", label: "Title", widget: "string" }
       - { name: "date", label: "Date", widget: "datetime" }
-      - { name: "country", label: "Country", widget: "string" }
-      - { name: "status", label: "Status", widget: "string" }
+      - { name: "country", label: "Country Name", widget: "string" }
+      - { name: "iso2", label: "ISO2 Code", widget: "string", required: false, hint: "Two-letter country code (e.g. 'gh' for Ghana)" }
+      - { name: "region", label: "Region", widget: "select", required: false, options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
+      - name: "status"
+        label: "Civic Space Status"
+        widget: "select"
+        options:
+          - { value: "open", label: "Open (9-10)" }
+          - { value: "restricted", label: "Restricted (7-8)" }
+          - { value: "narrowed", label: "Narrowed" }
+          - { value: "obstructed", label: "Obstructed (5-6)" }
+          - { value: "repressed", label: "Repressed (3-4)" }
+          - { value: "closed", label: "Closed (0-2)" }
+      - { name: "composite", label: "Composite Score (0-10)", widget: "number", value_type: "float", min: 0, max: 10, step: 0.5, required: false }
+      - name: "dimensions"
+        label: "Dimension Scores (0-10)"
+        widget: "object"
+        required: false
+        fields:
+          - { name: "regulatory", label: "D1 — Regulatory Framework", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "administrative", label: "D2 — Administrative Constraints", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "embRelationship", label: "D3 — EMB Relationship", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "security", label: "D4 — Security & Well-being", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "dataAccess", label: "D5 — Access to Electoral Data", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "funding", label: "D6 — Access to Funding", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "dialogue", label: "D7 — Dialogue & Consultation", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "perception", label: "D8 — Perception of Observers", widget: "number", value_type: "int", min: 0, max: 10 }
       - { name: "summary", label: "Summary", widget: "text" }
+      - { name: "source", label: "Source", widget: "string", required: false, default: "AfEONet Report 2025 — Eyes on the Ballot Watchers" }
       - { name: "downloadUrl", label: "Download URL", widget: "file", required: false }
       - { name: "authors", label: "Authors", widget: "list", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
@@ -61,20 +89,95 @@ collections:
     label: "Security Alerts"
     folder: "content/alerts"
     create: true
-    slug: "{{slug}}"
+    slug: "{{country_iso}-{{year}}-{{number}}"
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "id", label: "Alert ID", widget: "string" }
+      - { name: "id", label: "Alert ID", widget: "string", hint: "Format: XX-YYYY-NNN (e.g. UG-2025-001)" }
       - { name: "title", label: "Title", widget: "string" }
       - { name: "date", label: "Date", widget: "datetime" }
       - { name: "country", label: "Country", widget: "string" }
-      - { name: "status", label: "Status", widget: "string" }
+      - { name: "iso2", label: "ISO2 Code", widget: "string", required: false }
+      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
+      - name: "status"
+        label: "Civic Space Status"
+        widget: "select"
+        options:
+          - { value: "open", label: "Open" }
+          - { value: "restricted", label: "Restricted" }
+          - { value: "narrowed", label: "Narrowed" }
+          - { value: "obstructed", label: "Obstructed" }
+          - { value: "repressed", label: "Repressed" }
+          - { value: "closed", label: "Closed" }
+      - name: "severity"
+        label: "Severity"
+        widget: "select"
+        options:
+          - { value: "critical", label: "Critical — Immediate action required" }
+          - { value: "high", label: "High — Urgent attention needed" }
+          - { value: "medium", label: "Medium — Monitor closely" }
+          - { value: "low", label: "Low — Watch and engage" }
+      - name: "alertType"
+        label: "Alert Type"
+        widget: "select"
+        options:
+          - { value: "arrest", label: "Observer Arrest/Detention" }
+          - { value: "raid", label: "Office Raid/Property Seizure" }
+          - { value: "restriction", label: "Operational Restriction" }
+          - { value: "threat", label: "Security Threat" }
+          - { value: "closure", label: "Space Closure" }
+          - { value: "other", label: "Other" }
+      - name: "dimension"
+        label: "Primary Dimension Affected"
+        widget: "select"
+        required: false
+        options:
+          - { value: 1, label: "D1 — Regulatory Framework" }
+          - { value: 2, label: "D2 — Administrative Constraints" }
+          - { value: 3, label: "D3 — EMB Relationship" }
+          - { value: 4, label: "D4 — Security & Well-being" }
+          - { value: 5, label: "D5 — Access to Electoral Data" }
+          - { value: 6, label: "D6 — Access to Funding" }
+          - { value: 7, label: "D7 — Dialogue & Consultation" }
+          - { value: 8, label: "D8 — Perception of Observers" }
+      - { name: "affectedObservers", label: "Number of Affected Observers", widget: "number", required: false }
       - { name: "description", label: "Description", widget: "text" }
-      - { name: "severity", label: "Severity", widget: "string" }
-      - { name: "region", label: "Region", widget: "string" }
+      - { name: "relatedReport", label: "Related Report Slug", widget: "string", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
       - { name: "body", label: "Content", widget: "markdown" }
+
+  # Country Scores Collection (editable via CMS)
+  - name: "country-scores"
+    label: "Country Scores (2025)"
+    folder: "content/data"
+    create: true
+    slug: "{{iso2}}-scores"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { name: "country", label: "Country Name", widget: "string" }
+      - { name: "iso2", label: "ISO2 Code", widget: "string" }
+      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
+      - { name: "composite", label: "Composite Score (0-10)", widget: "number", value_type: "float", min: 0, max: 10, step: 0.5 }
+      - name: "status"
+        label: "Civic Space Category"
+        widget: "select"
+        options:
+          - { value: "open", label: "Open (9-10)" }
+          - { value: "restricted", label: "Restricted (7-8)" }
+          - { value: "narrowed", label: "Narrowed" }
+          - { value: "obstructed", label: "Obstructed (5-6)" }
+          - { value: "repressed", label: "Repressed (3-4)" }
+          - { value: "closed", label: "Closed (0-2)" }
+      - { name: "regulatory", label: "D1 — Regulatory Framework (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "administrative", label: "D2 — Administrative Constraints (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "embRelationship", label: "D3 — EMB Relationship (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "security", label: "D4 — Security & Well-being (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "dataAccess", label: "D5 — Access to Electoral Data (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "funding", label: "D6 — Access to Funding (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "dialogue", label: "D7 — Dialogue & Consultation (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "perception", label: "D8 — Perception of Observers (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "notes", label: "Notes", widget: "text", required: false }
 
   # About Sections Collection
   - name: "about"

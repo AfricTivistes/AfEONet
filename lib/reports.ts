@@ -2,11 +2,24 @@ import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
 
+export interface ReportDimensions {
+  regulatory?: number
+  administrative?: number
+  embRelationship?: number
+  security?: number
+  dataAccess?: number
+  funding?: number
+  dialogue?: number
+  perception?: number
+}
+
 export interface Report {
   id: number
   title: string
   date: string
   country: string
+  iso2?: string
+  region?: string
   status: string
   summary: string
   content?: string
@@ -14,18 +27,27 @@ export interface Report {
   authors?: string[]
   tags?: string[]
   slug: string
+  composite?: number
+  dimensions?: ReportDimensions
+  source?: string
+  notes?: string
 }
 
 export interface Alert {
-  id: number
+  id: string | number
   title: string
   date: string
   country: string
+  iso2?: string
   status: string
   description: string
   content?: string
   severity?: string
   region?: string
+  alertType?: string
+  dimension?: number
+  affectedObservers?: number | null
+  relatedReport?: string
   tags?: string[]
   slug: string
 }
@@ -109,7 +131,7 @@ export async function getAlerts(): Promise<Alert[]> {
 export async function getAlert(idOrSlug: string): Promise<Alert | null> {
   try {
     const alerts = await getAlerts()
-    const alert = alerts.find(a => 
+    const alert = alerts.find(a =>
       a.id.toString() === idOrSlug || a.slug === idOrSlug
     )
     return alert || null
@@ -117,4 +139,20 @@ export async function getAlert(idOrSlug: string): Promise<Alert | null> {
     console.error('Error loading alert:', error)
     return null
   }
+}
+
+function normalizeCountry(name: string): string {
+  return name.toLowerCase().replace(/[^a-z]/g, "")
+}
+
+export async function getRelatedReports(country: string): Promise<Report[]> {
+  const reports = await getReports()
+  const key = normalizeCountry(country)
+  return reports.filter((r) => normalizeCountry(r.country) === key)
+}
+
+export async function getRelatedAlerts(country: string): Promise<Alert[]> {
+  const alerts = await getAlerts()
+  const key = normalizeCountry(country)
+  return alerts.filter((a) => normalizeCountry(a.country) === key)
 }
