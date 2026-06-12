@@ -11,7 +11,7 @@ import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { CountrySelector } from "@/components/country-selector"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, Globe, Map, GitCompare, X } from "lucide-react"
+import { AlertTriangle, Globe, GitCompare, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -307,7 +307,6 @@ export default function DashboardContent() {
 
   const TABS = [
     { id: "global",     label: "Global View",    icon: Globe },
-    { id: "country",    label: "Country View",   icon: Map },
     { id: "comparison", label: "Comparison",     icon: GitCompare },
   ]
 
@@ -340,14 +339,18 @@ export default function DashboardContent() {
                 ? <>Selected: <span className="font-medium text-foreground">{selectedCountryData.name}</span> ({selectedCountryData.region})</>
                 : "Click a country to see details"}
             </p>
-            <AfricaMap selectedIso2={selectedCountry} onSelectCountry={(v) => { setCountry(v); if (v) setTab("country") }} />
+            <AfricaMap
+              selectedIso2={selectedCountry}
+              onSelectCountry={(v) => { setCountry(v); if (v) setTab("country") }}
+              onCountryClick={(iso2) => { router.push(`/dashboard?view=country&country=${iso2}`) }}
+            />
             <div className="mt-6 bg-secondary/10 p-4 rounded-lg">
               <StatusLegend />
             </div>
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-            {activeTab === "country" && selectedCountryData?.dimensions ? (
+            {selectedCountryData?.dimensions ? (
               <CountryDimensionPanel country={selectedCountryData} />
             ) : (
               <div className="space-y-4">
@@ -388,20 +391,6 @@ export default function DashboardContent() {
         </div>
 
         {activeTab === "global" && <GlobalView />}
-
-        {activeTab === "country" && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-            {selectedCountryData?.dimensions ? (
-              <CountryDimensionPanel country={selectedCountryData} />
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <Map className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                <p>Click a country on the map or use the selector above.</p>
-                <p className="text-xs mt-1">Only assessed countries (21) have dimension scores.</p>
-              </div>
-            )}
-          </div>
-        )}
 
         {activeTab === "comparison" && (
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">

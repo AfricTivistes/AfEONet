@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { ComposableMap, Geographies, Geography } from "react-simple-maps"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -45,35 +46,42 @@ function statusKey(status: CivicStatus | null): CivicStatus | "unknown" {
 interface AfricaMapProps {
   selectedIso2?: string | null
   onSelectCountry?: (iso2: string | null) => void
+  onCountryClick?: (iso2: string) => void
 }
 
-export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: AfricaMapProps) {
+export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, onCountryClick }: AfricaMapProps) {
+  const router = useRouter()
+  const mapRef = useRef<HTMLDivElement>(null)
   const [internalSelected, setInternalSelected] = useState<string | null>(null)
-  const [tooltip, setTooltip] = useState<{ name: string; status: CivicStatus | null } | null>(null)
+  const [tooltip, setTooltip] = useState<{ name: string; status: CivicStatus | null; x: number; y: number } | null>(null)
 
   const isControlled = controlledIso2 !== undefined
   const selectedIso2 = isControlled ? controlledIso2 : internalSelected
 
   const handleClick = useCallback(
     (iso2: string | null) => {
+      if (onCountryClick && iso2) {
+        onCountryClick(iso2)
+        return
+      }
       if (isControlled) {
         onSelectCountry?.(iso2 === selectedIso2 ? null : iso2)
       } else {
         setInternalSelected((prev) => (prev === iso2 ? null : iso2))
       }
     },
-    [isControlled, onSelectCountry, selectedIso2],
+    [isControlled, onSelectCountry, selectedIso2, onCountryClick],
   )
 
   const selectedCountry = selectedIso2 ? countries.find((c) => c.iso2 === selectedIso2) : null
 
   return (
-    <Card className="w-full border-primary/20">
+    <Card className="w-full border-primary/20 relative">
       <CardContent className="p-4">
         <h3 className="text-lg font-medium mb-4 text-primary">Civic Space Status in Africa</h3>
 
         {/* Interactive choropleth map */}
-        <div className="w-full rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900">
+        <div className="w-full rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900" ref={mapRef}>
           <ComposableMap
             projection="geoMercator"
             projectionConfig={{ scale: 380, center: [22, 2] }}
@@ -115,7 +123,19 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: Afr
                         hover: { fill: HOVER_FILL[key], outline: "none", cursor: "pointer" },
                         pressed: { outline: "none" },
                       }}
-                      onMouseEnter={() => country && setTooltip({ name: country.name, status: country.status })}
+                      onMouseEnter={(e) => {
+                        if (!country) return
+                        const rect = mapRef.current?.getBoundingClientRect()
+                        const svgRect = (e.target as SVGElement).getBoundingClientRect()
+                        if (rect && svgRect) {
+                          setTooltip({
+                            name: country.name,
+                            status: country.status,
+                            x: svgRect.left - rect.left + svgRect.width / 2,
+                            y: svgRect.top - rect.top - 10,
+                          })
+                        }
+                      }}
                       onMouseLeave={() => setTooltip(null)}
                       onClick={() => country && handleClick(country.iso2)}
                     />
@@ -126,12 +146,18 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: Afr
           </ComposableMap>
         </div>
 
-        {/* Hover tooltip (simple) */}
+        {/* Hover tooltip (positioned near cursor) */}
         {tooltip && (
-          <div className="mt-2 text-sm text-center text-muted-foreground">
-            <span className="font-medium text-foreground">{tooltip.name}</span>
-            {" — "}
-            <span>{statusLabel(tooltip.status)}</span>
+          <div
+            className="pointer-events-none absolute z-10 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm shadow-lg border"
+            style={{
+              left: tooltip.x,
+              top: tooltip.y,
+              transform: "translate(-50%, -100%)",
+            }}
+          >
+            <span className="font-medium">{tooltip.name}</span>
+            <span className="opacity-80 ml-2">— {statusLabel(tooltip.status)}</span>
           </div>
         )}
 
@@ -177,15 +203,26 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry }: Afr
               </h4>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                 {byRegion(region).map((country) => (
-                  <div
+                  <a
                     key={country.iso2}
-                    className={`${statusClass(country.status)} p-2 rounded-md cursor-pointer text-center text-xs font-medium transition-opacity hover:opacity-80 ${
-                      country.status === "narrowed" ? "text-black" : "text-white"
-                    } ${selectedIso2 === country.iso2 ? "ring-2 ring-primary ring-offset-1" : ""}`}
-                    onClick={() => handleClick(country.iso2)}
+                    href={onCountryClick ? `#` : `/dashboard?view=country&country=${country.iso2}`}
+                    onClick={(e) => {
+                      if (onCountryClick) {
+                        e.preventDefault()
+                        onCountryClick(country.iso2)
+                      }
+                    }}
+                    className={`${statusClass(country.status)} p-2 rounded-md text-center text-xs font-medium transition-opacity hover:opacity-80 ${
+                      selectedIso2 === country.iso2 ? "ring-2 ring-primary ring-offset-1" : ""
+                    }`}
+                    style={{
+                      display: "block",
+                      textDecoration: "none",
+                      color: country.status === "narrowed" ? "#000" : "#fff",
+                    }}
                   >
                     {country.name}
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
