@@ -63,6 +63,20 @@ We use a color coding system to visually represent the different civic space sit
 - **Repressed/threatened** - Red
 - **Closed** - Dark Red
 
+## Scoring Scale
+
+AfEONet uses a 0–10 scale to assess each of the eight dimensions of civic space. The composite score determines the overall civic space status:
+
+| Score Range | Status | Description |
+|-------------|--------|-------------|
+| 8 – 10 | **Open / Free / Secure** | Civic space is fully protected. Observers operate freely without fear of harassment or legal restrictions. |
+| 6 – 8 | **Narrowed** | Civic space is generally open but with specific restrictions or challenges that limit observer effectiveness. |
+| 4 – 6 | **Obstructed** | Civic space faces significant barriers. Observers encounter bureaucratic obstacles, legal threats, or targeted pressure. |
+| 2 – 4 | **Repressed / Threatened** | Civic space is severely constrained. Observers face arrests, violence, or systematic intimidation. |
+| 0 – 2 | **Closed** | Civic space is virtually non-existent. Election observation is prohibited or extremely dangerous. |
+
+*Source: Abel Eseru, "Monitoring Civic Space for Citizen Observers" (2025).*
+
 ### Data Collection Process
 
 Our data collection process involves a network of focal persons in different African countries. These individuals are trained to observe and document the state of civic space according to our eight dimensions. The collected data is then validated by our team of administrators before being published on the platform.
