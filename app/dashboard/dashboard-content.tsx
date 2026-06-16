@@ -159,8 +159,15 @@ function SummarySheet() {
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-primary mb-1">Summary Sheet</h2>
-      <p className="text-sm text-muted-foreground mb-4">Civic space categories across {total} assessed countries</p>
+      <div className="flex items-start justify-between mb-1">
+        <div>
+          <h2 className="text-lg font-bold text-primary mb-1">Summary Sheet</h2>
+          <p className="text-sm text-muted-foreground mb-4">Civic space categories across {total} assessed countries</p>
+        </div>
+        <Button asChild variant="outline" size="sm" className="border-primary/20 text-primary text-xs">
+          <Link href="/about#scoring">Scoring →</Link>
+        </Button>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {categories.map((cat) => {
           const Icon = cat.icon
