@@ -2,6 +2,7 @@
 import type { NextConfig } from "next";
 import { env } from "process";
 import createMDX from '@next/mdx'
+import createNextIntlPlugin from 'next-intl/plugin'
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: [(env.REPLIT_DOMAINS || "").split(",")[0]],
@@ -17,5 +18,7 @@ const withMDX = createMDX({
   extension: /\.(md|mdx)$/,
 })
 
-// Merge MDX config with Next.js config
-export default withMDX(nextConfig);
+const withNextIntl = createNextIntlPlugin('./i18n.ts')
+
+// Chain: next-intl → MDX → Next.js config
+export default withNextIntl(withMDX(nextConfig));
