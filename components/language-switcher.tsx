@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useLocale } from "next-intl"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter } from "@/lib/i18n/navigation"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Check, Globe } from "lucide-react"
@@ -27,8 +27,7 @@ export function LanguageSwitcher() {
 
   const handleLanguageChange = (langCode: string) => {
     // Replace current locale in pathname with new locale
-    const newPathname = pathname.replace(`/${locale}`, `/${langCode}`)
-    router.push(newPathname)
+    router.replace(pathname, { locale: langCode })
     setOpen(false)
   }
 
