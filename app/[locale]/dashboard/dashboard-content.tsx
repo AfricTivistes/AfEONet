@@ -2,6 +2,7 @@
 
 import { useMemo } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
@@ -11,7 +12,7 @@ import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { CountrySelector } from "@/components/country-selector"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, Globe, GitCompare, X } from "lucide-react"
+import { AlertTriangle, Globe, GitCompare, X, Shield, Unlock, AlertOctagon, Lock, Ban } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -123,6 +124,85 @@ function CountryDimensionPanel({ country }: { country: Country }) {
   )
 }
 
+function SummarySheet() {
+  const t = useTranslations("dashboard")
+  const assessed = useMemo(() => assessedCountries(), [])
+  const total = assessed.length
+
+  const categories = useMemo(() => {
+    const cats = {
+      open: { label: "Open / Free", range: "8–10", min: 8, icon: Unlock, color: "hsl(120 100% 35%)" },
+      narrowed: { label: "Narrowed", range: "6–8", min: 6, icon: Shield, color: "hsl(45 100% 50%)" },
+      obstructed: { label: "Obstructed", range: "4–6", min: 4, icon: AlertOctagon, color: "hsl(30 100% 50%)" },
+      repressed: { label: "Repressed / Threatened", range: "2–4", min: 2, icon: Lock, color: "hsl(30 100% 30%)" },
+      closed: { label: "Closed", range: "0–2", min: 0, icon: Ban, color: "hsl(0 100% 50%)" },
+    }
+
+    const counts = {
+      open: 0, narrowed: 0, obstructed: 0, repressed: 0, closed: 0,
+    }
+
+    for (const c of assessed) {
+      const score = c.composite ?? 0
+      if (score >= 8) counts.open++
+      else if (score >= 6) counts.narrowed++
+      else if (score >= 4) counts.obstructed++
+      else if (score >= 2) counts.repressed++
+      else counts.closed++
+    }
+
+    return Object.entries(cats).map(([key, config]) => ({
+      key,
+      ...config,
+      count: counts[key as keyof typeof counts],
+      pct: total > 0 ? Math.round((counts[key as keyof typeof counts] / total) * 100) : 0,
+    }))
+  }, [assessed, total])
+
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
+      <div className="flex items-start justify-between mb-1">
+        <div>
+          <h2 className="text-lg font-bold text-primary mb-1">{t("summary")}</h2>
+          <p className="text-sm text-muted-foreground mb-4">{t("summaryDesc")} ({total})</p>
+        </div>
+        <Button asChild variant="outline" size="sm" className="border-primary/20 text-primary text-xs">
+          <Link href="/about#scoring">{t("scoring")} →</Link>
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {categories.map((cat) => {
+          const Icon = cat.icon
+          return (
+            <div
+              key={cat.key}
+              className="bg-secondary/10 rounded-lg p-4 text-center space-y-2"
+            >
+              <div className="flex justify-center">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: `${cat.color}30` }}
+                >
+                  <Icon className="h-5 w-5" style={{ color: cat.color }} />
+                </div>
+              </div>
+              <div className="text-2xl font-bold" style={{ color: cat.color }}>
+                {cat.count}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {cat.pct}% — {cat.label}
+              </div>
+              <div className="text-xs font-mono text-muted-foreground">
+                {cat.range}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
   const assessed = useMemo(() => assessedCountries().sort((a, b) => (b.composite ?? 0) - (a.composite ?? 0)), [])
 
@@ -133,6 +213,8 @@ function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
 
   return (
     <div className="space-y-8">
+      <SummarySheet />
+
       <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
         <h2 className="text-lg font-bold text-primary mb-1">Average Scores — 8 Dimensions (21 countries)</h2>
         <p className="text-sm text-muted-foreground mb-4">Global composite: <strong>5.2/10</strong></p>
@@ -314,13 +396,15 @@ export default function DashboardContent() {
     { id: "comparison", label: "Comparison",  icon: GitCompare },
   ]
 
+  const t = useTranslations("dashboard")
+  
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       <section className="bg-primary py-12 text-white">
         <div className="container">
-          <h1 className="text-3xl font-bold tracking-tight">Civic Space Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-primary-foreground/80 max-w-2xl mt-2">
-            2025 AfEONet assessment — 21 countries, 8 dimensions. Source: Abel Eseru, Eyes on the Ballot Watchers.
+            {t("subtitle")}
           </p>
         </div>
       </section>

@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "title": "AfEONet - African Election Observers Network",
+    "description": "Monitoring civic space for citizen election observers in Africa"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "reports": "Reports",
+    "alerts": "Alerts",
+    "news": "News",
+    "about": "About",
+    "contact": "Contact",
+    "submit": "Submit Data",
+    "admin": "Admin"
+  },
+  "status": {
+    "open": "Open/Free",
+    "restricted": "Restricted",
+    "narrowed": "Narrowed",
+    "obstructed": "Obstructed",
+    "repressed": "Repressed/Threatened",
+    "closed": "Closed"
+  },
+  "dimensions": {
+    "regulatory": "Regulatory Framework",
+    "administrative": "Administrative Constraints",
+    "embRelationship": "EMB Relationship",
+    "security": "Safety & Wellbeing",
+    "dataAccess": "Access to Election Data",
+    "funding": "Access to Funding",
+    "dialogue": "Dialogue & Consultation",
+    "perception": "Perception"
+  },
+  "dashboard": {
+    "title": "Civic Space Dashboard",
+    "subtitle": "2025 AfEONet assessment — 21 countries, 8 dimensions",
+    "summary": "Summary Sheet",
+    "summaryDesc": "Civic space categories across assessed countries",
+    "averageScores": "Average Scores — 8 Dimensions",
+    "globalComposite": "Global composite",
+    "countryRankings": "Country Rankings",
+    "selectCountry": "Select Country",
+    "clearSelection": "Clear selection",
+    "countriesAssessed": "countries assessed",
+    "dimensionsEvaluated": "dimensions evaluated",
+    "view": {
+      "global": "Global View",
+      "comparison": "Comparison"
+    },
+    "scoring": "Scoring Scale"
+  },
+  "submit": {
+    "title": "Submit Civic Space Data",
+    "step": "Step",
+    "generalInfo": "General Information",
+    "country": "Country",
+    "observer": "Your name",
+    "date": "Observation date",
+    "rating": "Rating",
+    "trend": "Trend",
+    "context": "Context and reasons",
+    "improving": "Improving",
+    "stable": "Stable",
+    "deteriorating": "Deteriorating",
+    "unknown": "Unknown",
+    "previous": "Previous",
+    "next": "Next",
+    "save": "Save",
+    "submit": "Submit",
+    "selectCountry": "Select a country",
+    "selectTrend": "Select a trend",
+    "describeContext": "Describe the context and reasons for your assessment...",
+    "provideDetails": "Provide details that justify your assessment.",
+    "summary": "Summary and confirmation"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "close": "Close",
+    "readMore": "Read more",
+    "viewAll": "View all",
+    "learnMore": "Learn more"
+  }
+}
