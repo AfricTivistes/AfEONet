@@ -68,6 +68,10 @@
     "next": "Suivant",
     "save": "Enregistrer",
     "submit": "Soumettre",
+    "selectCountry": "Sélectionner un pays",
+    "selectTrend": "Sélectionner une tendance",
+    "describeContext": "Décrivez le contexte et les raisons de votre évaluation...",
+    "provideDetails": "Fournissez des détails qui justifient votre évaluation.",
     "summary": "Résumé et confirmation"
   },
   "common": {

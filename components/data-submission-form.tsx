@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -58,6 +59,7 @@ const formSchema = z.object({
 })
 
 export function DataSubmissionForm() {
+  const t = useTranslations("submit")
   const [step, setStep] = useState(1)
   const totalSteps = 5
 
@@ -106,9 +108,9 @@ export function DataSubmissionForm() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-primary mb-2">Submit Civic Space Data</h2>
+      <h2 className="text-2xl font-bold text-primary mb-2">{t("title")}</h2>
       <p className="text-muted-foreground mb-6">
-        Step {step} of {totalSteps} - {step === 1 ? "General Information" : `Dimension ${step - 1}`}
+        {t("step")} {step} {t("of")} {totalSteps} - {step === 1 ? t("generalInfo") : `Dimension ${step - 1}`}
       </p>
       <div className="w-full bg-secondary/20 h-2 mb-8 rounded-full overflow-hidden">
         <div
@@ -126,11 +128,11 @@ export function DataSubmissionForm() {
                 name="country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Country</FormLabel>
+                    <FormLabel>{t("country")}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="border-primary/20">
-                          <SelectValue placeholder="Select a country" />
+                          <SelectValue placeholder={t("selectCountry")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -469,7 +471,7 @@ export function DataSubmissionForm() {
                 name="relationshipRating"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>Rating</FormLabel>
+                    <FormLabel>{t("rating")}</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -533,11 +535,11 @@ export function DataSubmissionForm() {
                 name="relationshipTrend"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Trend</FormLabel>
+                    <FormLabel>{t("trend")}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="border-primary/20">
-                          <SelectValue placeholder="Select a trend" />
+                          <SelectValue placeholder={t("selectTrend")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

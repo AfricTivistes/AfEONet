@@ -68,6 +68,10 @@
     "next": "Next",
     "save": "Save",
     "submit": "Submit",
+    "selectCountry": "Select a country",
+    "selectTrend": "Select a trend",
+    "describeContext": "Describe the context and reasons for your assessment...",
+    "provideDetails": "Provide details that justify your assessment.",
     "summary": "Summary and confirmation"
   },
   "common": {
