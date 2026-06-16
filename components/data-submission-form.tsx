@@ -14,24 +14,24 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-// Descriptions des dimensions pour aider les utilisateurs à comprendre chaque dimension
+// Descriptions des dimensions — alignées avec le data collection tool d'Abel Eseru
 const dimensionDescriptions = {
   regulatoryFramework:
-    "The regulatory framework that protects citizen observers as human rights defenders, including laws and institutions governing civil society organizations' operations.",
+    "Laws and institutions governing civil society organizations' operations, including registration requirements, operational constraints, and penalties for non-compliance.",
   administrativeConstraints:
-    "Accreditation procedures and other bureaucracies imposed on citizen observers, which were once relatively simple but have become more constraining.",
-  relationship:
-    "The quality and nature of the relationship between citizen observer organizations and the electoral management body.",
-  security:
-    "The use of legal and illegal mechanisms that threaten the work of citizen observer organizations, their leaders, staff, and volunteers.",
-  accessToData:
-    "The procedures in place to allow citizen observers to access information on electoral management and processes.",
+    "Accreditation procedures, fees, and bureaucratic obstacles imposed on citizen observers. Includes accreditation timelines, costs, and requirements for foreign observers.",
+  embRelationship:
+    "The quality and nature of the relationship between citizen observer organizations and the Electoral Management Body (EMB). Includes communication, cooperation, and information sharing.",
+  safetyWellbeing:
+    "Threats, intimidation, arrests, or physical violence against citizen observers, their leaders, staff, and volunteers. Includes legal and illegal mechanisms used to constrain their work.",
+  accessToElectionData:
+    "Access to voter registers, polling station lists, and election results at the polling station level. Includes transparency in electoral data management.",
   accessToFunding:
-    "The freedom of citizen observers to mobilize funding for election observation, the types of funding sources available, and whether these sources are open or controlled.",
-  dialogue:
-    "The platforms available for citizen observers to engage in dialogue with relevant government institutions on observation recommendations and electoral reforms.",
+    "Barriers to mobilizing funding for election observation. Includes restrictions on donor funding, local fundraising limitations, and political interference in funding sources.",
+  dialogueConsultation:
+    "Spaces for dialogue between citizen observers and government institutions, including the EMB, on electoral reforms and observation recommendations. Includes post-election consultation mechanisms.",
   perception:
-    "The perception of the ruling party/regime, opposition political parties, media, and the general public on the role of citizen observers in democracy and the credibility of elections.",
+    "Perception of citizen observers by the ruling party/regime, opposition, media, and general public. Includes their credibility, trustworthiness, and acceptance as democracy actors.",
 }
 
 const formSchema = z.object({
@@ -177,7 +177,7 @@ export function DataSubmissionForm() {
           {step === 2 && (
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-4">
-                <h3 className="text-lg font-medium text-primary">Regulatory Framework</h3>
+                <h3 className="text-lg font-medium text-primary">D1 — Regulatory Framework</h3>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -185,7 +185,7 @@ export function DataSubmissionForm() {
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="max-w-xs text-xs">
-                        Evaluate the regulatory framework that protects citizen observers as human rights defenders.
+                        Score 0–10: Laws and institutions governing civil society operations.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -310,7 +310,7 @@ export function DataSubmissionForm() {
           {step === 3 && (
             <div className="space-y-6">
               <div className="flex items-center space-x-2 mb-4">
-                <h3 className="text-lg font-medium text-primary">Administrative Constraints</h3>
+                <h3 className="text-lg font-medium text-primary">D2 — Administrative Constraints</h3>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -318,7 +318,7 @@ export function DataSubmissionForm() {
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="max-w-xs text-xs">
-                        Evaluate the administrative constraints imposed on citizen observers.
+                        Score 0–10: Accreditation procedures, fees, and bureaucratic obstacles.
                       </p>
                     </TooltipContent>
                   </Tooltip>
