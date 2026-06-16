@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
+import { Link } from "next-intl"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { Menu, X } from "lucide-react"
@@ -11,14 +12,16 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  const t = useTranslations("navigation")
+  
   const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "News", href: "/news" },
-    { name: "Reports", href: "/reports" },
-    { name: "Submit Data", href: "/submit" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
+    { name: t("home"), href: "/" },
+    { name: t("dashboard"), href: "/dashboard" },
+    { name: t("news"), href: "/news" },
+    { name: t("reports"), href: "/reports" },
+    { name: t("submit"), href: "/submit" },
+    { name: t("about"), href: "/about" },
+    { name: t("contact"), href: "/contact" },
   ]
 
   useEffect(() => {
@@ -86,7 +89,7 @@ export default function Header() {
               asChild
               className="hidden md:flex bg-secondary text-primary hover:bg-secondary/90 transition-all duration-200"
             >
-              <Link href="/login">Login</Link>
+              <Link href="/login">{t("admin")}</Link>
             </Button>
 
             <Button

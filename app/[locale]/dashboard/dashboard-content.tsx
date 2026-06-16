@@ -2,6 +2,7 @@
 
 import { useMemo } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
@@ -124,6 +125,7 @@ function CountryDimensionPanel({ country }: { country: Country }) {
 }
 
 function SummarySheet() {
+  const t = useTranslations("dashboard")
   const assessed = useMemo(() => assessedCountries(), [])
   const total = assessed.length
 
@@ -161,11 +163,11 @@ function SummarySheet() {
     <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
       <div className="flex items-start justify-between mb-1">
         <div>
-          <h2 className="text-lg font-bold text-primary mb-1">Summary Sheet</h2>
-          <p className="text-sm text-muted-foreground mb-4">Civic space categories across {total} assessed countries</p>
+          <h2 className="text-lg font-bold text-primary mb-1">{t("summary")}</h2>
+          <p className="text-sm text-muted-foreground mb-4">{t("summaryDesc")} ({total})</p>
         </div>
         <Button asChild variant="outline" size="sm" className="border-primary/20 text-primary text-xs">
-          <Link href="/about#scoring">Scoring →</Link>
+          <Link href="/about#scoring">{t("scoring")} →</Link>
         </Button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -394,13 +396,15 @@ export default function DashboardContent() {
     { id: "comparison", label: "Comparison",  icon: GitCompare },
   ]
 
+  const t = useTranslations("dashboard")
+  
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       <section className="bg-primary py-12 text-white">
         <div className="container">
-          <h1 className="text-3xl font-bold tracking-tight">Civic Space Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-primary-foreground/80 max-w-2xl mt-2">
-            2025 AfEONet assessment — 21 countries, 8 dimensions. Source: Abel Eseru, Eyes on the Ballot Watchers.
+            {t("subtitle")}
           </p>
         </div>
       </section>

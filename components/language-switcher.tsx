@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useLocale } from "next-intl"
+import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Check, Globe } from "lucide-react"
@@ -13,31 +15,25 @@ type Language = {
 }
 
 const languages: Language[] = [
-  {
-    code: "en",
-    name: "English",
-    flag: "🇬🇧",
-  },
-  {
-    code: "fr",
-    name: "Français",
-    flag: "🇫🇷",
-  },
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
 ]
 
 export function LanguageSwitcher() {
-  const [currentLanguage, setCurrentLanguage] = useState<string>("en")
+  const locale = useLocale()
+  const router = useRouter()
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
   const handleLanguageChange = (langCode: string) => {
-    setCurrentLanguage(langCode)
+    // Replace current locale in pathname with new locale
+    const newPathname = pathname.replace(`/${locale}`, `/${langCode}`)
+    router.push(newPathname)
     setOpen(false)
-    // Ici, vous pourriez implémenter la logique pour changer la langue de l'application
-    // Par exemple, en utilisant i18n ou en stockant la préférence dans localStorage
   }
 
   const getCurrentLanguage = () => {
-    return languages.find((lang) => lang.code === currentLanguage) || languages[0]
+    return languages.find((lang) => lang.code === locale) || languages[0]
   }
 
   return (
@@ -60,7 +56,7 @@ export function LanguageSwitcher() {
               <div className="flex items-center w-full">
                 <span className="mr-2">{language.flag}</span>
                 <span>{language.name}</span>
-                {currentLanguage === language.code && <Check className={cn("ml-auto h-4 w-4")} />}
+                {locale === language.code && <Check className={cn("ml-auto h-4 w-4")} />}
               </div>
             </Button>
           ))}
@@ -69,4 +65,3 @@ export function LanguageSwitcher() {
     </Popover>
   )
 }
-
