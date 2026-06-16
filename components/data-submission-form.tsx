@@ -461,7 +461,7 @@ export function DataSubmissionForm() {
               </div>
 
               <div className="bg-secondary/10 p-4 rounded-md mb-6">
-                <p className="text-sm text-muted-foreground">{dimensionDescriptions.relationship}</p>
+                <p className="text-sm text-muted-foreground">{dimensionDescriptions.embRelationship}</p>
               </div>
 
               <FormField
