@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "title": "AfEONet - Réseau Africain des Observateurs d'Élections",
+    "description": "Surveillance de l'espace civique pour les observateurs citoyens d'élections en Afrique"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "reports": "Rapports",
+    "alerts": "Alertes",
+    "news": "Actualités",
+    "about": "À propos",
+    "contact": "Contact",
+    "submit": "Soumettre des données",
+    "admin": "Admin"
+  },
+  "status": {
+    "open": "Ouvert/Libre",
+    "restricted": "Restreint",
+    "narrowed": "Rétréci",
+    "obstructed": "Obstrué",
+    "repressed": "Réprimé/Menacé",
+    "closed": "Fermé"
+  },
+  "dimensions": {
+    "regulatory": "Cadre Réglementaire",
+    "administrative": "Contraintes Administratives",
+    "embRelationship": "Relation avec l'EMB",
+    "security": "Sécurité & Bien-être",
+    "dataAccess": "Accès aux Données Électorales",
+    "funding": "Accès au Financement",
+    "dialogue": "Dialogue & Consultation",
+    "perception": "Perception"
+  },
+  "dashboard": {
+    "title": "Tableau de bord de l'Espace Civique",
+    "subtitle": "Évaluation AfEONet 2025 — 21 pays, 8 dimensions",
+    "summary": "Tableau Synthétique",
+    "summaryDesc": "Catégories d'espace civique parmi les pays évalués",
+    "averageScores": "Scores Moyens — 8 Dimensions",
+    "globalComposite": "Composite global",
+    "countryRankings": "Classement des Pays",
+    "selectCountry": "Sélectionner un pays",
+    "clearSelection": "Effacer la sélection",
+    "countriesAssessed": "pays évalués",
+    "dimensionsEvaluated": "dimensions évaluées",
+    "view": {
+      "global": "Vue Globale",
+      "comparison": "Comparaison"
+    },
+    "scoring": "Échelle de Notation"
+  },
+  "submit": {
+    "title": "Soumettre des Données sur l'Espace Civique",
+    "step": "Étape",
+    "generalInfo": "Informations Générales",
+    "country": "Pays",
+    "observer": "Votre nom",
+    "date": "Date d'observation",
+    "rating": "Évaluation",
+    "trend": "Tendance",
+    "context": "Contexte et raisons",
+    "improving": "S'améliore",
+    "stable": "Stable",
+    "deteriorating": "Se dégrade",
+    "unknown": "Inconnu",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "save": "Enregistrer",
+    "submit": "Soumettre",
+    "summary": "Résumé et confirmation"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "close": "Fermer",
+    "readMore": "Lire la suite",
+    "viewAll": "Voir tout",
+    "learnMore": "En savoir plus"
+  }
+}
