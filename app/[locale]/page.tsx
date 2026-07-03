@@ -1,5 +1,6 @@
-import Link from "next/link"
 import Image from "next/image"
+import { Link } from "@/lib/i18n/navigation"
+import { getTranslations } from "next-intl/server"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AfricaMap } from "@/components/africa-map"
@@ -7,26 +8,29 @@ import { ArrowRight, BarChart2, FileText, Send, Users, Calendar, Globe, Shield, 
 import { Badge } from "@/components/ui/badge"
 import { getPage } from "@/lib/pages"
 import { getAllNewsArticles } from "@/lib/news"
+import { getReports } from "@/lib/reports"
 import { statusCounts, statusLabel, countries } from "@/lib/countries"
+import { PARTNER_NAMES } from "@/lib/partners"
 
-// Données pour les statistiques
-const stats = [
-  { value: "54", label: "African Countries", icon: Globe, color: "bg-accent-pink" },
-  { value: "1000+", label: "Election Observers", icon: Users, color: "bg-accent-blue" },
-  { value: "250+", label: "Reports Published", icon: FileText, color: "bg-accent-green" },
-  { value: "35+", label: "Partner Organizations", icon: Shield, color: "bg-accent-purple" },
-]
+function buildStats(t: Awaited<ReturnType<typeof getTranslations>>, reportsCount: number) {
+  return [
+    { value: "54", label: t("statCountries"), icon: Globe, color: "bg-accent-pink" },
+    { value: "1000+", label: t("statObservers"), icon: Users, color: "bg-accent-blue" },
+    { value: `${reportsCount}`, label: t("statReports"), icon: FileText, color: "bg-accent-green" },
+    { value: "35+", label: t("statPartners"), icon: Shield, color: "bg-accent-purple" },
+  ]
+}
 
-const STATUS_ORDER = ["open", "narrowed", "obstructed", "repressed", "closed", "unknown"] as const
+const STATUS_ORDER = ["open", "restricted", "narrowed", "obstructed", "repressed", "closed", "unknown"] as const
 
-function CivicSpaceStats() {
+function CivicSpaceStats({ tCommon }: { tCommon: Awaited<ReturnType<typeof getTranslations>> }) {
   const counts = statusCounts()
   return (
     <div className="flex flex-wrap justify-center gap-3 mb-6">
       {STATUS_ORDER.map((key) => {
         const count = counts[key]
         if (count === 0) return null
-        const label = key === "unknown" ? "Not assessed" : statusLabel(key)
+        const label = key === "unknown" ? tCommon("notAssessed") : statusLabel(key)
         return (
           <div
             key={key}
@@ -43,10 +47,17 @@ function CivicSpaceStats() {
   )
 }
 
-export default async function Home() {
-  const pageData = await getPage('homepage')
-  const newsArticles = getAllNewsArticles().slice(0, 4) // Top 4 recent articles
-  
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "home" })
+  const tCommon = await getTranslations({ locale, namespace: "common" })
+  const tNav = await getTranslations({ locale, namespace: "navigation" })
+  const tFooter = await getTranslations({ locale, namespace: "footer" })
+  const pageData = await getPage('homepage', locale)
+  const newsArticles = getAllNewsArticles(locale).slice(0, 4) // Top 4 recent articles
+  const stats = buildStats(t, (await getReports(locale)).length)
+  const assessedCount = countries.filter((c) => c.status !== null).length
+
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       {/* Hero Section */}
@@ -67,21 +78,21 @@ export default async function Home() {
                 ) : (
                   <div className="space-y-2">
                     <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none text-white">
-                      Monitoring Civic Space for Citizen Election Observers
+                      {t("heroTitleFallback")}
                     </h1>
                     <p className="max-w-[600px] text-primary-foreground/80 md:text-xl">
-                      AfEONet monitors and documents civic space for citizen election observers in Africa.
+                      {t("heroSubtitleFallback")}
                     </p>
                   </div>
                 )}
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg" className="gap-1 bg-secondary text-primary hover:bg-secondary/90">
                     <Link href="/dashboard">
-                      View data <ArrowRight className="h-4 w-4 ml-2" />
+                      {t("viewData")} <ArrowRight className="h-4 w-4 ml-2" />
                     </Link>
                   </Button>
                   <Button asChild size="lg" className="bg-white/20 text-white border border-white/40 hover:bg-white/30">
-                    <Link href="/about">About AfEONet</Link>
+                    <Link href="/about">{t("aboutAfeonet")}</Link>
                   </Button>
                 </div>
               </div>
@@ -132,7 +143,7 @@ export default async function Home() {
                 <div className="mt-8">
                   <Button asChild className="bg-primary text-white hover:bg-primary/90">
                     <Link href="/about">
-                      Learn more about our mission <ArrowRight className="ml-2 h-4 w-4" />
+                      {t("learnMoreMission")} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                 </div>
@@ -140,22 +151,19 @@ export default async function Home() {
             ) : (
               <div>
                 <h2 className="text-3xl font-bold mb-6 text-primary relative inline-block">
-                  Our Mission
+                  {t("missionTitleFallback")}
                   <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
                 </h2>
                 <p className="mb-4 text-muted-foreground">
-                  AfEONet&apos;s mission is to monitor and document the state of civic space for citizen election observers in
-                  Africa. Our ultimate goal is to establish a robust monitoring framework that highlights and reports
-                  whenever the work of citizen observers is threatened.
+                  {t("missionParagraph1Fallback")}
                 </p>
                 <p className="text-muted-foreground">
-                  Citizen election observers are now recognized as human rights defenders, playing an indispensable role
-                  in upholding civil and political rights, as well as strengthening democratic values and principles.
+                  {t("missionParagraph2Fallback")}
                 </p>
                 <div className="mt-8">
                   <Button asChild className="bg-primary text-white hover:bg-primary/90">
                     <Link href="/about">
-                      Learn more about our mission <ArrowRight className="ml-2 h-4 w-4" />
+                      {t("learnMoreMission")} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                 </div>
@@ -171,30 +179,33 @@ export default async function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-white text-lg font-medium">Citizen observers monitoring elections in Africa</p>
+                  <p className="text-white text-lg font-medium">{t("missionImageCaption")}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-      
+
       {/* Overview of Civic Space */}
       <section className="py-16 md:py-24 bg-white dark:bg-background">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8">
-            <h2 className="text-3xl font-bold text-primary">Overview of Civic Space in Africa</h2>
+            <h2 className="text-3xl font-bold text-primary">{t("overviewTitle")}</h2>
             <p className="max-w-[700px] text-muted-foreground md:text-lg">
-              Explore the current state of civic space for election observers across the continent.
+              {t("overviewSubtitle")}
             </p>
           </div>
 
           {/* Live status stats */}
-          <CivicSpaceStats />
+          <CivicSpaceStats tCommon={tCommon} />
 
           <p className="text-center text-sm text-muted-foreground mb-8">
-            <span className="font-medium text-primary">{countries.filter((c) => c.status !== null).length}</span>
-            {" / "}{countries.length} countries assessed — {countries.length - countries.filter((c) => c.status !== null).length} pending
+            {t("countriesAssessedText", {
+              assessed: assessedCount,
+              total: countries.length,
+              pending: countries.length - assessedCount,
+            })}
           </p>
 
           <AfricaMap navigateOnClick />
@@ -202,7 +213,7 @@ export default async function Home() {
           <div className="mt-8 text-center">
             <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">
               <Link href="/dashboard">
-                View full dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                {t("overviewCta")} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
@@ -221,9 +232,9 @@ export default async function Home() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-6">Key Features</h2>
+              <h2 className="text-3xl font-bold text-white mb-6">{t("featuresTitleFallback")}</h2>
               <p className="max-w-[700px] text-primary-foreground/80 md:text-lg">
-                Discover how AfEONet helps you understand and improve civic space.
+                {t("featuresSubtitleFallback")}
               </p>
             </div>
           )}
@@ -233,9 +244,9 @@ export default async function Home() {
                 <div className="p-3 bg-secondary rounded-full">
                   <BarChart2 className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Data Visualization</h3>
+                <h3 className="text-xl font-bold text-white">{t("featureDataVizTitle")}</h3>
                 <p className="text-primary-foreground/80">
-                  Explore civic space data through interactive visualizations and maps.
+                  {t("featureDataVizText")}
                 </p>
               </CardContent>
             </Card>
@@ -244,9 +255,9 @@ export default async function Home() {
                 <div className="p-3 bg-secondary rounded-full">
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Detailed Reports</h3>
+                <h3 className="text-xl font-bold text-white">{t("featureReportsTitle")}</h3>
                 <p className="text-primary-foreground/80">
-                  Access comprehensive reports on the state of civic space in different African countries.
+                  {t("featureReportsText")}
                 </p>
               </CardContent>
             </Card>
@@ -255,9 +266,9 @@ export default async function Home() {
                 <div className="p-3 bg-secondary rounded-full">
                   <Users className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Observer Network</h3>
+                <h3 className="text-xl font-bold text-white">{t("featureNetworkTitle")}</h3>
                 <p className="text-primary-foreground/80">
-                  Join a network of citizen observers dedicated to monitoring and improving civic space.
+                  {t("featureNetworkText")}
                 </p>
               </CardContent>
             </Card>
@@ -266,12 +277,12 @@ export default async function Home() {
                 <div className="p-3 bg-secondary rounded-full">
                   <Send className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Submit Data</h3>
+                <h3 className="text-xl font-bold text-white">{t("featureSubmitTitle")}</h3>
                 <p className="text-primary-foreground/80">
-                  Contribute to our database by submitting your observations on civic space in your country.
+                  {t("featureSubmitText")}
                 </p>
                 <Button asChild size="sm" className="mt-2 bg-secondary text-primary hover:bg-secondary/90">
-                  <Link href="/submit">Submit Now</Link>
+                  <Link href="/submit">{t("submitNow")}</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -291,9 +302,9 @@ export default async function Home() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <h2 className="text-3xl font-bold text-primary mb-6">Latest News</h2>
+              <h2 className="text-3xl font-bold text-primary mb-6">{t("newsTitleFallback")}</h2>
               <p className="max-w-[700px] text-muted-foreground md:text-lg">
-                Stay updated with the latest developments, reports, and activities from AfEONet
+                {t("newsSubtitleFallback")}
               </p>
             </div>
           )}
@@ -324,7 +335,7 @@ export default async function Home() {
                   </div>
                   <Button asChild className="w-fit bg-primary text-white hover:bg-primary/90">
                     <Link href={`/news/${newsArticles[0].slug}`}>
-                      Read full article <ArrowRight className="ml-2 h-4 w-4" />
+                      {t("readMore")} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                 </div>
@@ -354,7 +365,7 @@ export default async function Home() {
                     </div>
                   </div>
                   <Link href={`/news/${article.slug}`} className="text-primary text-sm font-medium">
-                    Read more
+                    {t("readMore")}
                   </Link>
                 </div>
               </div>
@@ -364,7 +375,7 @@ export default async function Home() {
           <div className="flex justify-center mt-12">
             <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">
               <Link href="/news">
-                View all news <ArrowRight className="ml-2 h-4 w-4" />
+                {t("viewAllNews")} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
@@ -386,17 +397,16 @@ export default async function Home() {
           ) : (
             <div className="flex flex-col items-center justify-center space-y-6 text-center">
               <div className="space-y-4 max-w-3xl">
-                <h2 className="text-3xl font-bold md:text-4xl text-primary">Join us in this mission</h2>
+                <h2 className="text-3xl font-bold md:text-4xl text-primary">{t("ctaTitleFallback")}</h2>
                 <p className="text-primary/80 md:text-lg">
-                  Contribute to monitoring civic space and help strengthen democracy in Africa. Together, we can make a
-                  difference in promoting transparent and fair elections across the continent.
+                  {t("ctaContentFallback")}
                 </p>
               </div>
             </div>
           )}
           <div className="flex flex-col gap-3 min-[400px]:flex-row mt-4">
             <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90">
-              <Link href="/contact">Contact Us</Link>
+              <Link href="/contact">{tFooter("contactUs")}</Link>
             </Button>
             <Button
               asChild
@@ -404,7 +414,7 @@ export default async function Home() {
               variant="outline"
               className="bg-transparent text-primary border-primary hover:bg-primary/10"
             >
-              <Link href="/login">Login</Link>
+              <Link href="/login">{tNav("login")}</Link>
             </Button>
             <Button
               asChild
@@ -412,7 +422,7 @@ export default async function Home() {
               variant="outline"
               className="bg-transparent text-primary border-primary hover:bg-primary/10"
             >
-              <Link href="/submit">Submit Data</Link>
+              <Link href="/submit">{tNav("submit")}</Link>
             </Button>
           </div>
         </div>
@@ -432,11 +442,9 @@ export default async function Home() {
                 </>
               ) : (
                 <>
-                  <h2 className="text-3xl font-bold text-primary mb-6">Our Impact Across Africa</h2>
+                  <h2 className="text-3xl font-bold text-primary mb-6">{t("impactTitleFallback")}</h2>
                   <p className="text-muted-foreground mb-6">
-                    AfEONet has been working tirelessly to monitor and improve civic space for election observers across
-                    Africa. Our network spans the continent, providing crucial data and insights that help strengthen
-                    democratic processes.
+                    {t("impactContentFallback")}
                   </p>
                 </>
               )}
@@ -446,9 +454,9 @@ export default async function Home() {
                     <Award className="h-3 w-3 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Improved Observer Protection</h3>
+                    <h3 className="font-semibold">{t("impactProtectionTitle")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Enhanced safety protocols and advocacy for observer rights.
+                      {t("impactProtectionText")}
                     </p>
                   </div>
                 </li>
@@ -457,9 +465,9 @@ export default async function Home() {
                     <Award className="h-3 w-3 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Data-Driven Advocacy</h3>
+                    <h3 className="font-semibold">{t("impactAdvocacyTitle")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Evidence-based approach to improving civic space policies.
+                      {t("impactAdvocacyText")}
                     </p>
                   </div>
                 </li>
@@ -468,9 +476,9 @@ export default async function Home() {
                     <Award className="h-3 w-3 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Capacity Building</h3>
+                    <h3 className="font-semibold">{t("impactCapacityTitle")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Training and resources for observer organizations across the continent.
+                      {t("impactCapacityText")}
                     </p>
                   </div>
                 </li>
@@ -478,7 +486,7 @@ export default async function Home() {
               <div className="mt-8">
                 <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">
                   <Link href="/about">
-                    Learn more about our work <ArrowRight className="ml-2 h-4 w-4" />
+                    {t("learnMoreWork")} <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
@@ -489,6 +497,26 @@ export default async function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Partners & Funding Section */}
+      <section className="py-16 bg-secondary/10">
+        <div className="container px-4 md:px-6 text-center">
+          <h2 className="text-xl font-bold text-primary mb-6">{tCommon("partnersTitle")}</h2>
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
+            {PARTNER_NAMES.map((name) => (
+              <div
+                key={name}
+                className="flex h-14 w-28 items-center justify-center rounded-md border border-primary/20 bg-white px-3 text-center text-xs font-medium text-primary/70"
+                title={name}
+              >
+                {name}
+              </div>
+            ))}
+          </div>
+          <p className="text-sm font-medium text-primary">{tCommon("euCofundedBy")}</p>
+          <p className="mx-auto mt-2 max-w-2xl text-xs text-muted-foreground">{tCommon("euDisclaimer")}</p>
         </div>
       </section>
     </div>

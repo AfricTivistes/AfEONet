@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/lib/i18n/navigation"
+import { getTranslations } from "next-intl/server"
 import { ArrowLeft, Calendar, User, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -12,6 +13,7 @@ import remarkGfm from "remark-gfm"
 interface NewsArticlePageProps {
   params: Promise<{
     id: string
+    locale: string
   }>
 }
 
@@ -24,8 +26,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: NewsArticlePageProps) {
   try {
-    const { id } = await params
-    const article = getNewsArticle(id)
+    const { id, locale } = await params
+    const article = getNewsArticle(id, locale)
     
     if (!article) {
       return {
@@ -127,13 +129,14 @@ async function renderMDXContent(slug: string, content: string) {
 }
 
 export default async function NewsArticlePage({ params }: NewsArticlePageProps) {
-  const { id } = await params
-  const article = getNewsArticle(id)
+  const { id, locale } = await params
+  const article = getNewsArticle(id, locale)
 
   if (!article) {
     notFound()
   }
 
+  const t = await getTranslations({ locale, namespace: "news" })
   const mdxContent = await renderMDXContent(article.slug, article.content)
 
   return (
@@ -143,7 +146,7 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
         <Button asChild variant="ghost" className="mb-6">
           <Link href="/news" className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Back to News
+            {t("backToNews")}
           </Link>
         </Button>
       </div>
@@ -218,13 +221,13 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
       <div className="bg-secondary/10 py-12 mt-12">
         <div className="container">
           <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-primary mb-6">Related Articles</h3>
+            <h3 className="text-2xl font-bold text-primary mb-6">{t("relatedArticlesTitle")}</h3>
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">
-                Discover more insights from AfEONet&apos;s research and monitoring work.
+                {t("relatedArticlesText")}
               </p>
               <Button asChild>
-                <Link href="/news">View All News</Link>
+                <Link href="/news">{t("viewAllNews")}</Link>
               </Button>
             </div>
           </div>

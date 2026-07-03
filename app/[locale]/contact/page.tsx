@@ -1,5 +1,6 @@
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { getTranslations } from "next-intl/server"
 import { getPage } from "@/lib/pages"
 import { ContactForm } from "@/components/contact-form"
 import { FAQSection } from "@/components/faq-section"
@@ -10,8 +11,10 @@ export const metadata = {
   description: "We're here to answer your questions and receive your feedback.",
 }
 
-export default async function ContactPage() {
-  const pageData = await getPage('contact')
+export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "contact" })
+  const pageData = await getPage('contact', locale)
   const staticContent = pageData?.content || ''
 
   return (
@@ -20,9 +23,9 @@ export default async function ContactPage() {
       <section className="bg-primary py-12 text-white">
         <div className="container">
           <div className="flex flex-col space-y-4">
-            <h1 className="text-3xl font-bold tracking-tight">Contact Us</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t("heroTitle")}</h1>
             <p className="text-primary-foreground/80 max-w-2xl">
-              We&apos;re here to answer your questions and receive your feedback.
+              {t("heroSubtitle")}
             </p>
           </div>
         </div>

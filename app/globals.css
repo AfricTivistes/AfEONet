@@ -38,6 +38,7 @@
 
     /* Civic Space Status Colors */
     --status-open: 120 100% 35%;
+    --status-restricted: 80 80% 40%;
     --status-narrowed: 45 100% 50%;
     --status-obstructed: 30 100% 50%;
     --status-repressed: 30 100% 30%;
@@ -95,6 +96,10 @@
 
 .status-open {
   @apply bg-[hsl(var(--status-open))];
+}
+
+.status-restricted {
+  @apply bg-[hsl(var(--status-restricted))];
 }
 
 .status-narrowed {

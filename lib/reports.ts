@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+import { byIso2 } from './countries'
+import { resolveLocalizedPath, listCanonicalSlugs } from './content-locale'
 
 export interface ReportDimensions {
   regulatory?: number
@@ -55,6 +57,23 @@ export interface Alert {
 const reportsDirectory = path.join(process.cwd(), 'content/reports')
 const alertsDirectory = path.join(process.cwd(), 'content/alerts')
 
+/**
+ * lib/countries.ts is the single source of truth for status/composite/dimensions.
+ * Report frontmatter duplicates these fields for CMS convenience, but whenever an
+ * iso2 match exists, the countries.ts values win to prevent the two from drifting apart.
+ */
+function withCanonicalCountryData(report: Report): Report {
+  if (!report.iso2) return report
+  const country = byIso2(report.iso2)
+  if (!country) return report
+  return {
+    ...report,
+    status: country.status ?? report.status,
+    composite: country.composite ?? report.composite,
+    dimensions: country.dimensions ?? report.dimensions,
+  }
+}
+
 // Ensure directories exist
 if (!fs.existsSync(reportsDirectory)) {
   fs.mkdirSync(reportsDirectory, { recursive: true })
@@ -63,22 +82,19 @@ if (!fs.existsSync(alertsDirectory)) {
   fs.mkdirSync(alertsDirectory, { recursive: true })
 }
 
-export async function getReports(): Promise<Report[]> {
+export async function getReports(locale = 'en'): Promise<Report[]> {
   try {
-    const files = fs.readdirSync(reportsDirectory)
-    const reports = files
-      .filter(file => file.endsWith('.mdx'))
-      .map(file => {
-        const filePath = path.join(reportsDirectory, file)
+    const reports = listCanonicalSlugs(reportsDirectory, 'mdx')
+      .map((slug) => {
+        const filePath = resolveLocalizedPath(reportsDirectory, slug, 'mdx', locale)
         const fileContents = fs.readFileSync(filePath, 'utf8')
         const { data, content } = matter(fileContents)
-        const slug = file.replace(/\.mdx?$/, '')
-        
-        return {
+
+        return withCanonicalCountryData({
           ...data,
           content,
           slug
-        } as Report
+        } as Report)
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
@@ -89,10 +105,10 @@ export async function getReports(): Promise<Report[]> {
   }
 }
 
-export async function getReport(idOrSlug: string): Promise<Report | null> {
+export async function getReport(idOrSlug: string, locale = 'en'): Promise<Report | null> {
   try {
-    const reports = await getReports()
-    const report = reports.find(r => 
+    const reports = await getReports(locale)
+    const report = reports.find(r =>
       r.id.toString() === idOrSlug || r.slug === idOrSlug
     )
     return report || null
@@ -102,17 +118,14 @@ export async function getReport(idOrSlug: string): Promise<Report | null> {
   }
 }
 
-export async function getAlerts(): Promise<Alert[]> {
+export async function getAlerts(locale = 'en'): Promise<Alert[]> {
   try {
-    const files = fs.readdirSync(alertsDirectory)
-    const alerts = files
-      .filter(file => file.endsWith('.mdx'))
-      .map(file => {
-        const filePath = path.join(alertsDirectory, file)
+    const alerts = listCanonicalSlugs(alertsDirectory, 'mdx')
+      .map((slug) => {
+        const filePath = resolveLocalizedPath(alertsDirectory, slug, 'mdx', locale)
         const fileContents = fs.readFileSync(filePath, 'utf8')
         const { data, content } = matter(fileContents)
-        const slug = file.replace(/\.mdx?$/, '')
-        
+
         return {
           ...data,
           content,
@@ -128,9 +141,9 @@ export async function getAlerts(): Promise<Alert[]> {
   }
 }
 
-export async function getAlert(idOrSlug: string): Promise<Alert | null> {
+export async function getAlert(idOrSlug: string, locale = 'en'): Promise<Alert | null> {
   try {
-    const alerts = await getAlerts()
+    const alerts = await getAlerts(locale)
     const alert = alerts.find(a =>
       a.id.toString() === idOrSlug || a.slug === idOrSlug
     )
@@ -145,14 +158,14 @@ function normalizeCountry(name: string): string {
   return name.toLowerCase().replace(/[^a-z]/g, "")
 }
 
-export async function getRelatedReports(country: string): Promise<Report[]> {
-  const reports = await getReports()
+export async function getRelatedReports(country: string, locale = 'en'): Promise<Report[]> {
+  const reports = await getReports(locale)
   const key = normalizeCountry(country)
   return reports.filter((r) => normalizeCountry(r.country) === key)
 }
 
-export async function getRelatedAlerts(country: string): Promise<Alert[]> {
-  const alerts = await getAlerts()
+export async function getRelatedAlerts(country: string, locale = 'en'): Promise<Alert[]> {
+  const alerts = await getAlerts(locale)
   const key = normalizeCountry(country)
   return alerts.filter((a) => normalizeCountry(a.country) === key)
 }

@@ -1,5 +1,5 @@
 # AfEONet - Decap CMS Production Configuration
-# Copy this to config.yml when deploying to production
+# Generated from config.yml — keep collections in sync by regenerating from config.yml.
 
 backend:
   name: git-gateway
@@ -21,148 +21,268 @@ logo_url: "/AfEONet-Logo-Green.jpeg"
 # Editorial workflow for content approval
 publish_mode: editorial_workflow
 
-# Collections configuration (same as development)
+# Internationalization
+i18n:
+  structure: multiple_files
+  locales: [en, fr]
+  default_locale: en
+
+# Collections configuration
 collections:
   # News Articles Collection
   - name: "news"
     label: "News Articles"
     folder: "content/news"
+    i18n: true
     create: true
     slug: "{{slug}}"
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-      - { name: "date", label: "Date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: true }
-      - { name: "category", label: "Category", widget: "select", options: ["News", "Annual Reports", "Research", "Analysis", "Updates"], required: true }
-      - { name: "author", label: "Author", widget: "string", required: true }
-      - { name: "featured", label: "Featured Article", widget: "boolean", default: false }
-      - { name: "image", label: "Featured Image", widget: "image", required: false }
+      - { name: "title", label: "Title", widget: "string", i18n: true }
+      - { name: "description", label: "Description", widget: "text", i18n: true }
+      - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
+      - { name: "category", label: "Category", widget: "select", options: ["civic-space", "election-observation", "alerts", "reports", "capacity-building", "general"] }
+      - { name: "author", label: "Author", widget: "string" }
+      - { name: "country", label: "Country (ISO2 or name)", widget: "string", required: false, hint: "Link news to a country for filtering (e.g. 'Ghana' or 'gh')" }
+      - { name: "dimensionTags", label: "Dimension Tags", widget: "select", multiple: true, required: false, options: ["Regulatory Framework", "Administrative Constraints", "EMB Relationship", "Security and Well-being", "Access to Electoral Data", "Access to Funding", "Dialogue and Consultation", "Perception of Observers"] }
+      - { name: "featured", label: "Featured", widget: "boolean", default: false }
+      - { name: "image", label: "Image", widget: "image", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content (MDX)", widget: "code", default_language: "mdx", allow_language_selection: false, required: true, hint: "Use MDX syntax with React components" }
+      - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Reports Collection
   - name: "reports"
-    label: "Reports"
+    label: "Country Reports"
     folder: "content/reports"
+    i18n: true
     create: true
     slug: "{{slug}}"
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "id", label: "Report ID", widget: "number", required: true }
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "date", label: "Date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: true }
-      - { name: "country", label: "Country", widget: "select", options: ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Democratic Republic of Congo", "Republic of Congo", "Côte d'Ivoire", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "São Tomé and Príncipe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"], required: true }
-      - { name: "status", label: "Civic Space Status", widget: "select", options: ["open", "narrowed", "obstructed", "repressed", "closed"], required: true }
-      - { name: "summary", label: "Summary", widget: "text", required: true }
-      - { name: "downloadUrl", label: "Download URL", widget: "string", required: false }
-      - { name: "authors", label: "Authors", widget: "list", required: true }
+      - { name: "id", label: "Report ID", widget: "number", i18n: duplicate }
+      - { name: "title", label: "Title", widget: "string", i18n: true }
+      - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
+      - { name: "country", label: "Country Name", widget: "string" }
+      - { name: "iso2", label: "ISO2 Code", widget: "string", required: false, hint: "Two-letter country code (e.g. 'gh' for Ghana)" }
+      - { name: "region", label: "Region", widget: "select", required: false, options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
+      - name: "status"
+        label: "Civic Space Status"
+        widget: "select"
+        options:
+          - { value: "open", label: "Open (9-10)" }
+          - { value: "restricted", label: "Restricted (7-8)" }
+          - { value: "narrowed", label: "Narrowed" }
+          - { value: "obstructed", label: "Obstructed (5-6)" }
+          - { value: "repressed", label: "Repressed (3-4)" }
+          - { value: "closed", label: "Closed (0-2)" }
+      - { name: "composite", label: "Composite Score (0-10)", widget: "number", value_type: "float", min: 0, max: 10, step: 0.5, required: false }
+      - name: "dimensions"
+        label: "Dimension Scores (0-10)"
+        widget: "object"
+        required: false
+        fields:
+          - { name: "regulatory", label: "D1 — Regulatory Framework", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "administrative", label: "D2 — Administrative Constraints", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "embRelationship", label: "D3 — EMB Relationship", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "security", label: "D4 — Security & Well-being", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "dataAccess", label: "D5 — Access to Electoral Data", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "funding", label: "D6 — Access to Funding", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "dialogue", label: "D7 — Dialogue & Consultation", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "perception", label: "D8 — Perception of Observers", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "summary", label: "Summary", widget: "text", i18n: true }
+      - { name: "source", label: "Source", widget: "string", required: false, default: "AfEONet Report 2025 — Eyes on the Ballot Watchers" }
+      - { name: "downloadUrl", label: "Download URL", widget: "file", required: false }
+      - { name: "authors", label: "Authors", widget: "list", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content (MDX)", widget: "code", default_language: "mdx", allow_language_selection: false, required: true, hint: "Use MDX syntax with React components" }
+      - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Alerts Collection
   - name: "alerts"
     label: "Security Alerts"
     folder: "content/alerts"
+    i18n: true
     create: true
-    slug: "{{slug}}"
+    slug: "{{country_iso}-{{year}}-{{number}}"
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "id", label: "Alert ID", widget: "number", required: true }
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "date", label: "Date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: true }
-      - { name: "country", label: "Country", widget: "select", options: ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Democratic Republic of Congo", "Republic of Congo", "Côte d'Ivoire", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "São Tomé and Príncipe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"], required: true }
-      - { name: "status", label: "Civic Space Status", widget: "select", options: ["open", "narrowed", "obstructed", "repressed", "closed"], required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-      - { name: "severity", label: "Severity Level", widget: "select", options: ["low", "moderate", "high", "critical"], required: true }
-      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "Central Africa", "Southern Africa", "North Africa"], required: true }
+      - { name: "id", label: "Alert ID", widget: "string", hint: "Format: XX-YYYY-NNN (e.g. UG-2025-001)", i18n: duplicate }
+      - { name: "title", label: "Title", widget: "string", i18n: true }
+      - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
+      - { name: "country", label: "Country", widget: "string" }
+      - { name: "iso2", label: "ISO2 Code", widget: "string", required: false }
+      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
+      - name: "status"
+        label: "Civic Space Status"
+        widget: "select"
+        options:
+          - { value: "open", label: "Open" }
+          - { value: "restricted", label: "Restricted" }
+          - { value: "narrowed", label: "Narrowed" }
+          - { value: "obstructed", label: "Obstructed" }
+          - { value: "repressed", label: "Repressed" }
+          - { value: "closed", label: "Closed" }
+      - name: "severity"
+        label: "Severity"
+        widget: "select"
+        options:
+          - { value: "critical", label: "Critical — Immediate action required" }
+          - { value: "high", label: "High — Urgent attention needed" }
+          - { value: "medium", label: "Medium — Monitor closely" }
+          - { value: "low", label: "Low — Watch and engage" }
+      - name: "alertType"
+        label: "Alert Type"
+        widget: "select"
+        options:
+          - { value: "arrest", label: "Observer Arrest/Detention" }
+          - { value: "raid", label: "Office Raid/Property Seizure" }
+          - { value: "restriction", label: "Operational Restriction" }
+          - { value: "threat", label: "Security Threat" }
+          - { value: "closure", label: "Space Closure" }
+          - { value: "other", label: "Other" }
+      - name: "dimension"
+        label: "Primary Dimension Affected"
+        widget: "select"
+        required: false
+        options:
+          - { value: 1, label: "D1 — Regulatory Framework" }
+          - { value: 2, label: "D2 — Administrative Constraints" }
+          - { value: 3, label: "D3 — EMB Relationship" }
+          - { value: 4, label: "D4 — Security & Well-being" }
+          - { value: 5, label: "D5 — Access to Electoral Data" }
+          - { value: 6, label: "D6 — Access to Funding" }
+          - { value: 7, label: "D7 — Dialogue & Consultation" }
+          - { value: 8, label: "D8 — Perception of Observers" }
+      - { name: "affectedObservers", label: "Number of Affected Observers", widget: "number", required: false }
+      - { name: "description", label: "Description", widget: "text", i18n: true }
+      - { name: "relatedReport", label: "Related Report Slug", widget: "string", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content (MDX)", widget: "code", default_language: "mdx", allow_language_selection: false, required: true, hint: "Use MDX syntax with React components" }
+      - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
-  # About Sections Collection (using code widget for MDX safety)
+  # Country Scores Collection (editable via CMS)
+  - name: "country-scores"
+    label: "Country Scores (2025)"
+    folder: "content/data"
+    create: true
+    slug: "{{iso2}}-scores"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { name: "country", label: "Country Name", widget: "string" }
+      - { name: "iso2", label: "ISO2 Code", widget: "string" }
+      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
+      - { name: "composite", label: "Composite Score (0-10)", widget: "number", value_type: "float", min: 0, max: 10, step: 0.5 }
+      - name: "status"
+        label: "Civic Space Category"
+        widget: "select"
+        options:
+          - { value: "open", label: "Open (9-10)" }
+          - { value: "restricted", label: "Restricted (7-8)" }
+          - { value: "narrowed", label: "Narrowed" }
+          - { value: "obstructed", label: "Obstructed (5-6)" }
+          - { value: "repressed", label: "Repressed (3-4)" }
+          - { value: "closed", label: "Closed (0-2)" }
+      - { name: "regulatory", label: "D1 — Regulatory Framework (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "administrative", label: "D2 — Administrative Constraints (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "embRelationship", label: "D3 — EMB Relationship (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "security", label: "D4 — Security & Well-being (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "dataAccess", label: "D5 — Access to Electoral Data (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "funding", label: "D6 — Access to Funding (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "dialogue", label: "D7 — Dialogue & Consultation (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "perception", label: "D8 — Perception of Observers (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
+      - { name: "notes", label: "Notes", widget: "text", required: false }
+
+  # About Sections Collection
   - name: "about"
     label: "About Sections"
     folder: "content/about"
+    i18n: true
     create: true
     slug: "{{slug}}"
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-      - { name: "section", label: "Section Type", widget: "select", options: ["dimensions", "methodology", "mission", "partners"], required: true }
-      - { name: "body", label: "Content (MDX)", widget: "code", default_language: "mdx", allow_language_selection: false, required: true, hint: "Use MDX syntax with React components like <DimensionGrid> and <DimensionCard>" }
+      - { name: "title", label: "Title", widget: "string", i18n: true }
+      - { name: "description", label: "Description", widget: "text", i18n: true }
+      - { name: "section", label: "Section", widget: "string" }
+      - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Pages Collection (Static Pages)
   - name: "pages"
     label: "Static Pages"
     folder: "content/pages"
+    i18n: true
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
     fields:
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-      
+      - { name: "title", label: "Title", widget: "string", required: true, i18n: true }
+      - { name: "description", label: "Description", widget: "text", required: true, i18n: true }
+
       # Hero Section
       - label: "Hero Section"
         name: "hero"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "Hero Title", widget: "string" }
           - { name: "subtitle", label: "Hero Subtitle", widget: "text" }
-      
+
       # Mission Section
       - label: "Mission Section"
         name: "mission"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "Mission Title", widget: "string" }
           - { name: "content", label: "Mission Content", widget: "markdown" }
-      
+
       # Features Section
       - label: "Features Section"
         name: "features"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "Features Title", widget: "string" }
           - { name: "subtitle", label: "Features Subtitle", widget: "text" }
-      
+
       # News Section
       - label: "News Section"
         name: "news"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "News Title", widget: "string" }
           - { name: "subtitle", label: "News Subtitle", widget: "text" }
-      
+
       # Call to Action Section
       - label: "Call to Action"
         name: "cta"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "CTA Title", widget: "string" }
           - { name: "content", label: "CTA Content", widget: "text" }
-      
+
       # Impact Section
       - label: "Impact Section"
         name: "impact"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "Impact Title", widget: "string" }
           - { name: "content", label: "Impact Content", widget: "text" }
-      
-      - { name: "body", label: "Additional Content", widget: "markdown", required: false }
+
+      - { name: "body", label: "Additional Content", widget: "markdown", required: false, i18n: true }
 
 # Editor settings
 editor:

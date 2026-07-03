@@ -216,9 +216,42 @@ export function byIsoNum(isoNum: string): Country | undefined {
   return countries.find((c) => c.isoNum === isoNum)
 }
 
+export function reportSlug(country: Pick<Country, "name">): string {
+  const ascii = country.name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+  return `${ascii.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}-2025`
+}
+
 export function statusClass(status: CivicStatus | null): string {
   if (!status) return "status-unknown"
   return `status-${status}`
+}
+
+// Single source of truth for status HSL values — mirrors the CSS custom
+// properties in app/globals.css (--status-*), so map/badges/charts never drift.
+const STATUS_HSL: Record<CivicStatus | "unknown", [h: number, s: number, l: number]> = {
+  open: [120, 100, 35],
+  restricted: [80, 80, 40],
+  narrowed: [45, 100, 50],
+  obstructed: [30, 100, 50],
+  repressed: [30, 100, 30],
+  closed: [0, 100, 50],
+  unknown: [220, 9, 75],
+}
+
+function statusKey(status: CivicStatus | null): CivicStatus | "unknown" {
+  return status ?? "unknown"
+}
+
+export function statusFill(status: CivicStatus | null, alphaPct = 100): string {
+  const [h, s, l] = STATUS_HSL[statusKey(status)]
+  return `hsl(${h} ${s}% ${l}% / ${alphaPct}%)`
+}
+
+export function statusHoverFill(status: CivicStatus | null): string {
+  const [h, s, l] = STATUS_HSL[statusKey(status)]
+  return `hsl(${h} ${s}% ${Math.max(0, l - 8)}%)`
 }
 
 export function statusLabel(status: CivicStatus | null): string {
@@ -273,17 +306,27 @@ export const DIMENSION_LABELS: Record<keyof CountryDimensions, string> = {
   perception: "Perception of Observers",
 }
 
-export const GLOBAL_AVERAGES: CountryDimensions = {
-  regulatory: 5.4,
-  administrative: 5.1,
-  embRelationship: 5.6,
-  security: 4.5,
-  dataAccess: 5.5,
-  funding: 4.4,
-  dialogue: 5.5,
-  perception: 5.6,
-}
-
 export function assessedCountries(): Country[] {
   return countries.filter((c) => c.composite !== undefined)
+}
+
+function round1(n: number): number {
+  return Math.round(n * 10) / 10
+}
+
+export const GLOBAL_AVERAGES: CountryDimensions = (() => {
+  const assessed = assessedCountries()
+  const keys = Object.keys(DIMENSION_LABELS) as (keyof CountryDimensions)[]
+  const averages = {} as CountryDimensions
+  for (const k of keys) {
+    const sum = assessed.reduce((s, c) => s + (c.dimensions?.[k] ?? 0), 0)
+    averages[k] = round1(sum / assessed.length)
+  }
+  return averages
+})()
+
+export function globalCompositeAverage(): number {
+  const assessed = assessedCountries()
+  const sum = assessed.reduce((s, c) => s + (c.composite ?? 0), 0)
+  return round1(sum / assessed.length)
 }

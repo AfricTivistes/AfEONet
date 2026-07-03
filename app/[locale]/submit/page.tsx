@@ -1,17 +1,33 @@
+import { getTranslations } from "next-intl/server"
 import { DataSubmissionForm } from "@/components/data-submission-form"
 import { Card, CardContent } from "@/components/ui/card"
 
-export default function SubmitPage() {
+export default async function SubmitPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "submit" })
+  const tDim = await getTranslations({ locale, namespace: "dimensions" })
+  const tAbout = await getTranslations({ locale, namespace: "about" })
+
+  const dimensions = [
+    { key: "regulatory", desc: t("dim1Desc") },
+    { key: "administrative", desc: t("dim2Desc") },
+    { key: "embRelationship", desc: t("dim3Desc") },
+    { key: "security", desc: t("dim4Desc") },
+    { key: "dataAccess", desc: t("dim5Desc") },
+    { key: "funding", desc: t("dim6Desc") },
+    { key: "dialogue", desc: t("dim7Desc") },
+    { key: "perception", desc: t("dim8Desc") },
+  ] as const
+
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
       {/* Hero Section */}
       <section className="bg-primary py-12 text-white">
         <div className="container">
           <div className="flex flex-col space-y-4">
-            <h1 className="text-3xl font-bold tracking-tight">Submit Data</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
             <p className="text-primary-foreground/80 max-w-2xl">
-              Use this form to submit data on the state of civic space in your country. Your contributions are essential
-              for monitoring and improving civic space for election observers.
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -22,54 +38,14 @@ export default function SubmitPage() {
           <div className="md:col-span-1">
             <Card className="sticky top-24">
               <CardContent className="p-6">
-                <h3 className="text-lg font-medium text-primary mb-4">The 8 Dimensions of Civic Space</h3>
+                <h3 className="text-lg font-medium text-primary mb-4">{tAbout("dimensionsTitle")}</h3>
                 <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium text-sm">1. Regulatory Framework</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Laws and institutions governing civil society organizations.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">2. Administrative Constraints</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Accreditation procedures and bureaucracies imposed on observers.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">3. Relationship with EMB</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Quality of relationship with the electoral management body.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">4. Security and Well-being</h4>
-                    <p className="text-xs text-muted-foreground">Threats to the work and safety of observers.</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">5. Access to Electoral Data</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Access to information on electoral management and processes.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">6. Access to Funding</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Freedom to mobilize funding for election observation.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">7. Dialogue and Consultation</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Platforms for engagement with government institutions.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">8. Perception of Observers</h4>
-                    <p className="text-xs text-muted-foreground">
-                      How observers are perceived by various stakeholders.
-                    </p>
-                  </div>
+                  {dimensions.map(({ key, desc }, i) => (
+                    <div key={key}>
+                      <h4 className="font-medium text-sm">{i + 1}. {tDim(key)}</h4>
+                      <p className="text-xs text-muted-foreground">{desc}</p>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
