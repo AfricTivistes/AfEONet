@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/i18n/navigation"
 import { ComposableMap, Geographies, Geography } from "react-simple-maps"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -11,45 +11,24 @@ import {
   statusClass,
   statusLabel,
   statusDescription,
+  statusFill,
+  statusHoverFill,
   REGIONS,
   type CivicStatus,
 } from "@/lib/countries"
 
-// Status fill colors (HSL values matching globals.css)
-const STATUS_FILL: Record<CivicStatus | "unknown", string> = {
-  open:        "hsl(120 100% 35%)",
-  restricted:  "hsl(80 80% 40%)",
-  narrowed:    "hsl(45 100% 50%)",
-  obstructed:  "hsl(30 100% 50%)",
-  repressed:   "hsl(30 100% 30%)",
-  closed:      "hsl(0 100% 50%)",
-  unknown:     "hsl(220 9% 75%)",
-}
-
-const HOVER_FILL: Record<CivicStatus | "unknown", string> = {
-  open:        "hsl(120 100% 28%)",
-  restricted:  "hsl(80 80% 32%)",
-  narrowed:    "hsl(45 100% 40%)",
-  obstructed:  "hsl(30 100% 40%)",
-  repressed:   "hsl(30 100% 22%)",
-  closed:      "hsl(0 100% 40%)",
-  unknown:     "hsl(220 9% 60%)",
-}
-
 // Numeric ISO IDs that belong to Africa (our 44 mappable countries + others in topo)
 const AFRICA_ISO_NUMS = new Set(countries.map((c) => c.isoNum))
-
-function statusKey(status: CivicStatus | null): CivicStatus | "unknown" {
-  return status ?? "unknown"
-}
 
 interface AfricaMapProps {
   selectedIso2?: string | null
   onSelectCountry?: (iso2: string | null) => void
   navigateOnClick?: boolean
+  /** When set, countries not matching this status are dimmed to highlight the filtered category. */
+  statusFilter?: CivicStatus | null
 }
 
-export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navigateOnClick }: AfricaMapProps) {
+export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navigateOnClick, statusFilter }: AfricaMapProps) {
   const router = useRouter()
   const mapRef = useRef<HTMLDivElement>(null)
   const [internalSelected, setInternalSelected] = useState<string | null>(null)
@@ -62,7 +41,7 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navig
   const handleClick = useCallback(
     (iso2: string | null) => {
       if (navigateOnClick && iso2) {
-        router.push(`/dashboard?view=country&country=${iso2}`)
+        router.push(`/dashboard?view=global&country=${iso2}`)
         return
       }
       if (isControlled) {
@@ -119,19 +98,21 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navig
                   }
 
                   const country = byIsoNum(isoNum)
-                  const key = statusKey(country?.status ?? null)
+                  const status = country?.status ?? null
                   const isSelected = country?.iso2 === selectedIso2
+                  const isDimmed = statusFilter != null && status !== statusFilter
 
                   return (
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      fill={isSelected ? HOVER_FILL[key] : STATUS_FILL[key]}
+                      fill={isSelected ? statusHoverFill(status) : statusFill(status)}
+                      fillOpacity={isDimmed ? 0.25 : 1}
                       stroke="white"
                       strokeWidth={0.8}
                       style={{
                         default: { outline: "none" },
-                        hover: { fill: HOVER_FILL[key], outline: "none", cursor: "pointer" },
+                        hover: { fill: statusHoverFill(status), outline: "none", cursor: "pointer" },
                         pressed: { outline: "none" },
                       }}
                       onMouseEnter={() => country && setTooltip({ name: country.name, status: country.status, composite: country.composite })}
@@ -208,7 +189,9 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navig
                     key={country.iso2}
                     className={`${statusClass(country.status)} p-2 rounded-md cursor-pointer text-center text-xs font-medium transition-opacity hover:opacity-80 ${
                       country.status === "narrowed" ? "text-black" : "text-white"
-                    } ${selectedIso2 === country.iso2 ? "ring-2 ring-primary ring-offset-1" : ""}`}
+                    } ${selectedIso2 === country.iso2 ? "ring-2 ring-primary ring-offset-1" : ""} ${
+                      statusFilter != null && country.status !== statusFilter ? "opacity-25" : ""
+                    }`}
                     onClick={() => handleClick(country.iso2)}
                   >
                     {country.name}

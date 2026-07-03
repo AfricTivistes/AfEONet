@@ -1,9 +1,9 @@
 "use client"
 
 import { useMemo } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
+import { useRouter, Link } from "@/lib/i18n/navigation"
 import { useTranslations } from "next-intl"
-import Link from "next/link"
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Cell,
@@ -12,27 +12,22 @@ import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { CountrySelector } from "@/components/country-selector"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, Globe, GitCompare, X, Shield, Unlock, AlertOctagon, Lock, Ban } from "lucide-react"
+import { AlertTriangle, Globe, GitCompare, X, Shield, Unlock, AlertOctagon, Lock, Ban, type LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
   assessedCountries,
   byIso2,
   statusLabel,
+  statusFill,
+  reportSlug,
   DIMENSION_LABELS,
   GLOBAL_AVERAGES,
+  globalCompositeAverage,
   type Country,
   type CountryDimensions,
+  type CivicStatus,
 } from "@/lib/countries"
-
-const STATUS_COLORS: Record<string, string> = {
-  open:       "hsl(120 100% 35%)",
-  restricted: "hsl(80 80% 40%)",
-  narrowed:   "hsl(45 100% 50%)",
-  obstructed: "hsl(30 100% 50%)",
-  repressed:  "hsl(30 100% 30%)",
-  closed:     "hsl(0 100% 50%)",
-}
 
 const DIM_KEYS = Object.keys(DIMENSION_LABELS) as (keyof CountryDimensions)[]
 const DIM_SHORT: Record<keyof CountryDimensions, string> = {
@@ -81,7 +76,7 @@ function CountryDimensionPanel({ country }: { country: Country }) {
         </div>
         <Badge
           className="ml-auto text-white"
-          style={{ backgroundColor: STATUS_COLORS[country.status ?? ""] ?? "#999" }}
+          style={{ backgroundColor: statusFill(country.status) }}
         >
           {statusLabel(country.status)} — {country.composite}/10
         </Badge>
@@ -96,7 +91,7 @@ function CountryDimensionPanel({ country }: { country: Country }) {
           <RadarChart data={data}>
             <PolarGrid />
             <PolarAngleAxis dataKey="dim" tick={{ fontSize: 11 }} />
-            <Radar name={country.name} dataKey="score" stroke={STATUS_COLORS[country.status ?? ""] ?? "#888"} fill={STATUS_COLORS[country.status ?? ""] ?? "#888"} fillOpacity={0.3} />
+            <Radar name={country.name} dataKey="score" stroke={statusFill(country.status)} fill={statusFill(country.status)} fillOpacity={0.3} />
             <Radar name="Africa avg." dataKey="global" stroke="#94a3b8" fill="#94a3b8" fillOpacity={0.15} strokeDasharray="4 2" />
             <Legend />
             <Tooltip formatter={(v) => `${v}/10`} />
@@ -116,7 +111,7 @@ function CountryDimensionPanel({ country }: { country: Country }) {
       </div>
 
       <Button asChild variant="outline" className="w-full border-primary/20 text-primary">
-        <Link href={`/reports/${country.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-2025`}>
+        <Link href={`/reports/${reportSlug(country)}`}>
           Full Report →
         </Link>
       </Button>
@@ -124,39 +119,40 @@ function CountryDimensionPanel({ country }: { country: Country }) {
   )
 }
 
-function SummarySheet() {
+const STATUS_ICONS: Record<CivicStatus, LucideIcon> = {
+  open: Unlock,
+  restricted: Shield,
+  narrowed: AlertTriangle,
+  obstructed: AlertOctagon,
+  repressed: Lock,
+  closed: Ban,
+}
+
+const STATUS_ORDER: CivicStatus[] = ["open", "restricted", "narrowed", "obstructed", "repressed", "closed"]
+
+function SummarySheet({ activeStatus, onToggle }: { activeStatus: CivicStatus | null; onToggle: (status: CivicStatus) => void }) {
   const t = useTranslations("dashboard")
   const assessed = useMemo(() => assessedCountries(), [])
   const total = assessed.length
 
+  // Grouped by each country's actual assessed status — the same canonical
+  // CivicStatus enum used by the map and country pages, not a re-derived score band.
   const categories = useMemo(() => {
-    const cats = {
-      open: { label: "Open / Free", range: "8–10", min: 8, icon: Unlock, color: "hsl(120 100% 35%)" },
-      narrowed: { label: "Narrowed", range: "6–8", min: 6, icon: Shield, color: "hsl(45 100% 50%)" },
-      obstructed: { label: "Obstructed", range: "4–6", min: 4, icon: AlertOctagon, color: "hsl(30 100% 50%)" },
-      repressed: { label: "Repressed / Threatened", range: "2–4", min: 2, icon: Lock, color: "hsl(30 100% 30%)" },
-      closed: { label: "Closed", range: "0–2", min: 0, icon: Ban, color: "hsl(0 100% 50%)" },
-    }
-
-    const counts = {
-      open: 0, narrowed: 0, obstructed: 0, repressed: 0, closed: 0,
-    }
-
+    const counts = new Map<CivicStatus, number>(STATUS_ORDER.map((s) => [s, 0]))
     for (const c of assessed) {
-      const score = c.composite ?? 0
-      if (score >= 8) counts.open++
-      else if (score >= 6) counts.narrowed++
-      else if (score >= 4) counts.obstructed++
-      else if (score >= 2) counts.repressed++
-      else counts.closed++
+      if (c.status) counts.set(c.status, (counts.get(c.status) ?? 0) + 1)
     }
 
-    return Object.entries(cats).map(([key, config]) => ({
-      key,
-      ...config,
-      count: counts[key as keyof typeof counts],
-      pct: total > 0 ? Math.round((counts[key as keyof typeof counts] / total) * 100) : 0,
-    }))
+    return STATUS_ORDER
+      .map((status) => ({
+        key: status,
+        status,
+        label: statusLabel(status),
+        icon: STATUS_ICONS[status],
+        count: counts.get(status) ?? 0,
+        pct: total > 0 ? Math.round(((counts.get(status) ?? 0) / total) * 100) : 0,
+      }))
+      .filter((cat) => cat.count > 0)
   }, [assessed, total])
 
   return (
@@ -167,35 +163,39 @@ function SummarySheet() {
           <p className="text-sm text-muted-foreground mb-4">{t("summaryDesc")} ({total})</p>
         </div>
         <Button asChild variant="outline" size="sm" className="border-primary/20 text-primary text-xs">
-          <Link href="/about#scoring">{t("scoring")} →</Link>
+          <Link href="/about?tab=methodology#scoring">{t("scoring")} →</Link>
         </Button>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {categories.map((cat) => {
           const Icon = cat.icon
+          const isActive = activeStatus === cat.status
+          const isDimmed = activeStatus !== null && !isActive
           return (
-            <div
+            <button
               key={cat.key}
-              className="bg-secondary/10 rounded-lg p-4 text-center space-y-2"
+              type="button"
+              aria-pressed={isActive}
+              onClick={() => onToggle(cat.status)}
+              className={`bg-secondary/10 rounded-lg p-4 text-center space-y-2 transition-opacity cursor-pointer hover:bg-secondary/20 ${
+                isActive ? "ring-2 ring-primary" : ""
+              } ${isDimmed ? "opacity-40" : ""}`}
             >
               <div className="flex justify-center">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: `${cat.color}30` }}
+                  style={{ backgroundColor: statusFill(cat.status, 30) }}
                 >
-                  <Icon className="h-5 w-5" style={{ color: cat.color }} />
+                  <Icon className="h-5 w-5" style={{ color: statusFill(cat.status) }} />
                 </div>
               </div>
-              <div className="text-2xl font-bold" style={{ color: cat.color }}>
+              <div className="text-2xl font-bold" style={{ color: statusFill(cat.status) }}>
                 {cat.count}
               </div>
               <div className="text-xs text-muted-foreground">
                 {cat.pct}% — {cat.label}
               </div>
-              <div className="text-xs font-mono text-muted-foreground">
-                {cat.range}
-              </div>
-            </div>
+            </button>
           )
         })}
       </div>
@@ -203,8 +203,21 @@ function SummarySheet() {
   )
 }
 
-function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
+function GlobalView({
+  onSelect,
+  activeStatus,
+  onToggleStatus,
+}: {
+  onSelect: (iso2: string) => void
+  activeStatus: CivicStatus | null
+  onToggleStatus: (status: CivicStatus) => void
+}) {
+  const t = useTranslations("dashboard")
   const assessed = useMemo(() => assessedCountries().sort((a, b) => (b.composite ?? 0) - (a.composite ?? 0)), [])
+  const filtered = useMemo(
+    () => (activeStatus ? assessed.filter((c) => c.status === activeStatus) : assessed),
+    [assessed, activeStatus],
+  )
 
   const globalChartData = DIM_KEYS.map((k) => ({
     dim: DIM_SHORT[k],
@@ -213,11 +226,11 @@ function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
 
   return (
     <div className="space-y-8">
-      <SummarySheet />
+      <SummarySheet activeStatus={activeStatus} onToggle={onToggleStatus} />
 
       <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-        <h2 className="text-lg font-bold text-primary mb-1">Average Scores — 8 Dimensions (21 countries)</h2>
-        <p className="text-sm text-muted-foreground mb-4">Global composite: <strong>5.2/10</strong></p>
+        <h2 className="text-lg font-bold text-primary mb-1">Average Scores — 8 Dimensions ({assessed.length} countries)</h2>
+        <p className="text-sm text-muted-foreground mb-4">Global composite: <strong>{globalCompositeAverage()}/10</strong></p>
         <div className="h-56">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={globalChartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
@@ -239,7 +252,19 @@ function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
       </div>
 
       <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-        <h2 className="text-lg font-bold text-primary mb-4">Country Rankings (2025)</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-primary">
+            Country Rankings (2025){activeStatus ? ` — ${statusLabel(activeStatus)}` : ""}
+          </h2>
+          {activeStatus && (
+            <button
+              onClick={() => onToggleStatus(activeStatus)}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3 w-3" /> Clear filter
+            </button>
+          )}
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -252,7 +277,7 @@ function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
               </tr>
             </thead>
             <tbody>
-              {assessed.map((c, i) => (
+              {filtered.map((c, i) => (
                 <tr
                   key={c.iso2}
                   className="border-b border-primary/5 hover:bg-primary/5 cursor-pointer"
@@ -264,7 +289,7 @@ function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
                   <td className="py-2 pr-4">
                     <span
                       className="inline-block px-2 py-0.5 rounded-full text-xs text-white"
-                      style={{ backgroundColor: STATUS_COLORS[c.status ?? ""] ?? "#999" }}
+                      style={{ backgroundColor: statusFill(c.status) }}
                     >
                       {statusLabel(c.status)}
                     </span>
@@ -276,6 +301,13 @@ function GlobalView({ onSelect }: { onSelect: (iso2: string) => void }) {
                   </td>
                 </tr>
               ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="py-6 text-center text-muted-foreground">
+                    No countries match this status.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -290,6 +322,7 @@ function ComparisonView({ countryA, countryB, onSelectA, onSelectB }: {
   onSelectA: (v: string | null) => void
   onSelectB: (v: string | null) => void
 }) {
+  const t = useTranslations("comparison")
   const a = countryA ? byIso2(countryA) : null
   const b = countryB ? byIso2(countryB) : null
 
@@ -305,11 +338,11 @@ function ComparisonView({ countryA, countryB, onSelectA, onSelectB }: {
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium mb-1 block">Country A</label>
+          <label className="text-sm font-medium mb-1 block">{t("countryA")}</label>
           <CountrySelector value={countryA ?? undefined} onSelect={(v) => onSelectA(v === countryA ? null : v)} />
         </div>
         <div>
-          <label className="text-sm font-medium mb-1 block">Country B</label>
+          <label className="text-sm font-medium mb-1 block">{t("countryB")}</label>
           <CountrySelector value={countryB ?? undefined} onSelect={(v) => onSelectB(v === countryB ? null : v)} />
         </div>
       </div>
@@ -323,7 +356,7 @@ function ComparisonView({ countryA, countryB, onSelectA, onSelectB }: {
                 <p className="text-xs text-muted-foreground mb-2">{c.region}</p>
                 <Badge
                   className="text-white text-xs"
-                  style={{ backgroundColor: STATUS_COLORS[c.status ?? ""] ?? "#999" }}
+                  style={{ backgroundColor: statusFill(c.status) }}
                 >
                   {statusLabel(c.status)} — {c.composite}/10
                 </Badge>
@@ -340,8 +373,8 @@ function ComparisonView({ countryA, countryB, onSelectA, onSelectB }: {
                   <YAxis type="category" dataKey="dim" tick={{ fontSize: 11 }} width={60} />
                   <Tooltip formatter={(v) => `${v}/10`} />
                   <Legend />
-                  <Bar dataKey={a.name} fill={STATUS_COLORS[a.status ?? ""] ?? "#888"} radius={[0, 4, 4, 0]} />
-                  <Bar dataKey={b.name} fill={STATUS_COLORS[b.status ?? ""] ?? "#aaa"} radius={[0, 4, 4, 0]} fillOpacity={0.7} />
+                  <Bar dataKey={a.name} fill={statusFill(a.status)} radius={[0, 4, 4, 0]} />
+                  <Bar dataKey={b.name} fill={statusFill(b.status)} radius={[0, 4, 4, 0]} fillOpacity={0.7} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -363,7 +396,7 @@ function ComparisonView({ countryA, countryB, onSelectA, onSelectB }: {
         </>
       ) : (
         <div className="text-center py-12 text-muted-foreground text-sm">
-          Select two assessed countries to compare their dimension scores.
+          {t("selectPrompt")}
         </div>
       )}
     </div>
@@ -377,6 +410,8 @@ export default function DashboardContent() {
   const activeTab = searchParams.get("view") ?? "global"
   const selectedCountry = searchParams.get("country")
   const compareCountry = searchParams.get("compare")
+  const statusParam = searchParams.get("status")
+  const activeStatus: CivicStatus | null = statusParam && (STATUS_ORDER as string[]).includes(statusParam) ? (statusParam as CivicStatus) : null
 
   function setParam(key: string, value: string | null) {
     const params = new URLSearchParams(searchParams.toString())
@@ -388,6 +423,7 @@ export default function DashboardContent() {
   function setTab(tab: string) { setParam("view", tab) }
   function setCountry(v: string | null) { setParam("country", v) }
   function setCompare(v: string | null) { setParam("compare", v) }
+  function toggleStatus(status: CivicStatus) { setParam("status", activeStatus === status ? null : status) }
 
   const selectedCountryData = selectedCountry ? byIso2(selectedCountry) : null
 
@@ -427,9 +463,9 @@ export default function DashboardContent() {
                 ? <>Selected: <span className="font-medium text-foreground">{selectedCountryData.name}</span> ({selectedCountryData.region})</>
                 : "Click a country to see details"}
             </p>
-            <AfricaMap selectedIso2={selectedCountry} onSelectCountry={setCountry} />
+            <AfricaMap selectedIso2={selectedCountry} onSelectCountry={setCountry} statusFilter={activeStatus} />
             <div className="mt-6 bg-secondary/10 p-4 rounded-lg">
-              <StatusLegend />
+              <StatusLegend activeStatus={activeStatus} onToggle={toggleStatus} />
             </div>
           </div>
 
@@ -449,9 +485,9 @@ export default function DashboardContent() {
                   </button>
                 )}
                 <div className="pt-4 border-t border-primary/10 text-sm text-muted-foreground space-y-1">
-                  <p><strong>21</strong> countries assessed</p>
-                  <p><strong>8</strong> dimensions evaluated</p>
-                  <p>Composite avg: <strong>5.2/10</strong></p>
+                  <p><strong>{assessedCountries().length}</strong> countries assessed</p>
+                  <p><strong>{DIM_KEYS.length}</strong> dimensions evaluated</p>
+                  <p>Composite avg: <strong>{globalCompositeAverage()}/10</strong></p>
                 </div>
               </div>
             )}
@@ -474,7 +510,9 @@ export default function DashboardContent() {
           ))}
         </div>
 
-        {activeTab === "global" && <GlobalView onSelect={setCountry} />}
+        {activeTab === "global" && (
+          <GlobalView onSelect={setCountry} activeStatus={activeStatus} onToggleStatus={toggleStatus} />
+        )}
 
         {activeTab === "comparison" && (
           <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">

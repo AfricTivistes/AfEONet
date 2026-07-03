@@ -50,7 +50,12 @@ export function CountrySelector({ value: controlledValue, onSelect }: CountrySel
               return (
                 <CommandGroup key={region} heading={region}>
                   {regionCountries.map((country) => (
-                    <CommandItem key={country.iso2} value={country.iso2} onSelect={handleSelect}>
+                    <CommandItem
+                      key={country.iso2}
+                      value={country.iso2}
+                      keywords={[country.name]}
+                      onSelect={handleSelect}
+                    >
                       <Check className={cn("mr-2 h-4 w-4", value === country.iso2 ? "opacity-100" : "opacity-0")} />
                       {country.name}
                     </CommandItem>

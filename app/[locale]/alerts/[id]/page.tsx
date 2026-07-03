@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
+import { Link } from '@/lib/i18n/navigation'
+import { getTranslations } from 'next-intl/server'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -11,6 +12,7 @@ import { getAlert } from "@/lib/reports"
 interface AlertPageProps {
   params: Promise<{
     id: string
+    locale: string
   }>
 }
 
@@ -41,9 +43,9 @@ function getSeverityColor(severity: string) {
 }
 
 export async function generateMetadata({ params }: AlertPageProps) {
-  const { id } = await params
-  const alert = await getAlert(id)
-  
+  const { id, locale } = await params
+  const alert = await getAlert(id, locale)
+
   if (!alert) {
     return {
       title: 'Alert Not Found - AfEONet',
@@ -58,12 +60,14 @@ export async function generateMetadata({ params }: AlertPageProps) {
 }
 
 export default async function AlertPage({ params }: AlertPageProps) {
-  const { id } = await params
-  const alert = await getAlert(id)
+  const { id, locale } = await params
+  const alert = await getAlert(id, locale)
 
   if (!alert) {
     notFound()
   }
+
+  const t = await getTranslations({ locale, namespace: "alerts" })
 
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">
@@ -73,7 +77,7 @@ export default async function AlertPage({ params }: AlertPageProps) {
           <Button variant="ghost" asChild className="text-primary hover:bg-primary/10">
             <Link href="/reports">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Reports & Alerts
+              {t("backToReportsAlerts")}
             </Link>
           </Button>
         </div>
@@ -89,16 +93,16 @@ export default async function AlertPage({ params }: AlertPageProps) {
               </Badge>
               {alert.severity && (
                 <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                  {alert.severity.toUpperCase()} PRIORITY
+                  {alert.severity.toUpperCase()} {t("priorityLabel")}
                 </Badge>
               )}
             </div>
             <h1 className="text-3xl font-bold tracking-tight">{alert.title}</h1>
-            
+
             <div className="flex flex-wrap items-center gap-4 text-primary-foreground/80">
               <div className="flex items-center">
                 <Calendar className="mr-2 h-4 w-4" />
-                {new Date(alert.date).toLocaleDateString('en-US', {
+                {new Date(alert.date).toLocaleDateString(locale, {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
@@ -130,7 +134,7 @@ export default async function AlertPage({ params }: AlertPageProps) {
                 <Alert className={getSeverityColor(alert.severity)}>
                   {getSeverityIcon(alert.severity)}
                   <AlertTitle className="font-bold">
-                    {alert.severity.toUpperCase()} SEVERITY ALERT
+                    {alert.severity.toUpperCase()} {t("severityAlertLabel")}
                   </AlertTitle>
                   <AlertDescription>
                     {alert.description}
@@ -202,36 +206,36 @@ export default async function AlertPage({ params }: AlertPageProps) {
             <div className="space-y-6">
               {/* Alert Details */}
               <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-                <h3 className="font-semibold text-primary mb-4">Alert Details</h3>
+                <h3 className="font-semibold text-primary mb-4">{t("alertDetails")}</h3>
                 <div className="space-y-3">
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Severity Level</div>
+                    <div className="text-sm font-medium text-muted-foreground">{t("severityLevel")}</div>
                     <div className="flex items-center mt-1">
                       {getSeverityIcon(alert.severity || 'low')}
                       <span className="ml-2 text-sm font-medium">
-                        {alert.severity?.toUpperCase() || 'LOW'}
+                        {alert.severity?.toUpperCase() || t("lowSeverity")}
                       </span>
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Civic Space Status</div>
+                    <div className="text-sm font-medium text-muted-foreground">{t("civicSpaceStatus")}</div>
                     <Badge className={`status-${alert.status} border-none mt-1`}>
                       {alert.status.charAt(0).toUpperCase() + alert.status.slice(1)}
                     </Badge>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Alert Date</div>
+                    <div className="text-sm font-medium text-muted-foreground">{t("alertDate")}</div>
                     <div className="text-sm text-foreground">
-                      {new Date(alert.date).toLocaleDateString()}
+                      {new Date(alert.date).toLocaleDateString(locale)}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-muted-foreground">Country/Region</div>
+                    <div className="text-sm font-medium text-muted-foreground">{t("countryRegion")}</div>
                     <div className="text-sm text-foreground">{alert.country}</div>
                   </div>
                   {alert.region && (
                     <div>
-                      <div className="text-sm font-medium text-muted-foreground">Regional Context</div>
+                      <div className="text-sm font-medium text-muted-foreground">{t("regionalContext")}</div>
                       <div className="text-sm text-foreground">{alert.region}</div>
                     </div>
                   )}
@@ -241,7 +245,7 @@ export default async function AlertPage({ params }: AlertPageProps) {
               {/* Tags */}
               {alert.tags && alert.tags.length > 0 && (
                 <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-                  <h3 className="font-semibold text-primary mb-4">Tags</h3>
+                  <h3 className="font-semibold text-primary mb-4">{t("tags")}</h3>
                   <div className="flex flex-wrap gap-2">
                     {alert.tags.map((tag, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
@@ -256,42 +260,42 @@ export default async function AlertPage({ params }: AlertPageProps) {
               {alert.severity === 'critical' && (
                 <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-6 border border-red-200 dark:border-red-800">
                   <h3 className="font-semibold text-red-800 dark:text-red-200 mb-4">
-                    Emergency Support
+                    {t("emergencySupportTitle")}
                   </h3>
                   <p className="text-sm text-red-700 dark:text-red-300 mb-4">
-                    If you are directly affected by this situation, contact our emergency support line.
+                    {t("emergencySupportText")}
                   </p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="w-full border-red-300 text-red-700 hover:bg-red-100 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
                   >
-                    Contact Emergency Line
+                    {t("emergencyContactLine")}
                   </Button>
                 </div>
               )}
 
               {/* Related Items */}
               <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-                <h3 className="font-semibold text-primary mb-4">Related</h3>
+                <h3 className="font-semibold text-primary mb-4">{t("relatedTitle")}</h3>
                 <div className="space-y-3">
-                  <Link 
+                  <Link
                     href="/reports"
                     className="block text-sm text-primary hover:underline"
                   >
-                    Browse all reports →
+                    {t("browseAllReports")} →
                   </Link>
-                  <Link 
+                  <Link
                     href="/reports?tab=alerts"
                     className="block text-sm text-primary hover:underline"
                   >
-                    View all alerts →
+                    {t("viewAllAlerts")} →
                   </Link>
-                  <Link 
+                  <Link
                     href="/contact"
                     className="block text-sm text-primary hover:underline"
                   >
-                    Report an incident →
+                    {t("reportIncident")} →
                   </Link>
                 </div>
               </div>

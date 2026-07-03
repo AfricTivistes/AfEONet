@@ -1,11 +1,13 @@
-import Link from "next/link"
+import { Suspense } from "react"
 import Image from "next/image"
+import { Link } from "@/lib/i18n/navigation"
+import { getTranslations } from "next-intl/server"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Calendar, Search, Clock, User, ArrowRight } from "lucide-react"
+import { Calendar, Clock, User, ArrowRight } from "lucide-react"
 import { getAllNewsArticles, type NewsArticle } from "@/lib/news"
 import { Pagination } from "@/components/pagination"
+import { NewsSearch } from "@/components/news-search"
 
 const PER_PAGE = 12
 
@@ -35,16 +37,30 @@ function getCategories(articles: NewsArticle[]): string[] {
 }
 
 export default async function NewsPage({
+  params: routeParams,
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ page?: string; category?: string; q?: string }>
 }) {
+  const { locale } = await routeParams
+  const t = await getTranslations({ locale, namespace: "news" })
+  const tCommon = await getTranslations({ locale, namespace: "common" })
   const params = await searchParams
   const currentPage = Math.max(1, Number(params?.page) || 1)
+  const activeCategory = params?.category && params.category !== "All" ? params.category : null
+  const query = params?.q?.trim().toLowerCase() ?? ""
 
-  const allArticles = getAllNewsArticles()
+  const allArticlesUnfiltered = getAllNewsArticles(locale)
+  const categories = getCategories(allArticlesUnfiltered)
+
+  const allArticles = allArticlesUnfiltered.filter((article) => {
+    if (activeCategory && article.category !== activeCategory) return false
+    if (query && !article.title.toLowerCase().includes(query) && !article.description.toLowerCase().includes(query)) return false
+    return true
+  })
+
   const featuredArticles = allArticles.filter(article => article.featured)
-  const categories = getCategories(allArticles)
 
   const featuredArticle = featuredArticles.length > 0
     ? adaptArticleData(featuredArticles[0])
@@ -63,24 +79,46 @@ export default async function NewsPage({
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">News & Updates</h1>
+              <h1 className="text-3xl font-bold tracking-tight">{t("heroTitle")}</h1>
               <p className="text-primary-foreground/80 mt-2">
-                Stay informed about AfEONet activities, reports, and developments in election observation across Africa.
+                {t("heroSubtitle")}
               </p>
             </div>
-            <div className="relative w-full md:w-auto max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search news..."
-                className="pl-10 bg-white/20 border-none text-white placeholder:text-white/60"
-              />
-            </div>
+            <Suspense fallback={null}>
+              <NewsSearch />
+            </Suspense>
           </div>
         </div>
       </section>
 
       <div className="container py-12">
         <div className="flex flex-col space-y-16">
+          {/* Browse by Category */}
+          {categories.length > 1 && (
+            <section>
+              <h2 className="text-xl font-bold text-primary mb-4">{t("browseByCategory")}</h2>
+              <div className="flex flex-wrap gap-3">
+                {categories.map((category) => {
+                  const isActive = category === "All" ? !activeCategory : activeCategory === category
+                  const href = category === "All" ? "/news" : `/news?category=${encodeURIComponent(category)}`
+                  return (
+                    <Link
+                      key={category}
+                      href={href}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-primary text-white hover:bg-primary/90"
+                          : "bg-secondary/20 text-primary hover:bg-secondary/30"
+                      }`}
+                    >
+                      {category}
+                    </Link>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
           {/* Featured Article — visible only on page 1 */}
           {featuredArticle && currentPage === 1 && (
             <section className="bg-secondary/10 p-8 rounded-lg">
@@ -115,7 +153,7 @@ export default async function NewsPage({
                   </div>
                   <Button asChild className="w-fit bg-primary text-white hover:bg-primary/90">
                     <Link href={`/news/${featuredArticle.slug}`}>
-                      Read full article <ArrowRight className="ml-2 h-4 w-4" />
+                      {t("readFullArticle")} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                 </div>
@@ -128,10 +166,10 @@ export default async function NewsPage({
             <section>
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-primary">
-                  {currentPage === 1 ? "All Articles" : `All Articles — Page ${currentPage}`}
+                  {currentPage === 1 ? t("allArticles") : `${t("allArticles")} — ${currentPage}`}
                 </h2>
                 <span className="text-sm text-muted-foreground">
-                  {allArticles.length} articles
+                  {allArticles.length} {t("articlesCount")}
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -169,35 +207,17 @@ export default async function NewsPage({
                         href={`/news/${article.slug}`}
                         className="text-primary text-sm font-medium hover:text-primary/80 transition-colors flex items-center"
                       >
-                        Read more <ArrowRight className="ml-1 h-3 w-3" />
+                        {tCommon("readMore")} <ArrowRight className="ml-1 h-3 w-3" />
                       </Link>
                     </div>
                   </div>
                 ))}
               </div>
-              <Pagination currentPage={currentPage} totalPages={totalPages} />
-            </section>
-          )}
-
-          {/* Browse by Category */}
-          {categories.length > 1 && currentPage === 1 && (
-            <section>
-              <h2 className="text-2xl font-bold text-primary mb-6">Browse by Category</h2>
-              <div className="flex flex-wrap gap-3">
-                {categories.map((category, index) => (
-                  <Link
-                    key={category}
-                    href={`/news/category/${category.toLowerCase()}`}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      index === 0
-                        ? "bg-primary text-white hover:bg-primary/90"
-                        : "bg-secondary/20 text-primary hover:bg-secondary/30"
-                    }`}
-                  >
-                    {category}
-                  </Link>
-                ))}
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                baseParams={{ category: activeCategory ?? undefined, q: params?.q }}
+              />
             </section>
           )}
         </div>
@@ -205,8 +225,10 @@ export default async function NewsPage({
 
       {allArticles.length === 0 && (
         <div className="container py-16 text-center">
-          <h2 className="text-2xl font-bold text-primary mb-4">No articles available</h2>
-          <p className="text-muted-foreground">Articles will appear here once they are published.</p>
+          <h2 className="text-2xl font-bold text-primary mb-4">{t("noArticlesTitle")}</h2>
+          <p className="text-muted-foreground">
+            {activeCategory || query ? t("noArticlesFiltered") : t("noArticlesEmpty")}
+          </p>
         </div>
       )}
     </div>

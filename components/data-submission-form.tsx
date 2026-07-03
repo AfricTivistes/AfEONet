@@ -110,7 +110,7 @@ export function DataSubmissionForm() {
     <div>
       <h2 className="text-2xl font-bold text-primary mb-2">{t("title")}</h2>
       <p className="text-muted-foreground mb-6">
-        {t("step")} {step} {t("of")} {totalSteps} - {step === 1 ? t("generalInfo") : `Dimension ${step - 1}`}
+        {t("step")} {step} {t("of")} {totalSteps} - {step === 1 ? t("generalInfo") : `${t("dimension")} ${step - 1}`}
       </p>
       <div className="w-full bg-secondary/20 h-2 mb-8 rounded-full overflow-hidden">
         <div

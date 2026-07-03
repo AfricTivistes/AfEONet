@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+import { resolveLocalizedPath, listCanonicalSlugs } from './content-locale'
 
 const pagesDirectory = path.join(process.cwd(), 'content/pages')
 
@@ -24,10 +25,10 @@ export interface PageData {
   impact?: HomepageSection
 }
 
-export async function getPage(id: string): Promise<PageData | null> {
+export async function getPage(id: string, locale = 'en'): Promise<PageData | null> {
   try {
-    const fullPath = path.join(pagesDirectory, `${id}.md`)
-    
+    const fullPath = resolveLocalizedPath(pagesDirectory, id, 'md', locale)
+
     if (!fs.existsSync(fullPath)) {
       return null
     }
@@ -56,14 +57,7 @@ export async function getPage(id: string): Promise<PageData | null> {
 
 export async function getAllPages(): Promise<string[]> {
   try {
-    if (!fs.existsSync(pagesDirectory)) {
-      return []
-    }
-
-    const fileNames = fs.readdirSync(pagesDirectory)
-    return fileNames
-      .filter((fileName) => fileName.endsWith('.md'))
-      .map((fileName) => fileName.replace(/\.md$/, ''))
+    return listCanonicalSlugs(pagesDirectory, 'md')
   } catch (error) {
     console.error('Error reading pages directory:', error)
     return []

@@ -1,13 +1,21 @@
 import type React from "react"
 import { NextIntlClientProvider } from "next-intl"
-import { getMessages } from "next-intl/server"
+import { getMessages, setRequestLocale } from "next-intl/server"
 import { Inter } from "next/font/google"
 import "../globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { routing } from "@/lib/i18n/routing"
+import { baseMetadata } from "@/lib/metadata"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 
 const inter = Inter({ subsets: ["latin"] })
+
+export const metadata = baseMetadata
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }))
+}
 
 export default async function LocaleLayout({
   children,
@@ -17,6 +25,7 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
+  setRequestLocale(locale)
   const messages = await getMessages()
 
   return (

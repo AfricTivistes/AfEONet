@@ -13,7 +13,8 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const t = useTranslations("navigation")
-  
+  const tCommon = useTranslations("common")
+
   const navigation = [
     { name: t("home"), href: "/" },
     { name: t("dashboard"), href: "/dashboard" },
@@ -89,7 +90,7 @@ export default function Header() {
               asChild
               className="hidden md:flex bg-secondary text-primary hover:bg-secondary/90 transition-all duration-200"
             >
-              <Link href="/login">{t("admin")}</Link>
+              <Link href="/login">{t("login")}</Link>
             </Button>
 
             <Button
@@ -146,12 +147,12 @@ export default function Header() {
               </Link>
             ))}
             <div className="flex items-center justify-between py-2 border-t border-white/10 mt-2">
-              <span className="text-white/80">Language</span>
+              <span className="text-white/80">{tCommon("language")}</span>
               <LanguageSwitcher />
             </div>
             <Button asChild className="bg-secondary text-primary hover:bg-secondary/90 w-full mt-4">
               <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                Login
+                {t("login")}
               </Link>
             </Button>
           </nav>

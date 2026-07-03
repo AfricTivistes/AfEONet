@@ -43,7 +43,7 @@ collections:
       - { name: "featured", label: "Featured", widget: "boolean", default: false }
       - { name: "image", label: "Image", widget: "image", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content", widget: "markdown" }
+      - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Reports Collection
   - name: "reports"
@@ -56,8 +56,8 @@ collections:
     format: "frontmatter"
     fields:
       - { name: "id", label: "Report ID", widget: "number", i18n: duplicate }
-      - { name: "title", label: "Title", widget: "string" }
-      - { name: "date", label: "Date", widget: "datetime" }
+      - { name: "title", label: "Title", widget: "string", i18n: true }
+      - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
       - { name: "country", label: "Country Name", widget: "string" }
       - { name: "iso2", label: "ISO2 Code", widget: "string", required: false, hint: "Two-letter country code (e.g. 'gh' for Ghana)" }
       - { name: "region", label: "Region", widget: "select", required: false, options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
@@ -85,12 +85,12 @@ collections:
           - { name: "funding", label: "D6 — Access to Funding", widget: "number", value_type: "int", min: 0, max: 10 }
           - { name: "dialogue", label: "D7 — Dialogue & Consultation", widget: "number", value_type: "int", min: 0, max: 10 }
           - { name: "perception", label: "D8 — Perception of Observers", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "summary", label: "Summary", widget: "text" }
+      - { name: "summary", label: "Summary", widget: "text", i18n: true }
       - { name: "source", label: "Source", widget: "string", required: false, default: "AfEONet Report 2025 — Eyes on the Ballot Watchers" }
       - { name: "downloadUrl", label: "Download URL", widget: "file", required: false }
       - { name: "authors", label: "Authors", widget: "list", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content", widget: "markdown" }
+      - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Alerts Collection
   - name: "alerts"
@@ -150,10 +150,10 @@ collections:
           - { value: 7, label: "D7 — Dialogue & Consultation" }
           - { value: 8, label: "D8 — Perception of Observers" }
       - { name: "affectedObservers", label: "Number of Affected Observers", widget: "number", required: false }
-      - { name: "description", label: "Description", widget: "text" }
+      - { name: "description", label: "Description", widget: "text", i18n: true }
       - { name: "relatedReport", label: "Related Report Slug", widget: "string", required: false }
       - { name: "tags", label: "Tags", widget: "list", required: false }
-      - { name: "body", label: "Content", widget: "markdown" }
+      - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Country Scores Collection (editable via CMS)
   - name: "country-scores"
@@ -192,80 +192,88 @@ collections:
   - name: "about"
     label: "About Sections"
     folder: "content/about"
+    i18n: true
     create: true
     slug: "{{slug}}"
     extension: "mdx"
     format: "frontmatter"
     fields:
-      - { name: "title", label: "Title", widget: "string" }
-      - { name: "description", label: "Description", widget: "text" }
+      - { name: "title", label: "Title", widget: "string", i18n: true }
+      - { name: "description", label: "Description", widget: "text", i18n: true }
       - { name: "section", label: "Section", widget: "string" }
-      - { name: "body", label: "Content", widget: "markdown" }
+      - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Pages Collection (Static Pages)
   - name: "pages"
     label: "Static Pages"
     folder: "content/pages"
+    i18n: true
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
     fields:
-      - { name: "title", label: "Title", widget: "string", required: true }
-      - { name: "description", label: "Description", widget: "text", required: true }
-  
+      - { name: "title", label: "Title", widget: "string", required: true, i18n: true }
+      - { name: "description", label: "Description", widget: "text", required: true, i18n: true }
+
       # Hero Section
       - label: "Hero Section"
         name: "hero"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "Hero Title", widget: "string" }
           - { name: "subtitle", label: "Hero Subtitle", widget: "text" }
-  
+
       # Mission Section
       - label: "Mission Section"
         name: "mission"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "Mission Title", widget: "string" }
           - { name: "content", label: "Mission Content", widget: "markdown" }
-  
+
       # Features Section
       - label: "Features Section"
         name: "features"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "Features Title", widget: "string" }
           - { name: "subtitle", label: "Features Subtitle", widget: "text" }
-  
+
       # News Section
       - label: "News Section"
         name: "news"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "News Title", widget: "string" }
           - { name: "subtitle", label: "News Subtitle", widget: "text" }
-  
+
       # Call to Action Section
       - label: "Call to Action"
         name: "cta"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "CTA Title", widget: "string" }
           - { name: "content", label: "CTA Content", widget: "text" }
-  
+
       # Impact Section
       - label: "Impact Section"
         name: "impact"
         widget: "object"
         required: false
+        i18n: true
         fields:
           - { name: "title", label: "Impact Title", widget: "string" }
           - { name: "content", label: "Impact Content", widget: "text" }
-  
-      - { name: "body", label: "Additional Content", widget: "markdown", required: false }
+
+      - { name: "body", label: "Additional Content", widget: "markdown", required: false, i18n: true }
