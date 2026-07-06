@@ -6,7 +6,7 @@ import { statusClass, type CivicStatus } from "@/lib/countries"
 
 // Canonical order, kept in sync with the CivicStatus enum in lib/countries.ts
 // so the legend can never omit a status that the map/dashboard actually use.
-const STATUS_ORDER: CivicStatus[] = ["open", "restricted", "narrowed", "obstructed", "repressed", "closed"]
+const STATUS_ORDER: CivicStatus[] = ["open", "restricted", "obstructed", "repressed", "closed"]
 
 interface StatusLegendProps {
   activeStatus?: CivicStatus | null

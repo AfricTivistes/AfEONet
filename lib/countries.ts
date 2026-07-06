@@ -1,4 +1,4 @@
-export type CivicStatus = "open" | "restricted" | "narrowed" | "obstructed" | "repressed" | "closed"
+export type CivicStatus = "open" | "restricted" | "obstructed" | "repressed" | "closed"
 export type Region =
   | "West Africa"
   | "East Africa"
@@ -31,11 +31,11 @@ export interface Country {
 
 export const countries: Country[] = [
   // North Africa
-  { iso2: "dz", iso3: "DZA", isoNum: "012", name: "Algeria", region: "North Africa", status: "narrowed" },
+  { iso2: "dz", iso3: "DZA", isoNum: "012", name: "Algeria", region: "North Africa", status: "obstructed" },
   { iso2: "eg", iso3: "EGY", isoNum: "818", name: "Egypt", region: "North Africa", status: "closed" },
   { iso2: "ma", iso3: "MAR", isoNum: "504", name: "Morocco", region: "North Africa", status: "repressed" },
   {
-    iso2: "tn", iso3: "TUN", isoNum: "788", name: "Tunisia", region: "North Africa", status: "narrowed",
+    iso2: "tn", iso3: "TUN", isoNum: "788", name: "Tunisia", region: "North Africa", status: "obstructed",
     composite: 6.5,
     dimensions: { regulatory: 7, administrative: 6, embRelationship: 7, security: 6, dataAccess: 7, funding: 5, dialogue: 7, perception: 6 },
     notes: "Post-revolution transition, dialogue remains open",
@@ -48,7 +48,7 @@ export const countries: Country[] = [
     notes: "IReV present but limited funding and digital transparency",
   },
   {
-    iso2: "gh", iso3: "GHA", isoNum: "288", name: "Ghana", region: "West Africa", status: "narrowed",
+    iso2: "gh", iso3: "GHA", isoNum: "288", name: "Ghana", region: "West Africa", status: "obstructed",
     composite: 6.5,
     dimensions: { regulatory: 8, administrative: 7, embRelationship: 9, security: 6, dataAccess: 7, funding: 5, dialogue: 8, perception: 8 },
     notes: "Strong EMB-CSO collaboration but heavy reliance on external funding",
@@ -230,13 +230,14 @@ export function statusClass(status: CivicStatus | null): string {
 
 // Single source of truth for status HSL values — mirrors the CSS custom
 // properties in app/globals.css (--status-*), so map/badges/charts never drift.
+// Score bands (Citizen Observer Score, 0-10): open 9-10, restricted 7-8,
+// obstructed 5-6, repressed 3-4, closed 0-2.
 const STATUS_HSL: Record<CivicStatus | "unknown", [h: number, s: number, l: number]> = {
-  open: [120, 100, 35],
-  restricted: [80, 80, 40],
-  narrowed: [45, 100, 50],
-  obstructed: [30, 100, 50],
-  repressed: [30, 100, 30],
-  closed: [0, 100, 50],
+  open: [149, 100, 33],        // #00A651
+  restricted: [89, 58, 56],    // #92D050
+  obstructed: [57, 100, 50],   // #FFF200
+  repressed: [0, 76, 50],      // #E02020
+  closed: [0, 100, 38],        // #C00000
   unknown: [220, 9, 75],
 }
 
@@ -254,11 +255,17 @@ export function statusHoverFill(status: CivicStatus | null): string {
   return `hsl(${h} ${s}% ${Math.max(0, l - 8)}%)`
 }
 
+// Maps a raw 0-10 score to its band color, for charts/bars that only have a
+// number (e.g. per-dimension scores) and no country/status object to read from.
+export function scoreColor(score: number): string {
+  const status: CivicStatus = score >= 9 ? "open" : score >= 7 ? "restricted" : score >= 5 ? "obstructed" : score >= 3 ? "repressed" : "closed"
+  return statusFill(status)
+}
+
 export function statusLabel(status: CivicStatus | null): string {
   switch (status) {
     case "open": return "Open"
     case "restricted": return "Restricted"
-    case "narrowed": return "Narrowed"
     case "obstructed": return "Obstructed"
     case "repressed": return "Repressed"
     case "closed": return "Closed"
@@ -270,7 +277,6 @@ export function statusDescription(status: CivicStatus | null): string {
   switch (status) {
     case "open": return "Civic space is fully respected and protected"
     case "restricted": return "Civic space faces some limitations but remains functional"
-    case "narrowed": return "Civic space is experiencing increasing restrictions"
     case "obstructed": return "Civic space faces significant obstacles"
     case "repressed": return "Civic space is severely limited with active threats"
     case "closed": return "Civic space is completely closed or non-existent"
@@ -282,7 +288,6 @@ export function statusCounts(): Record<CivicStatus | "unknown", number> {
   const counts: Record<CivicStatus | "unknown", number> = {
     open: 0,
     restricted: 0,
-    narrowed: 0,
     obstructed: 0,
     repressed: 0,
     closed: 0,
@@ -304,6 +309,19 @@ export const DIMENSION_LABELS: Record<keyof CountryDimensions, string> = {
   funding: "Access to Funding",
   dialogue: "Dialogue & Consultation",
   perception: "Perception of Observers",
+}
+
+export const DIM_KEYS = Object.keys(DIMENSION_LABELS) as (keyof CountryDimensions)[]
+
+export const DIM_SHORT: Record<keyof CountryDimensions, string> = {
+  regulatory:       "Regulatory",
+  administrative:   "Admin.",
+  embRelationship:  "EMB",
+  security:         "Security",
+  dataAccess:       "Data",
+  funding:          "Funding",
+  dialogue:         "Dialogue",
+  perception:       "Perception",
 }
 
 export function assessedCountries(): Country[] {

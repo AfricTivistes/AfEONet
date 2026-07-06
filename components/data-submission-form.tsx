@@ -221,11 +221,11 @@ export function DataSubmissionForm() {
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
-                            <RadioGroupItem value="narrowed" />
+                            <RadioGroupItem value="restricted" />
                           </FormControl>
                           <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-narrowed mr-2"></span>
-                            Narrowed
+                            <span className="inline-block w-3 h-3 rounded-full status-restricted mr-2"></span>
+                            Restricted
                           </FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
@@ -354,11 +354,11 @@ export function DataSubmissionForm() {
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
-                            <RadioGroupItem value="narrowed" />
+                            <RadioGroupItem value="restricted" />
                           </FormControl>
                           <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-narrowed mr-2"></span>
-                            Narrowed
+                            <span className="inline-block w-3 h-3 rounded-full status-restricted mr-2"></span>
+                            Restricted
                           </FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
@@ -489,11 +489,11 @@ export function DataSubmissionForm() {
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
-                            <RadioGroupItem value="narrowed" />
+                            <RadioGroupItem value="restricted" />
                           </FormControl>
                           <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-narrowed mr-2"></span>
-                            Narrowed
+                            <span className="inline-block w-3 h-3 rounded-full status-restricted mr-2"></span>
+                            Restricted
                           </FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">

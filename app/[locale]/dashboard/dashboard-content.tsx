@@ -6,13 +6,18 @@ import { useRouter, Link } from "@/lib/i18n/navigation"
 import { useTranslations } from "next-intl"
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Cell,
+  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid,
 } from "recharts"
 import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { CountrySelector } from "@/components/country-selector"
+import { ScoreBar } from "@/components/score-bar"
+import { AverageScoresChart } from "@/components/average-scores-chart"
+import { CountryRankingsTable } from "@/components/country-rankings-table"
+import { DimensionsInfo } from "@/components/dimensions-info"
+import { MethodologyInfo } from "@/components/methodology-info"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, Globe, GitCompare, X, Shield, Unlock, AlertOctagon, Lock, Ban, type LucideIcon } from "lucide-react"
+import { AlertTriangle, Globe, GitCompare, X, Shield, Unlock, AlertOctagon, Lock, Ban, LayoutGrid, BookOpen, type LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -22,24 +27,14 @@ import {
   statusFill,
   reportSlug,
   DIMENSION_LABELS,
+  DIM_KEYS,
+  DIM_SHORT,
   GLOBAL_AVERAGES,
   globalCompositeAverage,
   type Country,
   type CountryDimensions,
   type CivicStatus,
 } from "@/lib/countries"
-
-const DIM_KEYS = Object.keys(DIMENSION_LABELS) as (keyof CountryDimensions)[]
-const DIM_SHORT: Record<keyof CountryDimensions, string> = {
-  regulatory:       "Regulatory",
-  administrative:   "Admin.",
-  embRelationship:  "EMB",
-  security:         "Security",
-  dataAccess:       "Data",
-  funding:          "Funding",
-  dialogue:         "Dialogue",
-  perception:       "Perception",
-}
 
 function toDimArray(dims: CountryDimensions, country: string, globalAvg?: boolean) {
   return DIM_KEYS.map((k) => ({
@@ -48,19 +43,6 @@ function toDimArray(dims: CountryDimensions, country: string, globalAvg?: boolea
     score: dims[k],
     ...(globalAvg ? { global: GLOBAL_AVERAGES[k] } : {}),
   }))
-}
-
-function ScoreBar({ score, max = 10 }: { score: number; max?: number }) {
-  const pct = (score / max) * 100
-  const color = score >= 7 ? "bg-green-500" : score >= 5 ? "bg-yellow-500" : score >= 3 ? "bg-orange-500" : "bg-red-500"
-  return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
-      </div>
-      <span className="text-xs font-mono w-6 text-right">{score}</span>
-    </div>
-  )
 }
 
 function CountryDimensionPanel({ country }: { country: Country }) {
@@ -122,13 +104,12 @@ function CountryDimensionPanel({ country }: { country: Country }) {
 const STATUS_ICONS: Record<CivicStatus, LucideIcon> = {
   open: Unlock,
   restricted: Shield,
-  narrowed: AlertTriangle,
   obstructed: AlertOctagon,
   repressed: Lock,
   closed: Ban,
 }
 
-const STATUS_ORDER: CivicStatus[] = ["open", "restricted", "narrowed", "obstructed", "repressed", "closed"]
+const STATUS_ORDER: CivicStatus[] = ["open", "restricted", "obstructed", "repressed", "closed"]
 
 function SummarySheet({ activeStatus, onToggle }: { activeStatus: CivicStatus | null; onToggle: (status: CivicStatus) => void }) {
   const t = useTranslations("dashboard")
@@ -163,7 +144,7 @@ function SummarySheet({ activeStatus, onToggle }: { activeStatus: CivicStatus | 
           <p className="text-sm text-muted-foreground mb-4">{t("summaryDesc")} ({total})</p>
         </div>
         <Button asChild variant="outline" size="sm" className="border-primary/20 text-primary text-xs">
-          <Link href="/about?tab=methodology#scoring">{t("scoring")} →</Link>
+          <Link href="/dashboard?view=methodology#scoring">{t("scoring")} →</Link>
         </Button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -212,106 +193,11 @@ function GlobalView({
   activeStatus: CivicStatus | null
   onToggleStatus: (status: CivicStatus) => void
 }) {
-  const t = useTranslations("dashboard")
-  const assessed = useMemo(() => assessedCountries().sort((a, b) => (b.composite ?? 0) - (a.composite ?? 0)), [])
-  const filtered = useMemo(
-    () => (activeStatus ? assessed.filter((c) => c.status === activeStatus) : assessed),
-    [assessed, activeStatus],
-  )
-
-  const globalChartData = DIM_KEYS.map((k) => ({
-    dim: DIM_SHORT[k],
-    score: GLOBAL_AVERAGES[k],
-  }))
-
   return (
     <div className="space-y-8">
       <SummarySheet activeStatus={activeStatus} onToggle={onToggleStatus} />
-
-      <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-        <h2 className="text-lg font-bold text-primary mb-1">Average Scores — 8 Dimensions ({assessed.length} countries)</h2>
-        <p className="text-sm text-muted-foreground mb-4">Global composite: <strong>{globalCompositeAverage()}/10</strong></p>
-        <div className="h-56">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={globalChartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="dim" tick={{ fontSize: 11 }} />
-              <YAxis domain={[0, 10]} tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v) => `${v}/10`} />
-              <Bar dataKey="score" radius={[4, 4, 0, 0]}>
-                {globalChartData.map((entry) => (
-                  <Cell
-                    key={entry.dim}
-                    fill={entry.score >= 7 ? "hsl(120 100% 35%)" : entry.score >= 5 ? "hsl(45 100% 50%)" : entry.score >= 3 ? "hsl(30 100% 50%)" : "hsl(0 100% 50%)"}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-primary">
-            Country Rankings (2025){activeStatus ? ` — ${statusLabel(activeStatus)}` : ""}
-          </h2>
-          {activeStatus && (
-            <button
-              onClick={() => onToggleStatus(activeStatus)}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-3 w-3" /> Clear filter
-            </button>
-          )}
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-primary/10">
-                <th className="text-left py-2 pr-4 font-medium">#</th>
-                <th className="text-left py-2 pr-4 font-medium">Country</th>
-                <th className="text-left py-2 pr-4 font-medium">Region</th>
-                <th className="text-left py-2 pr-4 font-medium">Status</th>
-                <th className="text-left py-2 font-medium">Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((c, i) => (
-                <tr
-                  key={c.iso2}
-                  className="border-b border-primary/5 hover:bg-primary/5 cursor-pointer"
-                  onClick={() => onSelect(c.iso2)}
-                >
-                  <td className="py-2 pr-4 text-muted-foreground">{i + 1}</td>
-                  <td className="py-2 pr-4 font-medium">{c.name}</td>
-                  <td className="py-2 pr-4 text-muted-foreground">{c.region}</td>
-                  <td className="py-2 pr-4">
-                    <span
-                      className="inline-block px-2 py-0.5 rounded-full text-xs text-white"
-                      style={{ backgroundColor: statusFill(c.status) }}
-                    >
-                      {statusLabel(c.status)}
-                    </span>
-                  </td>
-                  <td className="py-2">
-                    <div className="flex items-center gap-2 min-w-24">
-                      <ScoreBar score={c.composite!} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-6 text-center text-muted-foreground">
-                    No countries match this status.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <AverageScoresChart />
+      <CountryRankingsTable activeStatus={activeStatus} onToggleStatus={onToggleStatus} onSelect={onSelect} />
     </div>
   )
 }
@@ -428,8 +314,10 @@ export default function DashboardContent() {
   const selectedCountryData = selectedCountry ? byIso2(selectedCountry) : null
 
   const TABS = [
-    { id: "global",     label: "Global View", icon: Globe },
-    { id: "comparison", label: "Comparison",  icon: GitCompare },
+    { id: "global",      label: "Global View",  icon: Globe },
+    { id: "comparison",  label: "Comparison",   icon: GitCompare },
+    { id: "dimensions",  label: "Dimensions",   icon: LayoutGrid },
+    { id: "methodology", label: "Methodology",  icon: BookOpen },
   ]
 
   const t = useTranslations("dashboard")
@@ -522,6 +410,18 @@ export default function DashboardContent() {
               onSelectA={setCountry}
               onSelectB={setCompare}
             />
+          </div>
+        )}
+
+        {activeTab === "dimensions" && (
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
+            <DimensionsInfo />
+          </div>
+        )}
+
+        {activeTab === "methodology" && (
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
+            <MethodologyInfo />
           </div>
         )}
       </div>

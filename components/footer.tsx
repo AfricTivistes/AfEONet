@@ -3,18 +3,6 @@ import { getTranslations } from "next-intl/server"
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaGithub } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/lib/i18n/navigation"
-import { PARTNER_NAMES } from "@/lib/partners"
-
-function PartnerLogoPlaceholder({ name }: { name: string }) {
-  return (
-    <div
-      className="flex h-14 w-28 items-center justify-center rounded-md border border-white/20 bg-white/5 px-3 text-center text-xs font-medium text-white/70"
-      title={name}
-    >
-      {name}
-    </div>
-  )
-}
 
 export default async function Footer() {
   const currentYear = new Date().getFullYear()
@@ -120,7 +108,7 @@ export default async function Footer() {
             <ul className="space-y-3 text-sm">
               <li>
                 <Link
-                  href="/about?tab=methodology#scoring"
+                  href="/dashboard?view=methodology#scoring"
                   className="text-white/70 hover:text-secondary transition-colors duration-200 flex items-center gap-1"
                 >
                   {t("methodology")}
@@ -128,7 +116,7 @@ export default async function Footer() {
               </li>
               <li>
                 <Link
-                  href="/about?tab=partners"
+                  href="/about"
                   className="text-white/70 hover:text-secondary transition-colors duration-200 flex items-center gap-1"
                 >
                   {t("partners")}
@@ -165,13 +153,7 @@ export default async function Footer() {
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-white/10">
-          <h3 className="mb-4 text-center text-sm font-semibold text-secondary">{tCommon("partnersTitle")}</h3>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {PARTNER_NAMES.map((name) => (
-              <PartnerLogoPlaceholder key={name} name={name} />
-            ))}
-          </div>
-          <p className="mt-6 text-center text-sm font-medium text-white/80">{tCommon("euCofundedBy")}</p>
+          <p className="text-center text-sm font-medium text-white/80">{tCommon("euCofundedBy")}</p>
           <p className="mx-auto mt-2 max-w-2xl text-center text-xs text-white/50">{tCommon("euDisclaimer")}</p>
         </div>
 
