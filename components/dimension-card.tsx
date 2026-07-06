@@ -3,7 +3,7 @@ import { Info } from "lucide-react"
 interface DimensionCardProps {
   title: string
   description: string
-  status: "open" | "restricted" | "narrowed" | "obstructed" | "repressed" | "closed"
+  status: "open" | "restricted" | "obstructed" | "repressed" | "closed"
   trend: "improving" | "stable" | "deteriorating" | "unknown"
   details?: string
 }
@@ -12,7 +12,6 @@ export function DimensionCard({ title, description, status, trend, details }: Di
   const statusLabels = {
     open: "Open",
     restricted: "Restricted",
-    narrowed: "Narrowed",
     obstructed: "Obstructed",
     repressed: "Repressed",
     closed: "Closed",

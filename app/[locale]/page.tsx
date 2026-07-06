@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AfricaMap } from "@/components/africa-map"
+import { AverageScoresChart } from "@/components/average-scores-chart"
+import { CountryRankingsTable } from "@/components/country-rankings-table"
 import { ArrowRight, BarChart2, FileText, Send, Users, Calendar, Globe, Shield, Award } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { getPage } from "@/lib/pages"
@@ -21,7 +23,7 @@ function buildStats(t: Awaited<ReturnType<typeof getTranslations>>, reportsCount
   ]
 }
 
-const STATUS_ORDER = ["open", "restricted", "narrowed", "obstructed", "repressed", "closed", "unknown"] as const
+const STATUS_ORDER = ["open", "restricted", "obstructed", "repressed", "closed", "unknown"] as const
 
 function CivicSpaceStats({ tCommon }: { tCommon: Awaited<ReturnType<typeof getTranslations>> }) {
   const counts = statusCounts()
@@ -35,7 +37,7 @@ function CivicSpaceStats({ tCommon }: { tCommon: Awaited<ReturnType<typeof getTr
           <div
             key={key}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium status-${key} ${
-              key === "narrowed" ? "text-black" : "text-white"
+              key === "obstructed" ? "text-black" : "text-white"
             }`}
           >
             <span className="text-lg font-bold">{count}</span>
@@ -208,7 +210,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             })}
           </p>
 
-          <AfricaMap navigateOnClick />
+          <AfricaMap navigateOnClick showRegionGrid={false} />
+
+          <div className="mt-8 space-y-8">
+            <AverageScoresChart />
+            <CountryRankingsTable limit={10} />
+          </div>
 
           <div className="mt-8 text-center">
             <Button asChild className="bg-secondary text-primary hover:bg-secondary/90">

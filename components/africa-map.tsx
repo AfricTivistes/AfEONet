@@ -26,9 +26,11 @@ interface AfricaMapProps {
   navigateOnClick?: boolean
   /** When set, countries not matching this status are dimmed to highlight the filtered category. */
   statusFilter?: CivicStatus | null
+  /** Whether to render the accessible region-grid country list below the map. Defaults to true. */
+  showRegionGrid?: boolean
 }
 
-export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navigateOnClick, statusFilter }: AfricaMapProps) {
+export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navigateOnClick, statusFilter, showRegionGrid = true }: AfricaMapProps) {
   const router = useRouter()
   const mapRef = useRef<HTMLDivElement>(null)
   const [internalSelected, setInternalSelected] = useState<string | null>(null)
@@ -149,7 +151,7 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navig
             <div className="flex items-start gap-3">
               <div
                 className={`w-10 h-10 rounded-md flex-shrink-0 ${statusClass(selectedCountry.status)} flex items-center justify-center font-bold text-lg ${
-                  selectedCountry.status === "narrowed" ? "text-black" : "text-white"
+                  selectedCountry.status === "obstructed" ? "text-black" : "text-white"
                 }`}
               >
                 {selectedCountry.name.charAt(0)}
@@ -176,35 +178,39 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navig
         )}
 
         {/* Region grid fallback (accessible + mobile) */}
-        <div className="mt-6 space-y-6">
-          {REGIONS.map((region) => (
-            <div key={region}>
-              <h4 className="font-medium text-primary mb-3 flex items-center text-sm">
-                <span className="inline-block w-2 h-2 rounded-full bg-primary mr-2" />
-                {region}
-              </h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-                {byRegion(region).map((country) => (
-                  <div
-                    key={country.iso2}
-                    className={`${statusClass(country.status)} p-2 rounded-md cursor-pointer text-center text-xs font-medium transition-opacity hover:opacity-80 ${
-                      country.status === "narrowed" ? "text-black" : "text-white"
-                    } ${selectedIso2 === country.iso2 ? "ring-2 ring-primary ring-offset-1" : ""} ${
-                      statusFilter != null && country.status !== statusFilter ? "opacity-25" : ""
-                    }`}
-                    onClick={() => handleClick(country.iso2)}
-                  >
-                    {country.name}
+        {showRegionGrid && (
+          <>
+            <div className="mt-6 space-y-6">
+              {REGIONS.map((region) => (
+                <div key={region}>
+                  <h4 className="font-medium text-primary mb-3 flex items-center text-sm">
+                    <span className="inline-block w-2 h-2 rounded-full bg-primary mr-2" />
+                    {region}
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                    {byRegion(region).map((country) => (
+                      <div
+                        key={country.iso2}
+                        className={`${statusClass(country.status)} p-2 rounded-md cursor-pointer text-center text-xs font-medium transition-opacity hover:opacity-80 ${
+                          country.status === "obstructed" ? "text-black" : "text-white"
+                        } ${selectedIso2 === country.iso2 ? "ring-2 ring-primary ring-offset-1" : ""} ${
+                          statusFilter != null && country.status !== statusFilter ? "opacity-25" : ""
+                        }`}
+                        onClick={() => handleClick(country.iso2)}
+                      >
+                        {country.name}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <p className="text-xs text-muted-foreground mt-4 text-center">
-          Comoros, Mauritius and Seychelles are shown in the region grid above (too small for map resolution).
-        </p>
+            <p className="text-xs text-muted-foreground mt-4 text-center">
+              Comoros, Mauritius and Seychelles are shown in the region grid above (too small for map resolution).
+            </p>
+          </>
+        )}
       </CardContent>
     </Card>
   )

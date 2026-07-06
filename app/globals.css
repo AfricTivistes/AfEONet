@@ -36,13 +36,12 @@
 
     --radius: 0.5rem;
 
-    /* Civic Space Status Colors */
-    --status-open: 120 100% 35%;
-    --status-restricted: 80 80% 40%;
-    --status-narrowed: 45 100% 50%;
-    --status-obstructed: 30 100% 50%;
-    --status-repressed: 30 100% 30%;
-    --status-closed: 0 100% 50%;
+    /* Civic Space Status Colors — Citizen Observer Score bands (0-10) */
+    --status-open: 149 100% 33%;        /* #00A651 — 9-10 */
+    --status-restricted: 89 58% 56%;    /* #92D050 — 7-8 */
+    --status-obstructed: 57 100% 50%;   /* #FFF200 — 5-6 */
+    --status-repressed: 0 76% 50%;      /* #E02020 — 3-4 */
+    --status-closed: 0 100% 38%;        /* #C00000 — 0-2 */
     --status-unknown: 220 9% 75%;
 
     /* Accent colors inspired by the image */
@@ -100,10 +99,6 @@
 
 .status-restricted {
   @apply bg-[hsl(var(--status-restricted))];
-}
-
-.status-narrowed {
-  @apply bg-[hsl(var(--status-narrowed))];
 }
 
 .status-obstructed {

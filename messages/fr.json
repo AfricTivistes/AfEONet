@@ -18,11 +18,17 @@
   "status": {
     "open": "Ouvert/Libre",
     "restricted": "Restreint",
-    "narrowed": "Rétréci",
     "obstructed": "Obstrué",
     "repressed": "Réprimé/Menacé",
     "closed": "Fermé",
-    "legendTitle": "Légende des Statuts"
+    "legendTitle": "Légende des Statuts",
+    "scoreRange": {
+      "open": "9-10",
+      "restricted": "7-8",
+      "obstructed": "5-6",
+      "repressed": "3-4",
+      "closed": "0-2"
+    }
   },
   "dimensions": {
     "regulatory": "Cadre Réglementaire",
@@ -48,7 +54,9 @@
     "dimensionsEvaluated": "dimensions évaluées",
     "view": {
       "global": "Vue Globale",
-      "comparison": "Comparaison"
+      "comparison": "Comparaison",
+      "dimensions": "Dimensions",
+      "methodology": "Méthodologie"
     },
     "scoring": "Échelle de Notation"
   },
