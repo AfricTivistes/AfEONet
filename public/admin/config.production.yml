@@ -73,7 +73,6 @@ collections:
         options:
           - { value: "open", label: "Open (9-10)" }
           - { value: "restricted", label: "Restricted (7-8)" }
-          - { value: "narrowed", label: "Narrowed" }
           - { value: "obstructed", label: "Obstructed (5-6)" }
           - { value: "repressed", label: "Repressed (3-4)" }
           - { value: "closed", label: "Closed (0-2)" }
@@ -120,7 +119,6 @@ collections:
         options:
           - { value: "open", label: "Open" }
           - { value: "restricted", label: "Restricted" }
-          - { value: "narrowed", label: "Narrowed" }
           - { value: "obstructed", label: "Obstructed" }
           - { value: "repressed", label: "Repressed" }
           - { value: "closed", label: "Closed" }
@@ -180,7 +178,6 @@ collections:
         options:
           - { value: "open", label: "Open (9-10)" }
           - { value: "restricted", label: "Restricted (7-8)" }
-          - { value: "narrowed", label: "Narrowed" }
           - { value: "obstructed", label: "Obstructed (5-6)" }
           - { value: "repressed", label: "Repressed (3-4)" }
           - { value: "closed", label: "Closed (0-2)" }

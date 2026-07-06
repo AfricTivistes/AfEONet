@@ -120,27 +120,27 @@ th {
 
 /* Status indicators for reports and alerts */
 .status-open {
-  color: #22c55e;
+  color: #00A651;
   font-weight: bold;
 }
 
-.status-narrowed {
-  color: #f59e0b;
+.status-restricted {
+  color: #92D050;
   font-weight: bold;
 }
 
 .status-obstructed {
-  color: #f97316;
+  color: #FFF200;
   font-weight: bold;
 }
 
 .status-repressed {
-  color: #ef4444;
+  color: #E02020;
   font-weight: bold;
 }
 
 .status-closed {
-  color: #991b1b;
+  color: #C00000;
   font-weight: bold;
 }
 
