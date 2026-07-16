@@ -1,16 +1,16 @@
-// Placeholder logos — swap in real assets under public/partners/ once supplied.
 export interface Partner {
   name: string
   logo?: string
 }
 
 // Funders and supporting organizations — shown on the homepage banner.
+// Logos sourced from each organization's official website (see public/partners/).
 export const PARTNERS: Partner[] = [
-  { name: "AHEAD Africa" },
-  { name: "European Union" },
-  { name: "EPD" },
-  { name: "Africtivistes" },
-  { name: "EPDE" },
-  { name: "NDI" },
-  { name: "EISA" },
+  { name: "AHEAD Africa", logo: "/partners/ahead-africa.svg" },
+  { name: "European Union", logo: "/partners/eu.svg" },
+  { name: "EPD", logo: "/partners/epd.svg" },
+  { name: "Africtivistes", logo: "/partners/africtivistes.svg" },
+  { name: "EPDE", logo: "/partners/epde.svg" },
+  { name: "NDI", logo: "/partners/ndi.png" },
+  { name: "EISA", logo: "/partners/eisa.jpg" },
 ]

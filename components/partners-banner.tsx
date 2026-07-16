@@ -7,16 +7,16 @@ export function PartnersBanner() {
       {PARTNERS.map((partner) => (
         <div
           key={partner.name}
-          className="flex h-14 w-28 items-center justify-center rounded-md border border-primary/20 bg-white px-3 text-center"
+          className="flex h-20 w-40 items-center justify-center rounded-md border border-primary/20 bg-white px-4 py-2 text-center"
           title={partner.name}
         >
           {partner.logo ? (
             <Image
               src={partner.logo}
               alt={partner.name}
-              width={96}
-              height={40}
-              className="object-contain"
+              width={128}
+              height={56}
+              className="max-h-14 w-auto object-contain"
             />
           ) : (
             <span className="text-xs font-medium text-primary/70">{partner.name}</span>
