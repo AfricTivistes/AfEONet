@@ -41,13 +41,13 @@ collections:
       - { name: "title", label: "Title", widget: "string", i18n: true }
       - { name: "description", label: "Description", widget: "text", i18n: true }
       - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
-      - { name: "category", label: "Category", widget: "select", options: ["Articles", "Alerts"], hint: "News alerts are editorial announcements — country security/civic-space alerts belong in the Security Alerts collection." }
-      - { name: "author", label: "Author", widget: "string" }
-      - { name: "country", label: "Country (ISO2 or name)", widget: "string", required: false, hint: "Link news to a country for filtering (e.g. 'Ghana' or 'gh')" }
-      - { name: "dimensionTags", label: "Dimension Tags", widget: "select", multiple: true, required: false, options: ["Regulatory Framework", "Administrative Constraints", "EMB Relationship", "Security and Well-being", "Access to Electoral Data", "Access to Funding", "Dialogue and Consultation", "Perception of Observers"] }
-      - { name: "featured", label: "Featured", widget: "boolean", default: false }
-      - { name: "image", label: "Image", widget: "image", required: false }
-      - { name: "tags", label: "Tags", widget: "list", required: false }
+      - { name: "category", label: "Category", widget: "select", options: ["Articles", "Alerts"], hint: "News alerts are editorial announcements — country security/civic-space alerts belong in the Security Alerts collection.", i18n: duplicate }
+      - { name: "author", label: "Author", widget: "string", i18n: duplicate }
+      - { name: "country", label: "Country (ISO2 or name)", widget: "string", required: false, hint: "Link news to a country for filtering (e.g. 'Ghana' or 'gh')", i18n: duplicate }
+      - { name: "dimensionTags", label: "Dimension Tags", widget: "select", multiple: true, required: false, options: ["Regulatory Framework", "Administrative Constraints", "EMB Relationship", "Security and Well-being", "Access to Electoral Data", "Access to Funding", "Dialogue and Consultation", "Perception of Observers"], i18n: duplicate }
+      - { name: "featured", label: "Featured", widget: "boolean", default: false, i18n: duplicate }
+      - { name: "image", label: "Image", widget: "image", required: false, i18n: duplicate }
+      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: duplicate }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Reports Collection
@@ -63,6 +63,7 @@ collections:
       - { name: "id", label: "Report ID", widget: "number", i18n: duplicate }
       - { name: "title", label: "Title", widget: "string", i18n: true }
       - name: "category"
+        i18n: duplicate
         label: "Publication Category"
         widget: "select"
         required: false
@@ -71,10 +72,11 @@ collections:
           - { value: "civic-space-annual", label: "Civic Space Annual Reports" }
           - { value: "country-specific", label: "Country-Specific Reports" }
       - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
-      - { name: "country", label: "Country Name", widget: "string" }
-      - { name: "iso2", label: "ISO2 Code", widget: "string", required: false, hint: "Two-letter country code (e.g. 'gh' for Ghana)" }
-      - { name: "region", label: "Region", widget: "select", required: false, options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
+      - { name: "country", label: "Country Name", widget: "string", i18n: duplicate }
+      - { name: "iso2", label: "ISO2 Code", widget: "string", required: false, hint: "Two-letter country code (e.g. 'gh' for Ghana)", i18n: duplicate }
+      - { name: "region", label: "Region", widget: "select", required: false, options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"], i18n: duplicate }
       - name: "status"
+        i18n: duplicate
         label: "Civic Space Status"
         widget: "select"
         options:
@@ -83,8 +85,9 @@ collections:
           - { value: "obstructed", label: "Obstructed (5-6)" }
           - { value: "repressed", label: "Repressed (3-4)" }
           - { value: "closed", label: "Closed (0-2)" }
-      - { name: "composite", label: "Composite Score (0-10)", widget: "number", value_type: "float", min: 0, max: 10, step: 0.5, required: false }
+      - { name: "composite", label: "Composite Score (0-10)", widget: "number", value_type: "float", min: 0, max: 10, step: 0.5, required: false, i18n: duplicate }
       - name: "dimensions"
+        i18n: duplicate
         label: "Dimension Scores (0-10)"
         widget: "object"
         required: false
@@ -98,10 +101,10 @@ collections:
           - { name: "dialogue", label: "D7 — Dialogue & Consultation", widget: "number", value_type: "int", min: 0, max: 10 }
           - { name: "perception", label: "D8 — Perception of Observers", widget: "number", value_type: "int", min: 0, max: 10 }
       - { name: "summary", label: "Summary", widget: "text", i18n: true }
-      - { name: "source", label: "Source", widget: "string", required: false, default: "AfEONet Report 2025 — Eyes on the Ballot Watchers" }
-      - { name: "downloadUrl", label: "Download URL", widget: "file", required: false }
-      - { name: "authors", label: "Authors", widget: "list", required: false }
-      - { name: "tags", label: "Tags", widget: "list", required: false }
+      - { name: "source", label: "Source", widget: "string", required: false, default: "AfEONet Report 2025 — Eyes on the Ballot Watchers", i18n: duplicate }
+      - { name: "downloadUrl", label: "Download URL", widget: "file", required: false, i18n: duplicate }
+      - { name: "authors", label: "Authors", widget: "list", required: false, i18n: duplicate }
+      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: duplicate }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Alerts Collection
@@ -117,10 +120,11 @@ collections:
       - { name: "id", label: "Alert ID", widget: "string", hint: "Format: XX-YYYY-NNN (e.g. UG-2025-001)", i18n: duplicate }
       - { name: "title", label: "Title", widget: "string", i18n: true }
       - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
-      - { name: "country", label: "Country", widget: "string" }
-      - { name: "iso2", label: "ISO2 Code", widget: "string", required: false }
-      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
+      - { name: "country", label: "Country", widget: "string", i18n: duplicate }
+      - { name: "iso2", label: "ISO2 Code", widget: "string", required: false, i18n: duplicate }
+      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"], i18n: duplicate }
       - name: "status"
+        i18n: duplicate
         label: "Civic Space Status"
         widget: "select"
         options:
@@ -130,6 +134,7 @@ collections:
           - { value: "repressed", label: "Repressed" }
           - { value: "closed", label: "Closed" }
       - name: "severity"
+        i18n: duplicate
         label: "Severity"
         widget: "select"
         options:
@@ -138,6 +143,7 @@ collections:
           - { value: "medium", label: "Medium — Monitor closely" }
           - { value: "low", label: "Low — Watch and engage" }
       - name: "alertType"
+        i18n: duplicate
         label: "Alert Type"
         widget: "select"
         options:
@@ -148,6 +154,7 @@ collections:
           - { value: "closure", label: "Space Closure" }
           - { value: "other", label: "Other" }
       - name: "dimension"
+        i18n: duplicate
         label: "Primary Dimension Affected"
         widget: "select"
         required: false
@@ -160,10 +167,10 @@ collections:
           - { value: 6, label: "D6 — Access to Funding" }
           - { value: 7, label: "D7 — Dialogue & Consultation" }
           - { value: 8, label: "D8 — Perception of Observers" }
-      - { name: "affectedObservers", label: "Number of Affected Observers", widget: "number", required: false }
+      - { name: "affectedObservers", label: "Number of Affected Observers", widget: "number", required: false, i18n: duplicate }
       - { name: "description", label: "Description", widget: "text", i18n: true }
-      - { name: "relatedReport", label: "Related Report Slug", widget: "string", required: false }
-      - { name: "tags", label: "Tags", widget: "list", required: false }
+      - { name: "relatedReport", label: "Related Report Slug", widget: "string", required: false, i18n: duplicate }
+      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: duplicate }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Country Scores Collection (editable via CMS)
@@ -210,8 +217,8 @@ collections:
     fields:
       - { name: "title", label: "Title", widget: "string", i18n: true }
       - { name: "description", label: "Description", widget: "text", i18n: true }
-      - { name: "section", label: "Section", widget: "string" }
-      - { name: "order", label: "Display Order", widget: "number", value_type: "int", default: 1 }
+      - { name: "section", label: "Section", widget: "string", i18n: duplicate }
+      - { name: "order", label: "Display Order", widget: "number", value_type: "int", default: 1, i18n: duplicate }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Pages Collection (Static Pages)
@@ -234,8 +241,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "Hero Title", widget: "string" }
-          - { name: "subtitle", label: "Hero Subtitle", widget: "text" }
+          - { name: "title", label: "Hero Title", widget: "string", i18n: true }
+          - { name: "subtitle", label: "Hero Subtitle", widget: "text", i18n: true }
 
       # Mission Section
       - label: "Mission Section"
@@ -244,8 +251,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "Mission Title", widget: "string" }
-          - { name: "content", label: "Mission Content", widget: "markdown" }
+          - { name: "title", label: "Mission Title", widget: "string", i18n: true }
+          - { name: "content", label: "Mission Content", widget: "markdown", i18n: true }
 
       # Features Section
       - label: "Features Section"
@@ -254,8 +261,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "Features Title", widget: "string" }
-          - { name: "subtitle", label: "Features Subtitle", widget: "text" }
+          - { name: "title", label: "Features Title", widget: "string", i18n: true }
+          - { name: "subtitle", label: "Features Subtitle", widget: "text", i18n: true }
 
       # News Section
       - label: "News Section"
@@ -264,8 +271,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "News Title", widget: "string" }
-          - { name: "subtitle", label: "News Subtitle", widget: "text" }
+          - { name: "title", label: "News Title", widget: "string", i18n: true }
+          - { name: "subtitle", label: "News Subtitle", widget: "text", i18n: true }
 
       # Call to Action Section
       - label: "Call to Action"
@@ -274,8 +281,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "CTA Title", widget: "string" }
-          - { name: "content", label: "CTA Content", widget: "text" }
+          - { name: "title", label: "CTA Title", widget: "string", i18n: true }
+          - { name: "content", label: "CTA Content", widget: "text", i18n: true }
 
       # Impact Section
       - label: "Impact Section"
@@ -284,8 +291,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "Impact Title", widget: "string" }
-          - { name: "content", label: "Impact Content", widget: "text" }
+          - { name: "title", label: "Impact Title", widget: "string", i18n: true }
+          - { name: "content", label: "Impact Content", widget: "text", i18n: true }
 
       - { name: "body", label: "Additional Content", widget: "markdown", required: false, i18n: true }
 
