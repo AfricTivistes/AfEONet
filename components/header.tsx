@@ -19,7 +19,7 @@ export default function Header() {
     { name: t("home"), href: "/" },
     { name: t("dashboard"), href: "/dashboard" },
     { name: t("news"), href: "/news" },
-    { name: t("reports"), href: "/reports" },
+    { name: t("publications"), href: "/publications" },
     { name: t("submit"), href: "/submit" },
     { name: t("about"), href: "/about" },
     { name: t("contact"), href: "/contact" },

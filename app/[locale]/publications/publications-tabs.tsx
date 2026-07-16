@@ -9,10 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Download, ArrowRight } from "lucide-react"
 import { Pagination } from "@/components/pagination"
 import type { Report, Alert } from "@/lib/reports"
+import { PUBLICATION_CATEGORIES, type PublicationCategory } from "@/lib/publication-categories"
 
-const VALID_TABS = ["reports", "alerts"]
+const VALID_TABS = ["publications", "alerts"]
+const LEGACY_TAB_ALIAS: Record<string, string> = { reports: "publications" }
 
-interface ReportsTabsProps {
+interface PublicationsTabsProps {
   reports: Report[]
   alerts: Alert[]
   reportsPage: number
@@ -20,9 +22,10 @@ interface ReportsTabsProps {
   totalReportsPages: number
   totalAlertsPages: number
   q?: string
+  category?: PublicationCategory
 }
 
-export function ReportsTabs({
+export function PublicationsTabs({
   reports,
   alerts,
   reportsPage,
@@ -30,28 +33,39 @@ export function ReportsTabs({
   totalReportsPages,
   totalAlertsPages,
   q,
-}: ReportsTabsProps) {
+  category,
+}: PublicationsTabsProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const t = useTranslations("reports")
+  const t = useTranslations("publications")
 
   const requestedTab = searchParams.get("tab")
-  const activeTab = requestedTab && VALID_TABS.includes(requestedTab) ? requestedTab : "reports"
+  const normalizedTab = requestedTab ? LEGACY_TAB_ALIAS[requestedTab] ?? requestedTab : undefined
+  const activeTab = normalizedTab && VALID_TABS.includes(normalizedTab) ? normalizedTab : "publications"
 
   function onValueChange(value: string) {
     const params = new URLSearchParams(searchParams.toString())
     params.set("tab", value)
-    router.replace(`/reports?${params.toString()}`, { scroll: false })
+    router.replace(`/publications?${params.toString()}`, { scroll: false })
+  }
+
+  function onCategoryChange(value?: PublicationCategory) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", "publications")
+    if (value) params.set("category", value)
+    else params.delete("category")
+    params.delete("rpage")
+    router.replace(`/publications?${params.toString()}`, { scroll: false })
   }
 
   return (
     <Tabs value={activeTab} onValueChange={onValueChange} className="w-full">
       <TabsList className="bg-primary/10 p-1 rounded-lg mb-6">
         <TabsTrigger
-          value="reports"
+          value="publications"
           className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-colors"
         >
-          {t("tabReports")}
+          {t("tabPublications")}
         </TabsTrigger>
         <TabsTrigger
           value="alerts"
@@ -61,7 +75,29 @@ export function ReportsTabs({
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="reports" className="space-y-6">
+      <TabsContent value="publications" className="space-y-6">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => onCategoryChange(undefined)}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+              !category ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
+            }`}
+          >
+            {t("categoryAll")}
+          </button>
+          {PUBLICATION_CATEGORIES.map((c) => (
+            <button
+              key={c}
+              onClick={() => onCategoryChange(c)}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                category === c ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
+              }`}
+            >
+              {t(`category-${c}`)}
+            </button>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reports.map((report) => (
             <div
@@ -83,7 +119,7 @@ export function ReportsTabs({
                   </Button>
                 ) : <span />}
                 <Button size="sm" asChild className="bg-secondary text-primary hover:bg-secondary/90">
-                  <Link href={`/reports/${report.id}`}>
+                  <Link href={`/publications/${report.id}`}>
                     {t("readReport")} <ArrowRight className="ml-2 h-3 w-3" />
                   </Link>
                 </Button>
@@ -95,7 +131,7 @@ export function ReportsTabs({
           currentPage={reportsPage}
           totalPages={totalReportsPages}
           pageParam="rpage"
-          baseParams={{ tab: "reports", q }}
+          baseParams={{ tab: "publications", q, category }}
         />
       </TabsContent>
 
