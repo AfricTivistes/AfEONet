@@ -1,4 +1,3 @@
-import { Suspense } from "react"
 import Image from "next/image"
 import { Link } from "@/lib/i18n/navigation"
 import { getTranslations } from "next-intl/server"
@@ -6,12 +5,14 @@ import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { getPage } from "@/lib/pages"
+import { getAboutSections } from "@/lib/about"
 import { notFound } from "next/navigation"
-import { AboutTabs } from "./about-tabs"
+import { aboutMarkdownComponents } from "./markdown-components"
+import { AboutSections } from "./about-sections"
 
 export const metadata = {
   title: "About AfEONet - African Election Observers Network",
-  description: "Discover our mission, history, and impact on election observation in Africa. Learn about our 8-dimension monitoring framework for civic space.",
+  description: "Discover our mission, vision, values, and impact on election observation in Africa.",
 }
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -19,6 +20,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const t = await getTranslations({ locale, namespace: "about" })
   const tFooter = await getTranslations({ locale, namespace: "footer" })
   const pageData = await getPage('about', locale)
+  const sections = await getAboutSections(locale)
 
   if (!pageData) {
     notFound()
@@ -41,35 +43,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start mb-16">
           <div className="prose prose-slate dark:prose-invert max-w-none">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                h1: ({ children }) => (
-                  <h1 className="text-3xl font-bold tracking-tight text-primary mb-6">{children}</h1>
-                ),
-                h2: ({ children }) => (
-                  <h2 className="text-2xl font-bold mb-6 text-primary relative inline-block">
-                    {children}
-                    <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-secondary"></span>
-                  </h2>
-                ),
-                h3: ({ children }) => (
-                  <h3 className="text-xl font-semibold mb-4 text-primary">{children}</h3>
-                ),
-                p: ({ children }) => (
-                  <p className="mb-4 text-muted-foreground leading-relaxed">{children}</p>
-                ),
-                a: ({ children, href }) => (
-                  <Link href={href || '#'} className="text-primary hover:text-primary/80 underline">
-                    {children}
-                  </Link>
-                ),
-                ul: ({ children }) => (
-                  <ul className="mb-4 space-y-2 text-muted-foreground list-disc list-inside">{children}</ul>
-                ),
-                li: ({ children }) => <li className="mb-1">{children}</li>,
-              }}
-            >
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={aboutMarkdownComponents}>
               {pageData.content}
             </ReactMarkdown>
           </div>
@@ -88,9 +62,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </div>
         </div>
 
-        <Suspense fallback={null}>
-          <AboutTabs />
-        </Suspense>
+        <AboutSections sections={sections} />
 
         <div className="bg-secondary/20 rounded-lg p-12 text-center">
           <h2 className="text-2xl font-bold text-primary mb-4">{t("joinNetworkTitle")}</h2>

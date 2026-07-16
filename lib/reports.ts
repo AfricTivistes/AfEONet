@@ -3,6 +3,7 @@ import path from 'path'
 import matter from 'gray-matter'
 import { byIso2 } from './countries'
 import { resolveLocalizedPath, listCanonicalSlugs } from './content-locale'
+import type { PublicationCategory } from './publication-categories'
 
 export interface ReportDimensions {
   regulatory?: number
@@ -14,6 +15,8 @@ export interface ReportDimensions {
   dialogue?: number
   perception?: number
 }
+
+export { PUBLICATION_CATEGORIES, type PublicationCategory } from './publication-categories'
 
 export interface Report {
   id: number
@@ -33,6 +36,7 @@ export interface Report {
   dimensions?: ReportDimensions
   source?: string
   notes?: string
+  category?: PublicationCategory
 }
 
 export interface Alert {

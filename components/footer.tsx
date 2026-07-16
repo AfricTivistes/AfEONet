@@ -71,10 +71,10 @@ export default async function Footer() {
               </li>
               <li>
                 <Link
-                  href="/reports"
+                  href="/publications"
                   className="text-white/70 hover:text-secondary transition-colors duration-200 flex items-center gap-1"
                 >
-                  {tNav("reports")}
+                  {tNav("publications")}
                 </Link>
               </li>
               <li>
@@ -116,7 +116,7 @@ export default async function Footer() {
               </li>
               <li>
                 <Link
-                  href="/about"
+                  href="/#partners"
                   className="text-white/70 hover:text-secondary transition-colors duration-200 flex items-center gap-1"
                 >
                   {t("partners")}

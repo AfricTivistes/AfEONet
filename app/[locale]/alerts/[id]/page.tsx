@@ -75,7 +75,7 @@ export default async function AlertPage({ params }: AlertPageProps) {
       <div className="border-b bg-white dark:bg-slate-900">
         <div className="container py-4">
           <Button variant="ghost" asChild className="text-primary hover:bg-primary/10">
-            <Link href="/reports">
+            <Link href="/publications">
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t("backToReportsAlerts")}
             </Link>
@@ -280,13 +280,13 @@ export default async function AlertPage({ params }: AlertPageProps) {
                 <h3 className="font-semibold text-primary mb-4">{t("relatedTitle")}</h3>
                 <div className="space-y-3">
                   <Link
-                    href="/reports"
+                    href="/publications"
                     className="block text-sm text-primary hover:underline"
                   >
                     {t("browseAllReports")} →
                   </Link>
                   <Link
-                    href="/reports?tab=alerts"
+                    href="/publications?tab=alerts"
                     className="block text-sm text-primary hover:underline"
                   >
                     {t("viewAllAlerts")} →

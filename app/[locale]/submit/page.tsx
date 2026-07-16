@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server"
 import { DataSubmissionForm } from "@/components/data-submission-form"
 import { Card, CardContent } from "@/components/ui/card"
+import { DIM_KEYS } from "@/lib/countries"
 
 export default async function SubmitPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -8,16 +9,7 @@ export default async function SubmitPage({ params }: { params: Promise<{ locale:
   const tDim = await getTranslations({ locale, namespace: "dimensions" })
   const tAbout = await getTranslations({ locale, namespace: "about" })
 
-  const dimensions = [
-    { key: "regulatory", desc: t("dim1Desc") },
-    { key: "administrative", desc: t("dim2Desc") },
-    { key: "embRelationship", desc: t("dim3Desc") },
-    { key: "security", desc: t("dim4Desc") },
-    { key: "dataAccess", desc: t("dim5Desc") },
-    { key: "funding", desc: t("dim6Desc") },
-    { key: "dialogue", desc: t("dim7Desc") },
-    { key: "perception", desc: t("dim8Desc") },
-  ] as const
+  const dimensions = DIM_KEYS.map((key, i) => ({ key, desc: t(`dim${i + 1}Desc`) }))
 
   return (
     <div className="flex flex-col min-h-screen bg-secondary/5">

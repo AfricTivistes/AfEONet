@@ -42,7 +42,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   if (!report) notFound()
 
-  const t = await getTranslations({ locale, namespace: "reports" })
+  const t = await getTranslations({ locale, namespace: "publications" })
 
   const [relatedAlerts, relatedNews] = await Promise.all([
     getRelatedAlerts(report.country, locale),
@@ -58,9 +58,9 @@ export default async function ReportPage({ params }: ReportPageProps) {
       <div className="border-b bg-white dark:bg-slate-900">
         <div className="container py-4">
           <Button variant="ghost" asChild className="text-primary hover:bg-primary/10">
-            <Link href="/reports">
+            <Link href="/publications">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("backToReports")}
+              {t("backToPublications")}
             </Link>
           </Button>
         </div>
@@ -165,7 +165,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
                   {relatedAlerts.map((a) => (
                     <Link
                       key={a.slug}
-                      href={`/reports/${a.slug}`}
+                      href={`/alerts/${a.slug}`}
                       className="block p-3 rounded-lg border border-primary/10 hover:border-primary/30 hover:bg-primary/5 transition-colors"
                     >
                       <div className="flex items-start gap-2">
@@ -251,7 +251,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
                 <h3 className="font-semibold text-primary mb-4">{t("otherReportsTitle", { country: report.country })}</h3>
                 <div className="space-y-2">
                   {otherReports.map((r) => (
-                    <Link key={r.slug} href={`/reports/${r.slug}`} className="block text-sm text-primary hover:underline">
+                    <Link key={r.slug} href={`/publications/${r.slug}`} className="block text-sm text-primary hover:underline">
                       {r.title}
                     </Link>
                   ))}
@@ -273,8 +273,8 @@ export default async function ReportPage({ params }: ReportPageProps) {
             <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
               <h3 className="font-semibold text-primary mb-3">{t("browse")}</h3>
               <div className="space-y-2 text-sm">
-                <Link href="/reports" className="block text-primary hover:underline">{t("allReports")} →</Link>
-                <Link href="/reports?tab=alerts" className="block text-primary hover:underline">{t("allAlerts")} →</Link>
+                <Link href="/publications" className="block text-primary hover:underline">{t("allReports")} →</Link>
+                <Link href="/publications?tab=alerts" className="block text-primary hover:underline">{t("allAlerts")} →</Link>
                 <Link href="/dashboard" className="block text-primary hover:underline">{t("dashboard")} →</Link>
               </div>
             </div>

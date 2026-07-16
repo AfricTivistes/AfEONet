@@ -12,7 +12,7 @@ import { getPage } from "@/lib/pages"
 import { getAllNewsArticles } from "@/lib/news"
 import { getReports } from "@/lib/reports"
 import { statusCounts, statusLabel, countries } from "@/lib/countries"
-import { PARTNER_NAMES } from "@/lib/partners"
+import { PartnersBanner } from "@/components/partners-banner"
 
 function buildStats(t: Awaited<ReturnType<typeof getTranslations>>, reportsCount: number) {
   return [
@@ -508,19 +508,11 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       </section>
 
       {/* Partners & Funding Section */}
-      <section className="py-16 bg-secondary/10">
+      <section id="partners" className="py-16 bg-secondary/10 scroll-mt-20">
         <div className="container px-4 md:px-6 text-center">
           <h2 className="text-xl font-bold text-primary mb-6">{tCommon("partnersTitle")}</h2>
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
-            {PARTNER_NAMES.map((name) => (
-              <div
-                key={name}
-                className="flex h-14 w-28 items-center justify-center rounded-md border border-primary/20 bg-white px-3 text-center text-xs font-medium text-primary/70"
-                title={name}
-              >
-                {name}
-              </div>
-            ))}
+          <div className="mb-8">
+            <PartnersBanner />
           </div>
           <p className="text-sm font-medium text-primary">{tCommon("euCofundedBy")}</p>
           <p className="mx-auto mt-2 max-w-2xl text-xs text-muted-foreground">{tCommon("euDisclaimer")}</p>

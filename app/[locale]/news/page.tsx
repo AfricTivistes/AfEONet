@@ -28,12 +28,12 @@ function adaptArticleData(article: NewsArticle) {
   }
 }
 
-function getCategories(articles: NewsArticle[]): string[] {
-  const categories = new Set(["All"])
-  articles.forEach(article => {
-    if (article.category) categories.add(article.category)
-  })
-  return Array.from(categories)
+const NEWS_CATEGORIES = ["Articles", "Alerts"] as const
+
+function categoryLabel(t: Awaited<ReturnType<typeof getTranslations>>, category: string): string {
+  if (category === "Articles") return t("categoryArticles")
+  if (category === "Alerts") return t("categoryAlerts")
+  return category
 }
 
 export default async function NewsPage({
@@ -52,7 +52,6 @@ export default async function NewsPage({
   const query = params?.q?.trim().toLowerCase() ?? ""
 
   const allArticlesUnfiltered = getAllNewsArticles(locale)
-  const categories = getCategories(allArticlesUnfiltered)
 
   const allArticles = allArticlesUnfiltered.filter((article) => {
     if (activeCategory && article.category !== activeCategory) return false
@@ -76,7 +75,7 @@ export default async function NewsPage({
     <div className="flex flex-col min-h-screen bg-secondary/5">
       {/* Hero Section */}
       <section className="bg-primary py-12 text-white">
-        <div className="container">
+        <div className="container space-y-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">{t("heroTitle")}</h1>
@@ -88,37 +87,39 @@ export default async function NewsPage({
               <NewsSearch />
             </Suspense>
           </div>
+
+          {/* Browse by Category */}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-medium text-primary-foreground/80">{t("browseByCategory")}</span>
+            <Link
+              href="/news"
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                !activeCategory
+                  ? "bg-secondary text-primary"
+                  : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+            >
+              {t("categoryAll")}
+            </Link>
+            {NEWS_CATEGORIES.map((category) => (
+              <Link
+                key={category}
+                href={`/news?category=${encodeURIComponent(category)}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  activeCategory === category
+                    ? "bg-secondary text-primary"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+              >
+                {categoryLabel(t, category)}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
       <div className="container py-12">
         <div className="flex flex-col space-y-16">
-          {/* Browse by Category */}
-          {categories.length > 1 && (
-            <section>
-              <h2 className="text-xl font-bold text-primary mb-4">{t("browseByCategory")}</h2>
-              <div className="flex flex-wrap gap-3">
-                {categories.map((category) => {
-                  const isActive = category === "All" ? !activeCategory : activeCategory === category
-                  const href = category === "All" ? "/news" : `/news?category=${encodeURIComponent(category)}`
-                  return (
-                    <Link
-                      key={category}
-                      href={href}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        isActive
-                          ? "bg-primary text-white hover:bg-primary/90"
-                          : "bg-secondary/20 text-primary hover:bg-secondary/30"
-                      }`}
-                    >
-                      {category}
-                    </Link>
-                  )
-                })}
-              </div>
-            </section>
-          )}
-
           {/* Featured Article — visible only on page 1 */}
           {featuredArticle && currentPage === 1 && (
             <section className="bg-secondary/10 p-8 rounded-lg">

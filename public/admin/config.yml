@@ -36,7 +36,7 @@ collections:
       - { name: "title", label: "Title", widget: "string", i18n: true }
       - { name: "description", label: "Description", widget: "text", i18n: true }
       - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
-      - { name: "category", label: "Category", widget: "select", options: ["civic-space", "election-observation", "alerts", "reports", "capacity-building", "general"] }
+      - { name: "category", label: "Category", widget: "select", options: ["Articles", "Alerts"], hint: "News alerts are editorial announcements — country security/civic-space alerts belong in the Security Alerts collection." }
       - { name: "author", label: "Author", widget: "string" }
       - { name: "country", label: "Country (ISO2 or name)", widget: "string", required: false, hint: "Link news to a country for filtering (e.g. 'Ghana' or 'gh')" }
       - { name: "dimensionTags", label: "Dimension Tags", widget: "select", multiple: true, required: false, options: ["Regulatory Framework", "Administrative Constraints", "EMB Relationship", "Security and Well-being", "Access to Electoral Data", "Access to Funding", "Dialogue and Consultation", "Perception of Observers"] }
@@ -47,7 +47,7 @@ collections:
 
   # Reports Collection
   - name: "reports"
-    label: "Country Reports"
+    label: "Publications"
     folder: "content/reports"
     i18n: true
     create: true
@@ -57,6 +57,14 @@ collections:
     fields:
       - { name: "id", label: "Report ID", widget: "number", i18n: duplicate }
       - { name: "title", label: "Title", widget: "string", i18n: true }
+      - name: "category"
+        label: "Publication Category"
+        widget: "select"
+        required: false
+        options:
+          - { value: "election-observation", label: "Election Observation Reports" }
+          - { value: "civic-space-annual", label: "Civic Space Annual Reports" }
+          - { value: "country-specific", label: "Country-Specific Reports" }
       - { name: "date", label: "Date", widget: "datetime", i18n: duplicate }
       - { name: "country", label: "Country Name", widget: "string" }
       - { name: "iso2", label: "ISO2 Code", widget: "string", required: false, hint: "Two-letter country code (e.g. 'gh' for Ghana)" }
@@ -198,6 +206,7 @@ collections:
       - { name: "title", label: "Title", widget: "string", i18n: true }
       - { name: "description", label: "Description", widget: "text", i18n: true }
       - { name: "section", label: "Section", widget: "string" }
+      - { name: "order", label: "Display Order", widget: "number", value_type: "int", default: 1 }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Pages Collection (Static Pages)
