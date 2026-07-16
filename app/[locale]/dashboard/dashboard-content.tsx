@@ -93,7 +93,7 @@ function CountryDimensionPanel({ country }: { country: Country }) {
       </div>
 
       <Button asChild variant="outline" className="w-full border-primary/20 text-primary">
-        <Link href={`/reports/${reportSlug(country)}`}>
+        <Link href={`/publications/${reportSlug(country)}`}>
           Full Report →
         </Link>
       </Button>

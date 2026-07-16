@@ -5,34 +5,38 @@ import { AlertTriangle } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { getPage } from "@/lib/pages"
-import { getReports, getAlerts } from "@/lib/reports"
-import { ReportsSearch } from "@/components/reports-search"
-import { ReportsTabs } from "./reports-tabs"
+import { getReports, getAlerts, PUBLICATION_CATEGORIES, type PublicationCategory } from "@/lib/reports"
+import { PublicationsSearch } from "@/components/publications-search"
+import { PublicationsTabs } from "./publications-tabs"
 
 const PER_PAGE = 6
 
-export default async function ReportsPage({
+export default async function PublicationsPage({
   params: routeParams,
   searchParams,
 }: {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ rpage?: string; apage?: string; q?: string }>
+  searchParams: Promise<{ rpage?: string; apage?: string; q?: string; category?: string }>
 }) {
   const { locale } = await routeParams
-  const t = await getTranslations({ locale, namespace: "reports" })
+  const t = await getTranslations({ locale, namespace: "publications" })
   const params = await searchParams
   const reportsPage = Math.max(1, Number(params?.rpage) || 1)
   const alertsPage = Math.max(1, Number(params?.apage) || 1)
   const query = params?.q?.trim().toLowerCase() ?? ""
+  const category = PUBLICATION_CATEGORIES.find((c) => c === params?.category) as PublicationCategory | undefined
 
-  const pageData = await getPage('reports', locale)
+  const pageData = await getPage('publications', locale)
   const staticContent = pageData?.content || ''
   const allReportsUnfiltered = await getReports(locale)
   const allAlertsUnfiltered = await getAlerts(locale)
 
-  const allReports = query
+  const reportsMatchingQuery = query
     ? allReportsUnfiltered.filter((r) => r.title.toLowerCase().includes(query) || r.summary.toLowerCase().includes(query) || r.country.toLowerCase().includes(query))
     : allReportsUnfiltered
+  const allReports = category
+    ? reportsMatchingQuery.filter((r) => r.category === category)
+    : reportsMatchingQuery
   const allAlerts = query
     ? allAlertsUnfiltered.filter((a) => a.title.toLowerCase().includes(query) || a.description.toLowerCase().includes(query) || a.country.toLowerCase().includes(query))
     : allAlertsUnfiltered
@@ -96,12 +100,12 @@ export default async function ReportsPage({
 
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <Suspense fallback={null}>
-            <ReportsSearch />
+            <PublicationsSearch />
           </Suspense>
         </div>
 
         <Suspense fallback={null}>
-          <ReportsTabs
+          <PublicationsTabs
             reports={reports}
             alerts={alerts}
             reportsPage={reportsPage}
@@ -109,6 +113,7 @@ export default async function ReportsPage({
             totalReportsPages={totalReportsPages}
             totalAlertsPages={totalAlertsPages}
             q={params?.q}
+            category={category}
           />
         </Suspense>
       </div>

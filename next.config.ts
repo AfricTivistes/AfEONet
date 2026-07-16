@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      { source: '/reports', destination: '/publications', permanent: true },
+      { source: '/reports/:id', destination: '/publications/:id', permanent: true },
+      { source: '/:locale(en|fr)/reports', destination: '/:locale/publications', permanent: true },
+      { source: '/:locale(en|fr)/reports/:id', destination: '/:locale/publications/:id', permanent: true },
+    ];
+  },
 };
 
 const withMDX = createMDX({

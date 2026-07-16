@@ -6,10 +6,10 @@ import { useTranslations } from "next-intl"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
-export function ReportsSearch() {
+export function PublicationsSearch() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const t = useTranslations("reports")
+  const t = useTranslations("publications")
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const params = new URLSearchParams(searchParams.toString())
@@ -17,7 +17,7 @@ export function ReportsSearch() {
     else params.delete("q")
     params.delete("rpage")
     params.delete("apage")
-    router.replace(`/reports?${params.toString()}`, { scroll: false })
+    router.replace(`/publications?${params.toString()}`, { scroll: false })
   }
 
   return (

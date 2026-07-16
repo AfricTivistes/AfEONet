@@ -1,2 +1,16 @@
-// Placeholder partner list — logos to be supplied and swapped in once available.
-export const PARTNER_NAMES = ["AHEAD Africa", "European Union", "AfricTivistes", "WAEON", "ESN-SA", "E-HORN"] as const
+// Placeholder logos — swap in real assets under public/partners/ once supplied.
+export interface Partner {
+  name: string
+  logo?: string
+}
+
+// Funders and supporting organizations — shown on the homepage banner.
+export const PARTNERS: Partner[] = [
+  { name: "AHEAD Africa" },
+  { name: "European Union" },
+  { name: "EPD" },
+  { name: "Africtivistes" },
+  { name: "EPDE" },
+  { name: "NDI" },
+  { name: "EISA" },
+]

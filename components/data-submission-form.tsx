@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, type Control } from "react-hook-form"
 import * as z from "zod"
 import { ChevronRight, ChevronLeft, Save, Send, HelpCircle } from "lucide-react"
 
@@ -14,74 +14,175 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { DIM_KEYS, type CountryDimensions } from "@/lib/countries"
 
-// Descriptions des dimensions — alignées avec le data collection tool d'Abel Eseru
-const dimensionDescriptions = {
-  regulatoryFramework:
-    "Laws and institutions governing civil society organizations' operations, including registration requirements, operational constraints, and penalties for non-compliance.",
-  administrativeConstraints:
-    "Accreditation procedures, fees, and bureaucratic obstacles imposed on citizen observers. Includes accreditation timelines, costs, and requirements for foreign observers.",
-  embRelationship:
-    "The quality and nature of the relationship between citizen observer organizations and the Electoral Management Body (EMB). Includes communication, cooperation, and information sharing.",
-  safetyWellbeing:
-    "Threats, intimidation, arrests, or physical violence against citizen observers, their leaders, staff, and volunteers. Includes legal and illegal mechanisms used to constrain their work.",
-  accessToElectionData:
-    "Access to voter registers, polling station lists, and election results at the polling station level. Includes transparency in electoral data management.",
-  accessToFunding:
-    "Barriers to mobilizing funding for election observation. Includes restrictions on donor funding, local fundraising limitations, and political interference in funding sources.",
-  dialogueConsultation:
-    "Spaces for dialogue between citizen observers and government institutions, including the EMB, on electoral reforms and observation recommendations. Includes post-election consultation mechanisms.",
-  perception:
-    "Perception of citizen observers by the ruling party/regime, opposition, media, and general public. Includes their credibility, trustworthiness, and acceptance as democracy actors.",
+type DimensionKey = keyof CountryDimensions
+type DimensionFieldName = `${DimensionKey}Rating` | `${DimensionKey}Trend` | `${DimensionKey}Context`
+
+const RATING_VALUES = ["open", "restricted", "obstructed", "repressed", "closed"] as const
+const TREND_VALUES = ["improving", "stable", "deteriorating", "unknown"] as const
+
+function buildDimensionShape(): Record<DimensionFieldName, z.ZodTypeAny> {
+  const shape = {} as Record<DimensionFieldName, z.ZodTypeAny>
+  for (const key of DIM_KEYS) {
+    shape[`${key}Rating`] = z.string().min(1, { message: "Please select a rating" })
+    shape[`${key}Trend`] = z.string().min(1, { message: "Please select a trend" })
+    shape[`${key}Context`] = z.string().optional()
+  }
+  return shape
+}
+
+function buildDimensionDefaults(): Record<DimensionFieldName, string> {
+  const defaults = {} as Record<DimensionFieldName, string>
+  for (const key of DIM_KEYS) {
+    defaults[`${key}Rating`] = ""
+    defaults[`${key}Trend`] = ""
+    defaults[`${key}Context`] = ""
+  }
+  return defaults
 }
 
 const formSchema = z.object({
   country: z.string().min(1, { message: "Please select a country" }),
   dataEntrant: z.string().min(1, { message: "Please enter your name" }),
   date: z.string().min(1, { message: "Please enter a date" }),
-
-  // Dimension 1
-  regulatoryFrameworkRating: z.string().min(1, { message: "Please select a rating" }),
-  regulatoryFrameworkTrend: z.string().min(1, { message: "Please select a trend" }),
-  regulatoryFrameworkContext: z.string().optional(),
-
-  // Dimension 2
-  administrativeConstraintsRating: z.string().min(1, { message: "Please select a rating" }),
-  administrativeConstraintsTrend: z.string().min(1, { message: "Please select a trend" }),
-  administrativeConstraintsContext: z.string().optional(),
-
-  // Dimension 3
-  relationshipRating: z.string().min(1, { message: "Please select a rating" }),
-  relationshipTrend: z.string().min(1, { message: "Please select a trend" }),
-  relationshipContext: z.string().optional(),
-
-  // Other dimensions would follow the same pattern
+  ...buildDimensionShape(),
 })
+
+type FormValues = z.infer<typeof formSchema>
+
+const totalSteps = DIM_KEYS.length + 2 // general info + 8 dimensions + summary
+
+function DimensionStep({
+  control,
+  dimensionKey,
+  index,
+}: {
+  control: Control<FormValues>
+  dimensionKey: DimensionKey
+  index: number
+}) {
+  const t = useTranslations("submit")
+  const tDim = useTranslations("dimensions")
+  const tStatus = useTranslations("status")
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2 mb-4">
+        <h3 className="text-lg font-medium text-primary">
+          D{index + 1} — {tDim(dimensionKey)}
+        </h3>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="h-4 w-4 text-muted-foreground" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs text-xs">{t(`dim${index + 1}Desc`)}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+
+      <div className="bg-secondary/10 p-4 rounded-md mb-6">
+        <p className="text-sm text-muted-foreground">{t(`dim${index + 1}Desc`)}</p>
+      </div>
+
+      <FormField
+        control={control}
+        name={`${dimensionKey}Rating`}
+        render={({ field }) => (
+          <FormItem className="space-y-3">
+            <FormLabel>{t("rating")}</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                defaultValue={field.value as string}
+                className="flex flex-col space-y-1"
+              >
+                {RATING_VALUES.map((rating) => (
+                  <FormItem key={rating} className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value={rating} />
+                    </FormControl>
+                    <FormLabel className="font-normal">
+                      <span className={`inline-block w-3 h-3 rounded-full status-${rating} mr-2`}></span>
+                      {tStatus(rating)}
+                    </FormLabel>
+                  </FormItem>
+                ))}
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`${dimensionKey}Trend`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("trend")}</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value as string}>
+              <FormControl>
+                <SelectTrigger className="border-primary/20">
+                  <SelectValue placeholder={t("selectTrend")} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {TREND_VALUES.map((trend) => (
+                  <SelectItem key={trend} value={trend}>
+                    {t(trend)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`${dimensionKey}Context`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("context")}</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder={t("describeContext")}
+                className="resize-none border-primary/20"
+                {...field}
+                value={field.value as string}
+              />
+            </FormControl>
+            <FormDescription>{t("provideDetails")}</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  )
+}
 
 export function DataSubmissionForm() {
   const t = useTranslations("submit")
+  const tDim = useTranslations("dimensions")
+  const tStatus = useTranslations("status")
   const [step, setStep] = useState(1)
-  const totalSteps = 5
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       country: "",
       dataEntrant: "",
       date: new Date().toISOString().split("T")[0],
-      regulatoryFrameworkRating: "",
-      regulatoryFrameworkTrend: "",
-      regulatoryFrameworkContext: "",
-      administrativeConstraintsRating: "",
-      administrativeConstraintsTrend: "",
-      administrativeConstraintsContext: "",
-      relationshipRating: "",
-      relationshipTrend: "",
-      relationshipContext: "",
+      ...buildDimensionDefaults(),
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: FormValues) {
     console.log(values)
     // Here, you would send the data to the server
     alert("Data submitted successfully!")
@@ -106,11 +207,18 @@ export function DataSubmissionForm() {
     }
   }
 
+  const values = form.getValues()
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-primary mb-2">{t("title")}</h2>
       <p className="text-muted-foreground mb-6">
-        {t("step")} {step} {t("of")} {totalSteps} - {step === 1 ? t("generalInfo") : `${t("dimension")} ${step - 1}`}
+        {t("step")} {step} {t("of")} {totalSteps} -{" "}
+        {step === 1
+          ? t("generalInfo")
+          : step === totalSteps
+          ? t("summary")
+          : `${t("dimension")} ${step - 1}`}
       </p>
       <div className="w-full bg-secondary/20 h-2 mb-8 rounded-full overflow-hidden">
         <div
@@ -152,9 +260,9 @@ export function DataSubmissionForm() {
                 name="dataEntrant"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Your name</FormLabel>
+                    <FormLabel>{t("observer")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your name" className="border-primary/20" {...field} />
+                      <Input placeholder={t("observer")} className="border-primary/20" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -165,7 +273,7 @@ export function DataSubmissionForm() {
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Observation date</FormLabel>
+                    <FormLabel>{t("date")}</FormLabel>
                     <FormControl>
                       <Input type="date" className="border-primary/20" {...field} />
                     </FormControl>
@@ -176,426 +284,46 @@ export function DataSubmissionForm() {
             </div>
           )}
 
-          {step === 2 && (
+          {step > 1 &&
+            step < totalSteps &&
+            DIM_KEYS.map(
+              (key, i) =>
+                step === i + 2 && (
+                  <DimensionStep key={key} control={form.control} dimensionKey={key} index={i} />
+                )
+            )}
+
+          {step === totalSteps && (
             <div className="space-y-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <h3 className="text-lg font-medium text-primary">D1 — Regulatory Framework</h3>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs text-xs">
-                        Score 0–10: Laws and institutions governing civil society operations.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-
-              <div className="bg-secondary/10 p-4 rounded-md mb-6">
-                <p className="text-sm text-muted-foreground">{dimensionDescriptions.regulatoryFramework}</p>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="regulatoryFrameworkRating"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Rating</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="open" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-open mr-2"></span>
-                            Open/free/secure
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="restricted" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-restricted mr-2"></span>
-                            Restricted
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="obstructed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-obstructed mr-2"></span>
-                            Obstructed
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="repressed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-repressed mr-2"></span>
-                            Repressed/threatened
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="closed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-closed mr-2"></span>
-                            Closed
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="regulatoryFrameworkTrend"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Trend</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="border-primary/20">
-                          <SelectValue placeholder="Select a trend" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="improving">Improving</SelectItem>
-                        <SelectItem value="stable">Stable</SelectItem>
-                        <SelectItem value="deteriorating">Deteriorating</SelectItem>
-                        <SelectItem value="unknown">Unknown</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="regulatoryFrameworkContext"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Context and reasons</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe the context and reasons for your assessment..."
-                        className="resize-none border-primary/20"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Provide details about laws, policies, or events that justify your assessment.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <h3 className="text-lg font-medium text-primary">D2 — Administrative Constraints</h3>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs text-xs">
-                        Score 0–10: Accreditation procedures, fees, and bureaucratic obstacles.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-
-              <div className="bg-secondary/10 p-4 rounded-md mb-6">
-                <p className="text-sm text-muted-foreground">{dimensionDescriptions.administrativeConstraints}</p>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="administrativeConstraintsRating"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Rating</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="open" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-open mr-2"></span>
-                            Open/free/secure
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="restricted" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-restricted mr-2"></span>
-                            Restricted
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="obstructed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-obstructed mr-2"></span>
-                            Obstructed
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="repressed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-repressed mr-2"></span>
-                            Repressed/threatened
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="closed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-closed mr-2"></span>
-                            Closed
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="administrativeConstraintsTrend"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Trend</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="border-primary/20">
-                          <SelectValue placeholder="Select a trend" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="improving">Improving</SelectItem>
-                        <SelectItem value="stable">Stable</SelectItem>
-                        <SelectItem value="deteriorating">Deteriorating</SelectItem>
-                        <SelectItem value="unknown">Unknown</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="administrativeConstraintsContext"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Context and reasons</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe the context and reasons for your assessment..."
-                        className="resize-none border-primary/20"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Provide details about administrative procedures, accreditation processes, or bureaucratic
-                      obstacles that justify your assessment.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="space-y-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <h3 className="text-lg font-medium text-primary">Relationship with Electoral Management Body</h3>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs text-xs">
-                        Evaluate the relationship between citizen observer organizations and the electoral management
-                        body.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-
-              <div className="bg-secondary/10 p-4 rounded-md mb-6">
-                <p className="text-sm text-muted-foreground">{dimensionDescriptions.embRelationship}</p>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="relationshipRating"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>{t("rating")}</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="open" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-open mr-2"></span>
-                            Open/free/secure
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="restricted" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-restricted mr-2"></span>
-                            Restricted
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="obstructed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-obstructed mr-2"></span>
-                            Obstructed
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="repressed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-repressed mr-2"></span>
-                            Repressed/threatened
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="closed" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            <span className="inline-block w-3 h-3 rounded-full status-closed mr-2"></span>
-                            Closed
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="relationshipTrend"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("trend")}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="border-primary/20">
-                          <SelectValue placeholder={t("selectTrend")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="improving">Improving</SelectItem>
-                        <SelectItem value="stable">Stable</SelectItem>
-                        <SelectItem value="deteriorating">Deteriorating</SelectItem>
-                        <SelectItem value="unknown">Unknown</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="relationshipContext"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Context and reasons</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe the context and reasons for your assessment..."
-                        className="resize-none border-primary/20"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Provide details about the nature of communication, cooperation, and interactions between observer
-                      organizations and the electoral management body.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium text-primary mb-4">Summary and confirmation</h3>
+              <h3 className="text-lg font-medium text-primary mb-4">{t("summary")}</h3>
               <p className="text-muted-foreground mb-6">
                 Please review your data before submitting. Once submitted, it will be reviewed by our administrators.
               </p>
 
               <div className="bg-secondary/10 rounded-lg p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-sm font-medium">Country:</div>
-                  <div className="text-sm">{form.getValues().country || "Not specified"}</div>
+                  <div className="text-sm font-medium">{t("country")}:</div>
+                  <div className="text-sm">{values.country || "Not specified"}</div>
 
-                  <div className="text-sm font-medium">Observer:</div>
-                  <div className="text-sm">{form.getValues().dataEntrant || "Not specified"}</div>
+                  <div className="text-sm font-medium">{t("observer")}:</div>
+                  <div className="text-sm">{values.dataEntrant || "Not specified"}</div>
 
-                  <div className="text-sm font-medium">Date:</div>
-                  <div className="text-sm">{form.getValues().date || "Not specified"}</div>
+                  <div className="text-sm font-medium">{t("date")}:</div>
+                  <div className="text-sm">{values.date || "Not specified"}</div>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {DIM_KEYS.map((key) => (
+                  <div key={key} className="bg-secondary/10 rounded-lg p-4">
+                    <div className="text-sm font-medium mb-1">{tDim(key)}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t("rating")}: {values[`${key}Rating`] ? tStatus(values[`${key}Rating`] as (typeof RATING_VALUES)[number]) : "—"}
+                      {" · "}
+                      {t("trend")}: {values[`${key}Trend`] ? t(values[`${key}Trend`] as (typeof TREND_VALUES)[number]) : "—"}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -604,17 +332,17 @@ export function DataSubmissionForm() {
             <div>
               {step > 1 && (
                 <Button type="button" variant="outline" onClick={prevStep} className="border-primary/20">
-                  <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+                  <ChevronLeft className="mr-2 h-4 w-4" /> {t("previous")}
                 </Button>
               )}
             </div>
             <div className="flex space-x-2">
               <Button type="button" variant="outline" onClick={saveAsDraft} className="border-primary/20">
-                <Save className="mr-2 h-4 w-4" /> Save
+                <Save className="mr-2 h-4 w-4" /> {t("save")}
               </Button>
               {step < totalSteps ? (
                 <Button type="button" onClick={nextStep} className="bg-primary text-white hover:bg-primary/90">
-                  Next <ChevronRight className="ml-2 h-4 w-4" />
+                  {t("next")} <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
                 <Button
@@ -622,7 +350,7 @@ export function DataSubmissionForm() {
                   onClick={form.handleSubmit(onSubmit)}
                   className="bg-secondary text-primary hover:bg-secondary/90"
                 >
-                  <Send className="mr-2 h-4 w-4" /> Submit
+                  <Send className="mr-2 h-4 w-4" /> {t("submit")}
                 </Button>
               )}
             </div>
