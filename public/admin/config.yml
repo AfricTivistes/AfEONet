@@ -42,7 +42,7 @@ collections:
       - { name: "dimensionTags", label: "Dimension Tags", widget: "select", multiple: true, required: false, options: ["Regulatory Framework", "Administrative Constraints", "EMB Relationship", "Security and Well-being", "Access to Electoral Data", "Access to Funding", "Dialogue and Consultation", "Perception of Observers"], i18n: duplicate }
       - { name: "featured", label: "Featured", widget: "boolean", default: false, i18n: duplicate }
       - { name: "image", label: "Image", widget: "image", required: false, i18n: duplicate }
-      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: duplicate }
+      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: true }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Reports Collection
@@ -82,24 +82,24 @@ collections:
           - { value: "closed", label: "Closed (0-2)" }
       - { name: "composite", label: "Composite Score (0-10)", widget: "number", value_type: "float", min: 0, max: 10, step: 0.5, required: false, i18n: duplicate }
       - name: "dimensions"
-        i18n: duplicate
+        i18n: true
         label: "Dimension Scores (0-10)"
         widget: "object"
         required: false
         fields:
-          - { name: "regulatory", label: "D1 — Regulatory Framework", widget: "number", value_type: "int", min: 0, max: 10 }
-          - { name: "administrative", label: "D2 — Administrative Constraints", widget: "number", value_type: "int", min: 0, max: 10 }
-          - { name: "embRelationship", label: "D3 — EMB Relationship", widget: "number", value_type: "int", min: 0, max: 10 }
-          - { name: "security", label: "D4 — Security & Well-being", widget: "number", value_type: "int", min: 0, max: 10 }
-          - { name: "dataAccess", label: "D5 — Access to Electoral Data", widget: "number", value_type: "int", min: 0, max: 10 }
-          - { name: "funding", label: "D6 — Access to Funding", widget: "number", value_type: "int", min: 0, max: 10 }
-          - { name: "dialogue", label: "D7 — Dialogue & Consultation", widget: "number", value_type: "int", min: 0, max: 10 }
-          - { name: "perception", label: "D8 — Perception of Observers", widget: "number", value_type: "int", min: 0, max: 10 }
+          - { name: "regulatory", label: "D1 — Regulatory Framework", widget: "number", value_type: "int", min: 0, max: 10, i18n: duplicate }
+          - { name: "administrative", label: "D2 — Administrative Constraints", widget: "number", value_type: "int", min: 0, max: 10, i18n: duplicate }
+          - { name: "embRelationship", label: "D3 — EMB Relationship", widget: "number", value_type: "int", min: 0, max: 10, i18n: duplicate }
+          - { name: "security", label: "D4 — Security & Well-being", widget: "number", value_type: "int", min: 0, max: 10, i18n: duplicate }
+          - { name: "dataAccess", label: "D5 — Access to Electoral Data", widget: "number", value_type: "int", min: 0, max: 10, i18n: duplicate }
+          - { name: "funding", label: "D6 — Access to Funding", widget: "number", value_type: "int", min: 0, max: 10, i18n: duplicate }
+          - { name: "dialogue", label: "D7 — Dialogue & Consultation", widget: "number", value_type: "int", min: 0, max: 10, i18n: duplicate }
+          - { name: "perception", label: "D8 — Perception of Observers", widget: "number", value_type: "int", min: 0, max: 10, i18n: duplicate }
       - { name: "summary", label: "Summary", widget: "text", i18n: true }
       - { name: "source", label: "Source", widget: "string", required: false, default: "AfEONet Report 2025 — Eyes on the Ballot Watchers", i18n: duplicate }
       - { name: "downloadUrl", label: "Download URL", widget: "file", required: false, i18n: duplicate }
-      - { name: "authors", label: "Authors", widget: "list", required: false, i18n: duplicate }
-      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: duplicate }
+      - { name: "authors", label: "Authors", widget: "list", required: false, i18n: true }
+      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: true }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Alerts Collection
@@ -108,7 +108,7 @@ collections:
     folder: "content/alerts"
     i18n: true
     create: true
-    slug: "{{country_iso}-{{year}}-{{number}}"
+    slug: "{{id}}"
     extension: "mdx"
     format: "frontmatter"
     fields:
@@ -165,7 +165,7 @@ collections:
       - { name: "affectedObservers", label: "Number of Affected Observers", widget: "number", required: false, i18n: duplicate }
       - { name: "description", label: "Description", widget: "text", i18n: true }
       - { name: "relatedReport", label: "Related Report Slug", widget: "string", required: false, i18n: duplicate }
-      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: duplicate }
+      - { name: "tags", label: "Tags", widget: "list", required: false, i18n: true }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
   # Country Scores Collection (editable via CMS)
