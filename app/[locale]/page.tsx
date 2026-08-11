@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { getPage } from "@/lib/pages"
 import { getAllNewsArticles } from "@/lib/news"
 import { getReports } from "@/lib/reports"
-import { statusCounts, statusLabel, countries } from "@/lib/countries"
+import { statusCounts, countries } from "@/lib/countries"
 import { PartnersBanner } from "@/components/partners-banner"
 
 function buildStats(t: Awaited<ReturnType<typeof getTranslations>>, reportsCount: number) {
@@ -25,14 +25,17 @@ function buildStats(t: Awaited<ReturnType<typeof getTranslations>>, reportsCount
 
 const STATUS_ORDER = ["open", "restricted", "obstructed", "repressed", "closed", "unknown"] as const
 
-function CivicSpaceStats({ tCommon }: { tCommon: Awaited<ReturnType<typeof getTranslations>> }) {
+function CivicSpaceStats({ tCommon, tStatus }: {
+  tCommon: Awaited<ReturnType<typeof getTranslations>>
+  tStatus: Awaited<ReturnType<typeof getTranslations>>
+}) {
   const counts = statusCounts()
   return (
     <div className="flex flex-wrap justify-center gap-3 mb-6">
       {STATUS_ORDER.map((key) => {
         const count = counts[key]
         if (count === 0) return null
-        const label = key === "unknown" ? tCommon("notAssessed") : statusLabel(key)
+        const label = key === "unknown" ? tCommon("notAssessed") : tStatus(key)
         return (
           <div
             key={key}
@@ -53,6 +56,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: "home" })
   const tCommon = await getTranslations({ locale, namespace: "common" })
+  const tStatus = await getTranslations({ locale, namespace: "status" })
   const tNav = await getTranslations({ locale, namespace: "navigation" })
   const tFooter = await getTranslations({ locale, namespace: "footer" })
   const pageData = await getPage('homepage', locale)
@@ -200,7 +204,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           </div>
 
           {/* Live status stats */}
-          <CivicSpaceStats tCommon={tCommon} />
+          <CivicSpaceStats tCommon={tCommon} tStatus={tStatus} />
 
           <p className="text-center text-sm text-muted-foreground mb-8">
             {t("countriesAssessedText", {

@@ -28,6 +28,14 @@
       "obstructed": "5-6",
       "repressed": "3-4",
       "closed": "0-2"
+    },
+    "description": {
+      "open": "L'espace civique est pleinement respecté et protégé",
+      "restricted": "L'espace civique connaît certaines limitations mais reste fonctionnel",
+      "obstructed": "L'espace civique se heurte à des obstacles importants",
+      "repressed": "L'espace civique est sévèrement limité, avec des menaces actives",
+      "closed": "L'espace civique est totalement fermé ou inexistant",
+      "unknown": "Ce pays n'a pas encore été évalué"
     }
   },
   "dimensions": {
@@ -58,7 +66,15 @@
       "dimensions": "Dimensions",
       "methodology": "Méthodologie"
     },
-    "scoring": "Échelle de Notation"
+    "scoring": "Échelle de Notation",
+    "mapTitle": "État de l'espace civique en Afrique",
+    "countriesCount": "{count} pays",
+    "clearFilter": "Effacer le filtre",
+    "noCountriesForStatus": "Aucun pays ne correspond à ce statut.",
+    "colCountry": "Pays",
+    "colRegion": "Région",
+    "colStatus": "Statut",
+    "colScore": "Note"
   },
   "submit": {
     "title": "Soumettre des Données sur l'Espace Civique",

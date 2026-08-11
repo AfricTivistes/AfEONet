@@ -1,11 +1,13 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell, ResponsiveContainer,
 } from "recharts"
 import { DIM_KEYS, DIM_SHORT, GLOBAL_AVERAGES, globalCompositeAverage, scoreColor, assessedCountries } from "@/lib/countries"
 
 export function AverageScoresChart() {
+  const t = useTranslations("dashboard")
   const assessed = assessedCountries()
   const chartData = DIM_KEYS.map((k) => ({
     dim: DIM_SHORT[k],
@@ -14,8 +16,12 @@ export function AverageScoresChart() {
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-primary mb-1">Average Scores — 8 Dimensions ({assessed.length} countries)</h2>
-      <p className="text-sm text-muted-foreground mb-4">Global composite: <strong>{globalCompositeAverage()}/10</strong></p>
+      <h2 className="text-lg font-bold text-primary mb-1">
+        {t("averageScores")} ({t("countriesCount", { count: assessed.length })})
+      </h2>
+      <p className="text-sm text-muted-foreground mb-4">
+        {t("globalComposite")}: <strong>{globalCompositeAverage()}/10</strong>
+      </p>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>

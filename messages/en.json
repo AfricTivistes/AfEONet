@@ -28,6 +28,14 @@
       "obstructed": "5-6",
       "repressed": "3-4",
       "closed": "0-2"
+    },
+    "description": {
+      "open": "Civic space is fully respected and protected",
+      "restricted": "Civic space faces some limitations but remains functional",
+      "obstructed": "Civic space faces significant obstacles",
+      "repressed": "Civic space is severely limited with active threats",
+      "closed": "Civic space is completely closed or non-existent",
+      "unknown": "This country has not yet been assessed"
     }
   },
   "dimensions": {
@@ -58,7 +66,15 @@
       "dimensions": "Dimensions",
       "methodology": "Methodology"
     },
-    "scoring": "Scoring Scale"
+    "scoring": "Scoring Scale",
+    "mapTitle": "Civic Space Status in Africa",
+    "countriesCount": "{count} countries",
+    "clearFilter": "Clear filter",
+    "noCountriesForStatus": "No countries match this status.",
+    "colCountry": "Country",
+    "colRegion": "Region",
+    "colStatus": "Status",
+    "colScore": "Score"
   },
   "submit": {
     "title": "Submit Civic Space Data",

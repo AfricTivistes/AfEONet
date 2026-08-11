@@ -3,9 +3,6 @@ backend:
   name: git-gateway
   branch: main
 
-# Development mode
-local_backend: true
-
 # Media settings
 media_folder: "public/uploads"
 public_folder: "/uploads"
@@ -168,39 +165,6 @@ collections:
       - { name: "tags", label: "Tags", widget: "list", required: false, i18n: true }
       - { name: "body", label: "Content", widget: "markdown", i18n: true }
 
-  # Country Scores Collection (editable via CMS)
-  - name: "country-scores"
-    label: "Country Scores (2025)"
-    folder: "content/data"
-    create: true
-    slug: "{{iso2}}-scores"
-    extension: "md"
-    format: "frontmatter"
-    fields:
-      - { name: "country", label: "Country Name", widget: "string" }
-      - { name: "iso2", label: "ISO2 Code", widget: "string" }
-      - { name: "region", label: "Region", widget: "select", options: ["West Africa", "East Africa", "North Africa", "Central Africa", "Southern Africa"] }
-      - { name: "composite", label: "Composite Score (0-10)", widget: "number", value_type: "float", min: 0, max: 10, step: 0.5 }
-      - name: "status"
-        label: "Civic Space Category"
-        widget: "select"
-        options:
-          - { value: "open", label: "Open (9-10)" }
-          - { value: "restricted", label: "Restricted (7-8)" }
-          - { value: "obstructed", label: "Obstructed (5-6)" }
-          - { value: "repressed", label: "Repressed (3-4)" }
-          - { value: "closed", label: "Closed (0-2)" }
-      - { name: "regulatory", label: "D1 — Regulatory Framework (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "administrative", label: "D2 — Administrative Constraints (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "embRelationship", label: "D3 — EMB Relationship (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "security", label: "D4 — Security & Well-being (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "dataAccess", label: "D5 — Access to Electoral Data (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "funding", label: "D6 — Access to Funding (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "dialogue", label: "D7 — Dialogue & Consultation (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "perception", label: "D8 — Perception of Observers (0-10)", widget: "number", value_type: "int", min: 0, max: 10 }
-      - { name: "notes", label: "Notes", widget: "text", required: false }
-
-  # About Sections Collection
   - name: "about"
     label: "About Sections"
     folder: "content/about"
