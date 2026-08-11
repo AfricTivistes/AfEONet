@@ -1,5 +1,12 @@
 [build]
   command = "npm run build"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Next.js Runtime v5. Declared explicitly (and pinned to a v5 range through the
+# devDependency) because the site previously ran the v4 runtime, whose edge
+# bundle crashed on Deno with "a4.snapshot is not a function".
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
