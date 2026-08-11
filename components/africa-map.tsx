@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useCallback, useRef } from "react"
+import { useTranslations } from "next-intl"
+import { useStatusLabel, useStatusDescription } from "@/lib/i18n/status"
 import { useRouter } from "@/lib/i18n/navigation"
 import { ComposableMap, Geographies, Geography } from "react-simple-maps"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,8 +11,6 @@ import {
   byIsoNum,
   byRegion,
   statusClass,
-  statusLabel,
-  statusDescription,
   statusFill,
   statusHoverFill,
   REGIONS,
@@ -33,6 +33,9 @@ interface AfricaMapProps {
 export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navigateOnClick, statusFilter, showRegionGrid = true }: AfricaMapProps) {
   const router = useRouter()
   const mapRef = useRef<HTMLDivElement>(null)
+  const t = useTranslations("dashboard")
+  const statusLabel = useStatusLabel()
+  const statusDescription = useStatusDescription()
   const [internalSelected, setInternalSelected] = useState<string | null>(null)
   const [tooltip, setTooltip] = useState<{ name: string; status: CivicStatus | null; composite?: number | null } | null>(null)
   const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null)
@@ -60,7 +63,7 @@ export function AfricaMap({ selectedIso2: controlledIso2, onSelectCountry, navig
   return (
     <Card className="w-full border-primary/20">
       <CardContent className="p-4">
-        <h3 className="text-lg font-medium mb-4 text-primary">Civic Space Status in Africa</h3>
+        <h3 className="text-lg font-medium mb-4 text-primary">{t("mapTitle")}</h3>
 
         {/* Interactive choropleth map */}
         <div

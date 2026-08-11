@@ -8,7 +8,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { getReport, getRelatedReports, getRelatedAlerts } from "@/lib/reports"
 import { getNewsByCountry } from "@/lib/news"
-import { DIMENSION_LABELS, statusLabel, type CountryDimensions } from "@/lib/countries"
+import { DIMENSION_LABELS, type CountryDimensions } from "@/lib/countries"
 
 interface ReportPageProps {
   params: Promise<{ id: string; locale: string }>
@@ -43,6 +43,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
   if (!report) notFound()
 
   const t = await getTranslations({ locale, namespace: "publications" })
+  const tStatus = await getTranslations({ locale, namespace: "status" })
 
   const [relatedAlerts, relatedNews] = await Promise.all([
     getRelatedAlerts(report.country, locale),
@@ -73,7 +74,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
               <Badge className={`status-${report.status} w-fit border-none`}>{report.country}</Badge>
               {report.composite && (
                 <Badge variant="secondary" className="w-fit">
-                  {t("score")}: {report.composite}/10 — {statusLabel(report.status as never)}
+                  {t("score")}: {report.composite}/10 — {tStatus(report.status as never)}
                 </Badge>
               )}
             </div>

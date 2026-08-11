@@ -1,9 +1,11 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { X } from "lucide-react"
 import { ScoreBar } from "@/components/score-bar"
-import { assessedCountries, statusFill, statusLabel, type CivicStatus } from "@/lib/countries"
+import { assessedCountries, statusFill, type CivicStatus } from "@/lib/countries"
+import { useStatusLabel } from "@/lib/i18n/status"
 
 interface CountryRankingsTableProps {
   activeStatus?: CivicStatus | null
@@ -13,6 +15,8 @@ interface CountryRankingsTableProps {
 }
 
 export function CountryRankingsTable({ activeStatus = null, onToggleStatus, onSelect, limit }: CountryRankingsTableProps) {
+  const t = useTranslations("dashboard")
+  const statusLabel = useStatusLabel()
   const assessed = useMemo(() => assessedCountries().sort((a, b) => (b.composite ?? 0) - (a.composite ?? 0)), [])
   const filtered = useMemo(
     () => (activeStatus ? assessed.filter((c) => c.status === activeStatus) : assessed),
@@ -24,14 +28,14 @@ export function CountryRankingsTable({ activeStatus = null, onToggleStatus, onSe
     <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-primary">
-          Country Rankings (2025){activeStatus ? ` — ${statusLabel(activeStatus)}` : ""}
+          {t("countryRankings")} (2025){activeStatus ? ` — ${statusLabel(activeStatus)}` : ""}
         </h2>
         {activeStatus && onToggleStatus && (
           <button
             onClick={() => onToggleStatus(activeStatus)}
             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
           >
-            <X className="h-3 w-3" /> Clear filter
+            <X className="h-3 w-3" /> {t("clearFilter")}
           </button>
         )}
       </div>
@@ -40,10 +44,10 @@ export function CountryRankingsTable({ activeStatus = null, onToggleStatus, onSe
           <thead>
             <tr className="border-b border-primary/10">
               <th className="text-left py-2 pr-4 font-medium">#</th>
-              <th className="text-left py-2 pr-4 font-medium">Country</th>
-              <th className="text-left py-2 pr-4 font-medium">Region</th>
-              <th className="text-left py-2 pr-4 font-medium">Status</th>
-              <th className="text-left py-2 font-medium">Score</th>
+              <th className="text-left py-2 pr-4 font-medium">{t("colCountry")}</th>
+              <th className="text-left py-2 pr-4 font-medium">{t("colRegion")}</th>
+              <th className="text-left py-2 pr-4 font-medium">{t("colStatus")}</th>
+              <th className="text-left py-2 font-medium">{t("colScore")}</th>
             </tr>
           </thead>
           <tbody>
@@ -74,7 +78,7 @@ export function CountryRankingsTable({ activeStatus = null, onToggleStatus, onSe
             {rows.length === 0 && (
               <tr>
                 <td colSpan={5} className="py-6 text-center text-muted-foreground">
-                  No countries match this status.
+                  {t("noCountriesForStatus")}
                 </td>
               </tr>
             )}

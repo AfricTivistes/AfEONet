@@ -8,6 +8,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid,
 } from "recharts"
+import { useStatusLabel } from "@/lib/i18n/status"
 import { StatusLegend } from "@/components/status-legend"
 import { AfricaMap } from "@/components/africa-map"
 import { CountrySelector } from "@/components/country-selector"
@@ -23,7 +24,6 @@ import { Badge } from "@/components/ui/badge"
 import {
   assessedCountries,
   byIso2,
-  statusLabel,
   statusFill,
   reportSlug,
   DIMENSION_LABELS,
@@ -46,6 +46,7 @@ function toDimArray(dims: CountryDimensions, country: string, globalAvg?: boolea
 }
 
 function CountryDimensionPanel({ country }: { country: Country }) {
+  const statusLabel = useStatusLabel()
   if (!country.dimensions) return null
   const data = toDimArray(country.dimensions, country.name, true)
 
@@ -113,6 +114,7 @@ const STATUS_ORDER: CivicStatus[] = ["open", "restricted", "obstructed", "repres
 
 function SummarySheet({ activeStatus, onToggle }: { activeStatus: CivicStatus | null; onToggle: (status: CivicStatus) => void }) {
   const t = useTranslations("dashboard")
+  const statusLabel = useStatusLabel()
   const assessed = useMemo(() => assessedCountries(), [])
   const total = assessed.length
 
@@ -209,6 +211,7 @@ function ComparisonView({ countryA, countryB, onSelectA, onSelectB }: {
   onSelectB: (v: string | null) => void
 }) {
   const t = useTranslations("comparison")
+  const statusLabel = useStatusLabel()
   const a = countryA ? byIso2(countryA) : null
   const b = countryB ? byIso2(countryB) : null
 

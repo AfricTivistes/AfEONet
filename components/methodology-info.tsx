@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { statusFill, statusLabel, type CivicStatus } from "@/lib/countries"
+import { statusFill, type CivicStatus } from "@/lib/countries"
 
 const STATUS_ORDER: CivicStatus[] = ["open", "restricted", "obstructed", "repressed", "closed"]
 
@@ -28,7 +28,7 @@ export function MethodologyInfo() {
             className="p-4 rounded-md text-center"
             style={{ backgroundColor: statusFill(status), color: status === "obstructed" ? "black" : "white" }}
           >
-            <p className="font-semibold">{statusLabel(status)}</p>
+            <p className="font-semibold">{tStatus(status)}</p>
             <p className="text-xs opacity-80 mt-1">{tStatus(`scoreRange.${status}`)}</p>
           </div>
         ))}
