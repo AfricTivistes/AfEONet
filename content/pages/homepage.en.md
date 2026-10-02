@@ -1,8 +1,9 @@
 ---
 title: Homepage
-description: AfEONet - Safeguarding Electoral Integrity. Defending Those Who Watch the Vote.
+description: "AfEONet - Safeguarding Electoral Integrity: Defending Those Who
+  Watch the Vote."
 hero:
-  title: Safeguarding Electoral Integrity. Defending Those Who Watch the Vote.
+  title: "Safeguarding Electoral Integrity: Defending Those Who Watch the Vote."
   subtitle: Protecting Citizen Election Observers and Civic Space Across Africa
 mission:
   title: Our Mission

@@ -1,9 +1,9 @@
 ---
 title: Page d'accueil
-description: AfEONet - Préserver l’intégrité électorale. Défendre ceux qui
-  veillent sur le vote.
+description: "AfEONet - Préserver l’intégrité électorale: Défendre ceux qui
+  veillent sur le vote."
 hero:
-  title: Préserver l’intégrité électorale. Défendre ceux qui veillent sur le vote.
+  title: "Préserver l’intégrité électorale: Défendre ceux qui veillent sur le vote."
   subtitle: >
     **Protéger les observateurs électoraux citoyens et l’espace civique en
     Afrique**
