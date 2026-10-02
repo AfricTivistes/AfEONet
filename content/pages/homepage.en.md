@@ -1,12 +1,9 @@
 ---
 title: Homepage
-description: "AfEONet - Defending the Watchers: Protecting Civic Space for
-  Citizen Election Observation  in Africa"
+description: AfEONet - Safeguarding Electoral Integrity. Defending Those Who Watch the Vote.
 hero:
-  title: "Defending the Watchers: Protecting Civic Space for Citizen Election
-    Observation in Africa"
-  subtitle: AfEONet monitors and documents civic space for citizen election
-    observers in Africa.
+  title: Safeguarding Electoral Integrity. Defending Those Who Watch the Vote.
+  subtitle: Protecting Citizen Election Observers and Civic Space Across Africa
 mission:
   title: Our Mission
   content: >-

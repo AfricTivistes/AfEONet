@@ -1,12 +1,12 @@
 ---
 title: Page d'accueil
-description: "AfEONet - Défendre les observateurs : protéger l’espace civique
-  pour l’observation citoyenne des élections en Afrique"
+description: AfEONet - Préserver l’intégrité électorale. Défendre ceux qui
+  veillent sur le vote.
 hero:
-  title: "Défendre les observateurs : protéger l’espace civique pour l’observation
-    citoyenne des élections en Afrique"
-  subtitle: AfEONet surveille et documente l'espace civique des observateurs
-    citoyens des élections en Afrique.
+  title: Préserver l’intégrité électorale. Défendre ceux qui veillent sur le vote.
+  subtitle: >
+    **Protéger les observateurs électoraux citoyens et l’espace civique en
+    Afrique**
 mission:
   title: Notre mission
   content: >
