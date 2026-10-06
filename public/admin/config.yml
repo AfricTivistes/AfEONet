@@ -18,6 +18,13 @@ i18n:
   locales: [en, fr]
   default_locale: en
 
+# Slugs: ASCII only — non-ASCII characters (accents, em dashes, curly quotes)
+# end up percent-encoded in URLs and are easy to break.
+slug:
+  encoding: "ascii"
+  clean_accents: true
+  sanitize_replacement: "-"
+
 # Collections configuration
 collections:
   # News Articles Collection

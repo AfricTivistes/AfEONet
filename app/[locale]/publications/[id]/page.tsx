@@ -9,13 +9,15 @@ import remarkGfm from "remark-gfm"
 import { getReport, getRelatedReports, getRelatedAlerts } from "@/lib/reports"
 import { getNewsByCountry } from "@/lib/news"
 import { DIMENSION_LABELS, type CountryDimensions } from "@/lib/countries"
+import { decodeSlug } from "@/lib/content-locale"
 
 interface ReportPageProps {
   params: Promise<{ id: string; locale: string }>
 }
 
 export async function generateMetadata({ params }: ReportPageProps) {
-  const { id, locale } = await params
+  const { id: rawId, locale } = await params
+  const id = decodeSlug(rawId)
   const report = await getReport(id, locale)
   if (!report) return { title: 'Report Not Found - AfEONet' }
   return { title: `${report.title} - AfEONet`, description: report.summary }
@@ -37,7 +39,8 @@ function ScoreBar({ score }: { score: number }) {
 const DIM_KEYS = Object.keys(DIMENSION_LABELS) as (keyof CountryDimensions)[]
 
 export default async function ReportPage({ params }: ReportPageProps) {
-  const { id, locale } = await params
+  const { id: rawId, locale } = await params
+  const id = decodeSlug(rawId)
   const report = await getReport(id, locale)
 
   if (!report) notFound()

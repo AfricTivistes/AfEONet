@@ -8,6 +8,7 @@ import { ArrowLeft, Calendar, MapPin, AlertTriangle, Info, AlertCircle, XCircle 
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { getAlert } from "@/lib/reports"
+import { decodeSlug } from "@/lib/content-locale"
 
 interface AlertPageProps {
   params: Promise<{
@@ -43,7 +44,8 @@ function getSeverityColor(severity: string) {
 }
 
 export async function generateMetadata({ params }: AlertPageProps) {
-  const { id, locale } = await params
+  const { id: rawId, locale } = await params
+  const id = decodeSlug(rawId)
   const alert = await getAlert(id, locale)
 
   if (!alert) {
@@ -60,7 +62,8 @@ export async function generateMetadata({ params }: AlertPageProps) {
 }
 
 export default async function AlertPage({ params }: AlertPageProps) {
-  const { id, locale } = await params
+  const { id: rawId, locale } = await params
+  const id = decodeSlug(rawId)
   const alert = await getAlert(id, locale)
 
   if (!alert) {
