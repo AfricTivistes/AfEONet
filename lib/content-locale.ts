@@ -31,3 +31,15 @@ export function listCanonicalSlugs(directory: string, ext: string): string[] {
     .filter((name) => name.endsWith(suffix))
     .map((name) => name.slice(0, -suffix.length))
 }
+
+/**
+ * Route params for non-ASCII slugs (e.g. `côte-d’ivoire-…`, `…-—-…`) arrive
+ * percent-encoded, so they must be decoded before matching a filename.
+ */
+export function decodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug)
+  } catch {
+    return slug
+  }
+}

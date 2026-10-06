@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MdxLayout } from "@/components/mdx-layout"
 import { getNewsArticle, getAllNewsArticles } from "@/lib/news"
+import { decodeSlug } from "@/lib/content-locale"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -26,7 +27,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: NewsArticlePageProps) {
   try {
-    const { id, locale } = await params
+    const { id: rawId, locale } = await params
+    const id = decodeSlug(rawId)
     const article = getNewsArticle(id, locale)
     
     if (!article) {
@@ -129,7 +131,8 @@ async function renderMDXContent(slug: string, content: string) {
 }
 
 export default async function NewsArticlePage({ params }: NewsArticlePageProps) {
-  const { id, locale } = await params
+  const { id: rawId, locale } = await params
+  const id = decodeSlug(rawId)
   const article = getNewsArticle(id, locale)
 
   if (!article) {
