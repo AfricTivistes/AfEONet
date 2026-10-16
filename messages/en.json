@@ -245,7 +245,12 @@
   },
   "contact": {
     "heroTitle": "Contact Us",
-    "heroSubtitle": "We're here to answer your questions and receive your feedback."
+    "heroSubtitle": "We're here to answer your questions and receive your feedback.",
+    "infoTitle": "Contact Information",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "addressLabel": "Address",
+    "faqTitle": "Frequently Asked Questions"
   },
   "comparison": {
     "countryA": "Country A",

@@ -245,7 +245,12 @@
   },
   "contact": {
     "heroTitle": "Contactez-nous",
-    "heroSubtitle": "Nous sommes là pour répondre à vos questions et recevoir vos retours."
+    "heroSubtitle": "Nous sommes là pour répondre à vos questions et recevoir vos retours.",
+    "infoTitle": "Coordonnées",
+    "emailLabel": "E-mail",
+    "phoneLabel": "Téléphone",
+    "addressLabel": "Adresse",
+    "faqTitle": "Questions fréquentes"
   },
   "comparison": {
     "countryA": "Pays A",

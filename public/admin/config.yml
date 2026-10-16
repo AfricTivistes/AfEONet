@@ -207,8 +207,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "Hero Title", widget: "string", i18n: true }
-          - { name: "subtitle", label: "Hero Subtitle", widget: "text", i18n: true }
+          - { name: "title", label: "Hero Title", widget: "string", required: false, i18n: true }
+          - { name: "subtitle", label: "Hero Subtitle", widget: "text", required: false, i18n: true }
 
       # Mission Section
       - label: "Mission Section"
@@ -217,8 +217,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "Mission Title", widget: "string", i18n: true }
-          - { name: "content", label: "Mission Content", widget: "markdown", i18n: true }
+          - { name: "title", label: "Mission Title", widget: "string", required: false, i18n: true }
+          - { name: "content", label: "Mission Content", widget: "markdown", required: false, i18n: true }
 
       # Features Section
       - label: "Features Section"
@@ -227,8 +227,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "Features Title", widget: "string", i18n: true }
-          - { name: "subtitle", label: "Features Subtitle", widget: "text", i18n: true }
+          - { name: "title", label: "Features Title", widget: "string", required: false, i18n: true }
+          - { name: "subtitle", label: "Features Subtitle", widget: "text", required: false, i18n: true }
 
       # News Section
       - label: "News Section"
@@ -237,8 +237,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "News Title", widget: "string", i18n: true }
-          - { name: "subtitle", label: "News Subtitle", widget: "text", i18n: true }
+          - { name: "title", label: "News Title", widget: "string", required: false, i18n: true }
+          - { name: "subtitle", label: "News Subtitle", widget: "text", required: false, i18n: true }
 
       # Call to Action Section
       - label: "Call to Action"
@@ -247,8 +247,8 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "CTA Title", widget: "string", i18n: true }
-          - { name: "content", label: "CTA Content", widget: "text", i18n: true }
+          - { name: "title", label: "CTA Title", widget: "string", required: false, i18n: true }
+          - { name: "content", label: "CTA Content", widget: "text", required: false, i18n: true }
 
       # Impact Section
       - label: "Impact Section"
@@ -257,7 +257,43 @@ collections:
         required: false
         i18n: true
         fields:
-          - { name: "title", label: "Impact Title", widget: "string", i18n: true }
-          - { name: "content", label: "Impact Content", widget: "text", i18n: true }
+          - { name: "title", label: "Impact Title", widget: "string", required: false, i18n: true }
+          - { name: "content", label: "Impact Content", widget: "text", required: false, i18n: true }
 
       - { name: "body", label: "Additional Content", widget: "markdown", required: false, i18n: true }
+
+  # Contact page: a single entry (create/delete off), kept out of "Static Pages" so editors
+  # only see the fields this page actually renders.
+  - name: "contact"
+    label: "Contact Page"
+    folder: "content/contact"
+    i18n: true
+    create: false
+    delete: false
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { name: "title", label: "Page Title (browser tab)", widget: "string", i18n: true }
+      - { name: "description", label: "Page Description (search engines)", widget: "text", i18n: true }
+      - label: "Hero Banner"
+        name: "hero"
+        widget: "object"
+        i18n: true
+        fields:
+          - { name: "title", label: "Banner Title", widget: "string", i18n: true }
+          - { name: "subtitle", label: "Banner Subtitle", widget: "text", i18n: true }
+      - { name: "infoTitle", label: "Contact Box Title", widget: "string", i18n: true }
+      - { name: "intro", label: "Contact Box Introduction", widget: "text", required: false, i18n: true }
+      - { name: "email", label: "Email", widget: "string", required: false, hint: "Leave empty to hide this line.", i18n: duplicate }
+      - { name: "phone", label: "Phone", widget: "string", required: false, hint: "Leave empty to hide this line.", i18n: duplicate }
+      - { name: "address", label: "Address", widget: "text", required: false, hint: "One line per row. Leave empty to hide this line.", i18n: true }
+      - { name: "faqTitle", label: "FAQ Title", widget: "string", i18n: true }
+      - label: "FAQ"
+        name: "faq"
+        widget: "list"
+        required: false
+        i18n: true
+        summary: "{{fields.question}}"
+        fields:
+          - { name: "question", label: "Question", widget: "string", i18n: true }
+          - { name: "answer", label: "Answer", widget: "text", i18n: true }

@@ -21,6 +21,7 @@ const formSchema = z.object({
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,16 +34,26 @@ export function ContactForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  // Posted to the static file so Netlify Forms (registered from public/__forms.html) stores it.
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
+    setSubmitError(false)
 
-    // Simulate form submission
-    setTimeout(() => {
-      console.log(values)
-      setIsSubmitting(false)
+    try {
+      const response = await fetch("/__forms.html", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ "form-name": "contact", ...values }).toString(),
+      })
+      if (!response.ok) throw new Error(`Form submission failed: ${response.status}`)
       setIsSuccess(true)
       form.reset()
-    }, 1500)
+    } catch (error) {
+      console.error(error)
+      setSubmitError(true)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -155,6 +166,12 @@ export function ContactForm() {
                 </FormItem>
               )}
             />
+
+            {submitError && (
+              <p className="text-sm text-destructive">
+                Your message could not be sent. Please try again or email us directly.
+              </p>
+            )}
 
             <Button
               type="submit"
