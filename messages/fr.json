@@ -109,7 +109,10 @@
     "dim5Desc": "Accès aux informations sur la gestion et les processus électoraux.",
     "dim6Desc": "Liberté de mobiliser des financements pour l'observation électorale.",
     "dim7Desc": "Plateformes d'engagement avec les institutions gouvernementales.",
-    "dim8Desc": "Perception des observateurs par les différentes parties prenantes."
+    "dim8Desc": "Perception des observateurs par les différentes parties prenantes.",
+    "successMessage": "Merci. Votre contribution a bien été reçue et sera examinée par notre équipe.",
+    "errorMessage": "Votre contribution n'a pas pu être envoyée. Réessayez dans quelques minutes ; utilisez le bouton Enregistrer pour conserver vos réponses.",
+    "invalidMessage": "Certaines réponses obligatoires manquent. L'étape à compléter est maintenant affichée."
   },
   "common": {
     "loading": "Chargement...",

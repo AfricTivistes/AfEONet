@@ -109,7 +109,10 @@
     "dim5Desc": "Access to information on electoral management and processes.",
     "dim6Desc": "Freedom to mobilize funding for election observation.",
     "dim7Desc": "Platforms for engagement with government institutions.",
-    "dim8Desc": "How observers are perceived by various stakeholders."
+    "dim8Desc": "How observers are perceived by various stakeholders.",
+    "successMessage": "Thank you. Your submission has been received and will be reviewed by our team.",
+    "errorMessage": "Your submission could not be sent. Please try again in a few minutes; use the Save button to keep your answers.",
+    "invalidMessage": "Some required answers are missing. The step that needs attention is now shown."
   },
   "common": {
     "loading": "Loading...",
