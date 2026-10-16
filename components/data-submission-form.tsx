@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { useTranslations } from "next-intl"
+import { useEffect, useState } from "react"
+import { useLocale, useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type Control } from "react-hook-form"
-import * as z from "zod"
-import { ChevronRight, ChevronLeft, Save, Send, HelpCircle } from "lucide-react"
+import { ChevronRight, ChevronLeft, Save, Send, HelpCircle, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -14,42 +13,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { DIM_KEYS, type CountryDimensions } from "@/lib/countries"
+import { DIM_KEYS } from "@/lib/countries"
+import {
+  HONEYPOT_FIELD,
+  RATING_VALUES,
+  TREND_VALUES,
+  buildDimensionDefaults,
+  countryName,
+  countryOptions,
+  submissionSchema as formSchema,
+  type DimensionKey,
+  type SubmissionValues as FormValues,
+} from "@/lib/submission"
 
-type DimensionKey = keyof CountryDimensions
-type DimensionFieldName = `${DimensionKey}Rating` | `${DimensionKey}Trend` | `${DimensionKey}Context`
-
-const RATING_VALUES = ["open", "restricted", "obstructed", "repressed", "closed"] as const
-const TREND_VALUES = ["improving", "stable", "deteriorating", "unknown"] as const
-
-function buildDimensionShape(): Record<DimensionFieldName, z.ZodTypeAny> {
-  const shape = {} as Record<DimensionFieldName, z.ZodTypeAny>
-  for (const key of DIM_KEYS) {
-    shape[`${key}Rating`] = z.string().min(1, { message: "Please select a rating" })
-    shape[`${key}Trend`] = z.string().min(1, { message: "Please select a trend" })
-    shape[`${key}Context`] = z.string().optional()
-  }
-  return shape
-}
-
-function buildDimensionDefaults(): Record<DimensionFieldName, string> {
-  const defaults = {} as Record<DimensionFieldName, string>
-  for (const key of DIM_KEYS) {
-    defaults[`${key}Rating`] = ""
-    defaults[`${key}Trend`] = ""
-    defaults[`${key}Context`] = ""
-  }
-  return defaults
-}
-
-const formSchema = z.object({
-  country: z.string().min(1, { message: "Please select a country" }),
-  dataEntrant: z.string().min(1, { message: "Please enter your name" }),
-  date: z.string().min(1, { message: "Please enter a date" }),
-  ...buildDimensionShape(),
-})
-
-type FormValues = z.infer<typeof formSchema>
+const DRAFT_KEY = "formDraft"
 
 const totalSteps = DIM_KEYS.length + 2 // general info + 8 dimensions + summary
 
@@ -170,23 +147,62 @@ export function DataSubmissionForm() {
   const t = useTranslations("submit")
   const tDim = useTranslations("dimensions")
   const tStatus = useTranslations("status")
+  const locale = useLocale()
   const [step, setStep] = useState(1)
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error" | "invalid">("idle")
+  const [honeypot, setHoneypot] = useState("")
+
+  const emptyValues = {
+    country: "",
+    dataEntrant: "",
+    date: new Date().toISOString().split("T")[0],
+    ...buildDimensionDefaults(),
+  } as FormValues
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      country: "",
-      dataEntrant: "",
-      date: new Date().toISOString().split("T")[0],
-      ...buildDimensionDefaults(),
-    },
+    defaultValues: emptyValues,
   })
 
-  function onSubmit(values: FormValues) {
-    console.log(values)
-    // Here, you would send the data to the server
-    alert("Data submitted successfully!")
-    // Don't reset the form here to avoid potential state issues
+  // Restore the draft saved with the "Save" button.
+  useEffect(() => {
+    try {
+      const draft = localStorage.getItem(DRAFT_KEY)
+      if (draft) form.reset({ ...emptyValues, ...JSON.parse(draft) })
+    } catch {
+      // Unreadable draft or blocked storage: start empty.
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function onSubmit(values: FormValues) {
+    setStatus("submitting")
+    try {
+      const res = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...values, locale, [HONEYPOT_FIELD]: honeypot }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      try {
+        localStorage.removeItem(DRAFT_KEY)
+      } catch {}
+      form.reset(emptyValues)
+      setStep(1)
+      setStatus("success")
+    } catch (error) {
+      console.error("Submission failed:", error)
+      setStatus("error")
+    }
+  }
+
+  // Errors sit on fields of other steps: jump to the first step that has one.
+  function onInvalid(errors: Partial<Record<keyof FormValues, unknown>>) {
+    const fields = Object.keys(errors)
+    const dimIndex = DIM_KEYS.findIndex((key) => fields.some((f) => f.startsWith(key)))
+    const generalError = ["country", "dataEntrant", "date"].some((f) => fields.includes(f))
+    setStep(generalError || dimIndex < 0 ? 1 : dimIndex + 2)
+    setStatus("invalid")
   }
 
   const nextStep = () => {
@@ -200,7 +216,7 @@ export function DataSubmissionForm() {
   const saveAsDraft = () => {
     try {
       const values = form.getValues()
-      localStorage.setItem("formDraft", JSON.stringify(values))
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(values))
       alert("Draft saved!")
     } catch (error) {
       console.error("Error saving draft:", error)
@@ -237,18 +253,18 @@ export function DataSubmissionForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("country")}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="border-primary/20">
                           <SelectValue placeholder={t("selectCountry")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="senegal">Senegal</SelectItem>
-                        <SelectItem value="nigeria">Nigeria</SelectItem>
-                        <SelectItem value="kenya">Kenya</SelectItem>
-                        <SelectItem value="ghana">Ghana</SelectItem>
-                        <SelectItem value="south-africa">South Africa</SelectItem>
+                        {countryOptions.map(({ iso2, name }) => (
+                          <SelectItem key={iso2} value={iso2}>
+                            {name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -303,7 +319,7 @@ export function DataSubmissionForm() {
               <div className="bg-secondary/10 rounded-lg p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-sm font-medium">{t("country")}:</div>
-                  <div className="text-sm">{values.country || "Not specified"}</div>
+                  <div className="text-sm">{(values.country && countryName(values.country)) || "Not specified"}</div>
 
                   <div className="text-sm font-medium">{t("observer")}:</div>
                   <div className="text-sm">{values.dataEntrant || "Not specified"}</div>
@@ -328,6 +344,34 @@ export function DataSubmissionForm() {
             </div>
           )}
 
+          {/* Honeypot: hidden from people and assistive tech, filled only by bots. */}
+          <input
+            type="text"
+            name={HONEYPOT_FIELD}
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="hidden"
+          />
+
+          {status === "success" && (
+            <p role="status" className="rounded-md bg-primary/10 p-4 text-sm text-primary">
+              {t("successMessage")}
+            </p>
+          )}
+          {status === "error" && (
+            <p role="alert" className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+              {t("errorMessage")}
+            </p>
+          )}
+          {status === "invalid" && (
+            <p role="alert" className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+              {t("invalidMessage")}
+            </p>
+          )}
+
           <div className="flex justify-between pt-6 border-t border-primary/10">
             <div>
               {step > 1 && (
@@ -347,10 +391,16 @@ export function DataSubmissionForm() {
               ) : (
                 <Button
                   type="button"
-                  onClick={form.handleSubmit(onSubmit)}
+                  onClick={form.handleSubmit(onSubmit, onInvalid)}
+                  disabled={status === "submitting"}
                   className="bg-secondary text-primary hover:bg-secondary/90"
                 >
-                  <Send className="mr-2 h-4 w-4" /> {t("submit")}
+                  {status === "submitting" ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="mr-2 h-4 w-4" />
+                  )}{" "}
+                  {t("submit")}
                 </Button>
               )}
             </div>
